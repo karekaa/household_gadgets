@@ -1,0 +1,6 @@
+# Genererte PDF-utlistinger av koden (lages fra .scad-fila ved behov)
+*_code.pdf
+
+# Vim swap-/backupfiler
+*.sw[a-p]
+*~

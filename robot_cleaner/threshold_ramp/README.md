@@ -1,103 +1,109 @@
-# Terskelrampe (modulbasert)
+# Threshold ramp (modular)
 
-Kilerampe som skal la robotstøvsugeren kjøre over en høy dørterskel. Den ligger
-på **utsiden** av terskelen (siden uten dørblad); på innsiden klarer roboten seg
-på det trappelignende trinnet som alt er der.
+> Norsk versjon: [README.no.md](README.no.md)
 
-Profilen er en rettvinklet trekant med kateter **27 mm** (høyde) × **150 mm**
-(dybde) = **10,2° stigning**, total bredde **810 mm**. Rampen er delt i
-**7 moduler à 115,7 mm** som klikkes sammen på stedet, siden 810 mm ikke går på
-byggeplata til en FlashForge Creator Pro 2 (200 × 148 × 150 mm).
+A wedge ramp that lets the robot vacuum drive over a tall door threshold. It
+sits on the **outside** of the threshold (the side without the door leaf); on the
+inside the robot manages on the stair-like step that is already there.
 
-Terskelen varierer fra 27 til 42 mm i høyde. Rampa møter den på 27 mm; resten av
-høydeforskjellen tar roboten selv (den klarer 20–25 mm uten rampe).
+The profile is a right-angled triangle with legs **27 mm** (height) × **150 mm**
+(depth) = **10.2° incline**, total width **810 mm**. The ramp is split into
+**7 modules of 115.7 mm** that click together in place, since 810 mm does not fit
+on the build plate of a FlashForge Creator Pro 2 (200 × 148 × 150 mm).
 
-## Parametrisering
+The threshold varies from 27 to 42 mm in height. The ramp meets it at 27 mm; the
+robot handles the rest of the height difference itself (it manages 20–25 mm
+without a ramp).
 
-Alt ligger i toppen av `threshold_ramp.scad`:
+## Parameterization
 
-| Parameter | Betydning |
+Everything sits at the top of `threshold_ramp.scad`:
+
+| Parameter | Meaning |
 |---|---|
-| `height_profile` | `[[avstand fra venstre, høyde], ...]`. Like høyder = flat topp. Skal toppen følge en terskel som varierer, mål f.eks. hver 100 mm og legg inn alle punktene – toppflaten loftes gjennom hvert punkt. |
-| `ramp_run` | dybden på skråplanet. 150 → 10,2°, 120 → 12,7°, 100 → 15,1° (ved 27 mm) |
-| `total_width` | bredden på ferdig rampe |
-| `n_modules` | antall moduler; modullengde = `total_width / n_modules` |
-| `bed_x/y/z` | byggevolumet, brukt i `assert` |
-| `label_enable` | graverer modulnummer i bakflaten. Slå på når `height_profile` ikke er flat, for da må modulene monteres i riktig rekkefølge |
-| `dim_enable` | graverer rampas mål (`810x150x27 mm`, satt sammen av parameterne) i sokkelenden – kortenden som er skjult inne i skjøten. Modul 1 har ingen sokkel og får derfor ingen tekst |
+| `height_profile` | `[[distance from left, height], ...]`. Equal heights = flat top. To make the top follow a threshold that varies, measure e.g. every 100 mm and enter all the points – the top surface is lofted through every point. |
+| `ramp_run` | the depth of the inclined plane. 150 → 10.2°, 120 → 12.7°, 100 → 15.1° (at 27 mm) |
+| `total_width` | the width of the finished ramp |
+| `n_modules` | number of modules; module length = `total_width / n_modules` |
+| `bed_x/y/z` | the build volume, used in `assert` |
+| `label_enable` | engraves the module number in the back face. Turn on when `height_profile` is not flat, because the modules then have to be assembled in the right order |
+| `dim_enable` | engraves the ramp dimensions (`810x150x27 mm`, assembled from the parameters) in the socket end – the short end that is hidden inside the joint. Module 1 has no socket and therefore gets no text |
 
-`echo` skriver ut vinkel, modullengde, utskriftsmål og hvilken akse modulen skal
-legges langs. `assert` stopper renderingen hvis modulen ikke passer på plata i
-noen av de to orienteringene, eller hvis skjøten havner på for tynt materiale.
+`echo` prints the angle, module length, print dimensions and which axis the
+module should be laid along. `assert` stops the rendering if the module does not
+fit on the plate in either of the two orientations, or if the joint ends up on
+material that is too thin.
 
-## Tilpasset roboten
+## Matched to the robot
 
-- **Stigning 10,2°** – godt under de ca. 15–17° der robotstøvsugere begynner å
-  spinne.
-- **Rillene matcher drivhjulet.** `grip_pitch = 8` mm ligger på samme avstand som
-  knottene i hjulmønsteret, og rillene er ca. 1 mm dype, så knottene får noe å
-  gripe i istedenfor å spinne på glatt plast. `grip_enable = false` gir helt
-  glatt flate.
+- **10.2° incline** – well below the approx. 15–17° where robot vacuums start to
+  spin.
+- **The grooves match the drive wheel.** `grip_pitch = 8` mm is the same spacing
+  as the lugs in the wheel pattern, and the grooves are approx. 1 mm deep, so the
+  lugs get something to grip instead of spinning on smooth plastic.
+  `grip_enable = false` gives a completely smooth surface.
 
-## Skjøten
+## The joint
 
-Svalehale-tapp (smal ved rota, bred ytterst) som går gjennom hele høyden i det
-tykke området av profilen. Fordi den utvider seg utover, kan modulene ikke
-trekkes fra hverandre i bredderetningen – de settes sammen ved å senke neste
-modul rett ned over tappen. To små kuleknotter i tappens flanker (stikker
-0,6 mm ut) går i matchende fordypninger i sokkelen og gir et hørbart klikk + tar
-opp slark. Sokkelveggen har en fri innkjøringskanal over fordypningen, så
-knotten glir uhindret ned til de siste 2 mm – da må den presses forbi full
-veggtykkelse og klikker på plass.
+A dovetail tenon (narrow at the root, wide at the tip) that runs through the full
+height in the thick area of the profile. Because it widens outwards, the modules
+cannot be pulled apart widthwise – they are assembled by lowering the next module
+straight down over the tenon. Two small spherical bumps in the flanks of the
+tenon (protruding 0.6 mm) engage matching recesses in the socket and give an
+audible click + take up play. The socket wall has a free lead-in channel above
+the recess, so the bump slides unobstructed down to the last 2 mm – there it has
+to be pressed past the full wall thickness and clicks into place.
 
-Justering:
+Adjustment:
 
-| Parameter | Effekt |
+| Parameter | Effect |
 |---|---|
-| `joint_clear` | spillerom. Øk til 0,35–0,4 hvis skjøten er for stram, ned mot 0,15 hvis den er løs |
-| `snap_proud` | klikk-kraften (effektivt grep = `snap_proud - joint_clear`). 0,45 = lett, 0,8 = stramt |
-| `snap_engage` | hvor lang strekning knotten må presses gjennom på slutten |
-| `snap_enable` | sett `false` for glatt skjøt uten klikk |
-| `joint_depth`, `joint_neck`, `joint_head` | tappens størrelse |
+| `joint_clear` | clearance. Increase to 0.35–0.4 if the joint is too tight, down towards 0.15 if it is loose |
+| `snap_proud` | the click force (effective grip = `snap_proud - joint_clear`). 0.45 = light, 0.8 = tight |
+| `snap_engage` | how long a stretch the bump has to be pressed through at the end |
+| `snap_enable` | set `false` for a smooth joint without a click |
+| `joint_depth`, `joint_neck`, `joint_head` | the size of the tenon |
 
-## Utskrift
+## Printing
 
-Med flat `height_profile` er det tre unike deler, ferdig i `stl/`:
+With a flat `height_profile` there are three unique parts, ready in `stl/`:
 
-| Fil | Antall | Beskrivelse |
+| File | Quantity | Description |
 |---|---|---|
-| `rampe_start.stl` | 1 | endemodul (bare tapp) |
-| `rampe_midt.stl` | 5 | midtmodul (tapp + sokkel) |
-| `rampe_slutt.stl` | 1 | endemodul (bare sokkel) |
+| `ramp_start.stl` | 1 | end module (tenon only) |
+| `ramp_middle.stl` | 5 | middle module (tenon + socket) |
+| `ramp_end.stl` | 1 | end module (socket only) |
 
-Fottrykk per utskrift: **129,7 × 150 × 27 mm** – legg modullengden langs
-Y-aksen (148 mm) og skråplanets 150 mm langs X-aksen (200 mm). Andre veien går
-ikke, siden 150 > 148.
+Footprint per print: **129.7 × 150 × 27 mm** – lay the module length along the
+Y axis (148 mm) and the 150 mm of the inclined plane along the X axis (200 mm).
+The other way round does not work, since 150 > 148.
 
-- Flat bunn ned, **ingen støtte** nødvendig.
-- Volumet er stort: ~1600 cm³ massivt for hele rampen, dvs. rundt 0,6–0,8 kg
-  filament med normale innstillinger. Regn 4–8 timer per modul.
-- Anbefalt: PETG eller PLA+, 0,2 mm lag, 3–4 perimetre, 20–25 % gyroid. Roboten
-  veier bare noen kilo, men rampen bør tåle at noen tråkker på den.
-- Brim hjelper mot at den tynne tuppen løsner.
-- Den tynne enden ender i en knivskarp kant. Skriveren gir den en tupp på
-  ~0,4 mm; slip eller varm av de siste millimeterne hvis den flerrer opp.
+- Flat bottom down, **no support** needed.
+- The volume is large: ~1600 cm³ solid for the whole ramp, i.e. around 0.6–0.8 kg
+  of filament with normal settings. Reckon 4–8 hours per module.
+- Recommended: PETG or PLA+, 0.2 mm layers, 3–4 perimeters, 20–25 % gyroid. The
+  robot only weighs a few kilos, but the ramp should tolerate someone stepping on
+  it.
+- A brim helps keep the thin tip from coming loose.
+- The thin end finishes in a razor-sharp edge. The printer gives it a tip of
+  ~0.4 mm; sand or heat off the last few millimeters if it frays.
 
-## Bygge om selv
+## Rebuilding it yourself
 
 ```bash
-# forhåndsvisning av hele rampen
+# preview of the whole ramp
 openscad threshold_ramp.scad
 
-# eksporter én modul (0 .. n_modules-1)
-openscad -o stl/rampe_midt.stl -D 'mode="plate"' -D 'part_index=3' threshold_ramp.scad
+# export one module (0 .. n_modules-1)
+openscad -o stl/ramp_middle.stl -D 'mode="plate"' -D 'part_index=3' threshold_ramp.scad
 ```
 
-`mode` kan være `assembly` (montert), `plate` (én modul for utskrift) eller
-`all_parts` (alle moduler side ved side).
+`mode` can be `assembly` (assembled), `plate` (one module for printing) or
+`all_parts` (all modules side by side).
 
-## Montering
+## Assembly
 
-Legg modulene mot terskelen fra én side, senk hver ny modul rett ned over
-tappen til den klikker. Fest gjerne hele rampen mot gulvet med dobbeltsidig
-teppetape hvis den vandrer når roboten dunker i den.
+Lay the modules against the threshold from one side, lowering each new module
+straight down over the tenon until it clicks. Feel free to fix the whole ramp to
+the floor with double-sided carpet tape if it wanders when the robot bumps into
+it.
