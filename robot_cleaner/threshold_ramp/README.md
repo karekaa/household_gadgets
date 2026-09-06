@@ -88,6 +88,39 @@ The other way round does not work, since 150 > 148.
 - The thin end finishes in a razor-sharp edge. The printer gives it a tip of
   ~0.4 mm; sand or heat off the last few millimeters if it frays.
 
+## The living room door – `livingroom_threshold_ramp.scad`
+
+A variant for the living room double door. Same construction, but **620 mm** wide
+in **5 modules of 124 mm**, and with two additions:
+
+- **A 15 mm lip over the threshold.** The top surface continues flat 15 mm past
+  the tall face and hangs in the air over the threshold, in the recess between
+  the edge of the threshold and the closed door leaf. The underside of the lip is
+  chamfered at 45° (`lip_drop = lip_out`), so it still prints flat bottom down
+  without support. `lip_out` = how far out, `lip_tip` = the thickness at the
+  outer edge, `lip_drop` = the length of the chamfer. Reduce `lip_drop` if the
+  recess under the door leaf is shallow (steeper overhang – may need support), or
+  set `lip_enable = false` for the plain triangle profile.
+- **A sideways ramp at the left end.** The left door leaf is almost always
+  closed, so the robot cannot drive over the ramp there. The left end (y = 0,
+  seen from the adjacent room) is therefore cut down to the floor by a single
+  plane over `side_run` = 120 mm ≈ 12.7°, so the robot can drive up onto the ramp
+  from the side instead of hitting an end wall. Keep `side_run` **smaller than
+  the module length**, so the taper stays inside module 1 and does not touch the
+  first joint – there is an `assert` on it.
+
+Footprint per print: **138 × 165 × 27 mm** – length along Y (148 mm), the profile
+along X (200 mm). Three unique parts, ready in `stl/`:
+
+| File | Quantity | Description |
+|---|---|---|
+| `livingroom_ramp_start.stl` | 1 | left end module – tapered sideways ramp, tenon only |
+| `livingroom_ramp_middle.stl` | 3 | middle module (tenon + socket) |
+| `livingroom_ramp_end.stl` | 1 | right end module (socket only) |
+
+The feather edge at the left end is as thin as the tip of the incline – sand or
+heat it off if it frays.
+
 ## Rebuilding it yourself
 
 ```bash

@@ -85,6 +85,38 @@ ikke, siden 150 > 148.
 - Den tynne enden ender i en knivskarp kant. Skriveren gir den en tupp på
   ~0,4 mm; slip eller varm av de siste millimeterne hvis den flerrer opp.
 
+## Stuedøra – `livingroom_threshold_ramp.scad`
+
+Variant for dobbeltdøra til stua. Samme konstruksjon, men **620 mm** bred i
+**5 moduler à 124 mm**, og med to tillegg:
+
+- **En 15 mm leppe over terskelen.** Toppflaten fortsetter flatt 15 mm forbi den
+  høye siden og henger i lufta over terskelen, i sporet mellom terskelkanten og
+  det lukkede dørbladet. Undersiden av leppa er avfaset 45° (`lip_drop =
+  lip_out`), så den skrives fremdeles med flat bunn ned uten støtte. `lip_out` =
+  hvor langt ut, `lip_tip` = tykkelsen ytterst, `lip_drop` = lengden på fasen.
+  Reduser `lip_drop` hvis sporet under dørbladet er lavt (brattere overheng – kan
+  trenge støtte), eller sett `lip_enable = false` for ren trekantprofil.
+- **Sideveis rampe i venstre ende.** Det venstre dørbladet står nesten alltid
+  lukket, så roboten kan ikke kjøre over rampa der. Venstre ende (y = 0, sett fra
+  naborommet) er derfor kuttet ned til gulvet av ett plan over `side_run` =
+  120 mm ≈ 12,7°, så roboten kan kjøre opp på rampa fra siden istedenfor å dunke
+  i en endevegg. Hold `side_run` **kortere enn modullengden**, så avfasingen blir
+  liggende inne i modul 1 og ikke rører den første skjøten – det er en `assert`
+  på det.
+
+Fottrykk per utskrift: **138 × 165 × 27 mm** – lengden langs Y (148 mm),
+profilen langs X (200 mm). Tre unike deler, ferdig i `stl/`:
+
+| Fil | Antall | Beskrivelse |
+|---|---|---|
+| `livingroom_ramp_start.stl` | 1 | venstre endemodul – sideveis rampe, bare tapp |
+| `livingroom_ramp_middle.stl` | 3 | midtmodul (tapp + sokkel) |
+| `livingroom_ramp_end.stl` | 1 | høyre endemodul (bare sokkel) |
+
+Fjærkanten i venstre ende er like tynn som tuppen på skråplanet – slip eller varm
+den av hvis den flerrer opp.
+
 ## Bygge om selv
 
 ```bash
