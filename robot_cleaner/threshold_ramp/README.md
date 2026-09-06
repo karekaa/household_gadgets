@@ -6,6 +6,8 @@ A wedge ramp that lets the robot vacuum drive over a tall door threshold. It
 sits on the **outside** of the threshold (the side without the door leaf); on the
 inside the robot manages on the stair-like step that is already there.
 
+![The assembled ramp, 810 mm](img/threshold_ramp_assembly.png)
+
 The profile is a right-angled triangle with legs **27 mm** (height) × **150 mm**
 (depth) = **10.2° incline**, total width **810 mm**. The ramp is split into
 **7 modules of 115.7 mm** that click together in place, since 810 mm does not fit
@@ -54,6 +56,8 @@ audible click + take up play. The socket wall has a free lead-in channel above
 the recess, so the bump slides unobstructed down to the last 2 mm – there it has
 to be pressed past the full wall thickness and clicks into place.
 
+![Two modules before they are joined – the socket in the short end](img/livingroom_joint.png)
+
 Adjustment:
 
 | Parameter | Effect |
@@ -93,6 +97,8 @@ The other way round does not work, since 150 > 148.
 A variant for the living room double door. Same construction, but **620 mm** wide
 in **5 modules of 124 mm**, and with two additions:
 
+![The assembled living room ramp – the left end runs out into the floor](img/livingroom_assembly.png)
+
 - **A 15 mm lip over the threshold.** The top surface continues flat 15 mm past
   the tall face and hangs in the air over the threshold, in the recess between
   the edge of the threshold and the closed door leaf. The underside of the lip is
@@ -101,6 +107,9 @@ in **5 modules of 124 mm**, and with two additions:
   outer edge, `lip_drop` = the length of the chamfer. Reduce `lip_drop` if the
   recess under the door leaf is shallow (steeper overhang – may need support), or
   set `lip_enable = false` for the plain triangle profile.
+
+  ![The profile seen end-on – the lip out to the left, the socket in yellow](img/livingroom_profile.png)
+
 - **A sideways ramp at the left end.** The left door leaf is almost always
   closed, so the robot cannot drive over the ramp there. The left end (y = 0,
   seen from the adjacent room) is therefore cut down to the floor by a single
@@ -108,6 +117,8 @@ in **5 modules of 124 mm**, and with two additions:
   from the side instead of hitting an end wall. Keep `side_run` **smaller than
   the module length**, so the taper stays inside module 1 and does not touch the
   first joint – there is an `assert` on it.
+
+  ![Module 1 – the sideways ramp on the left, the tenon at the far end](img/livingroom_start_module.png)
 
 Footprint per print: **138 × 165 × 27 mm** – length along Y (148 mm), the profile
 along X (200 mm). Three unique parts, ready in `stl/`:
@@ -133,6 +144,20 @@ openscad -o stl/ramp_middle.stl -D 'mode="plate"' -D 'part_index=3' threshold_ra
 
 `mode` can be `assembly` (assembled), `plate` (one module for printing) or
 `all_parts` (all modules side by side).
+
+The pictures in `img/` are rendered the same way, with `--render` (F6) so they
+show the finished geometry and not the preview:
+
+```bash
+openscad -o img/livingroom_assembly.png --render --imgsize=1400,900 \
+         --camera=0,0,0,58,0,38,0 --viewall --autocenter \
+         --colorscheme=Tomorrow livingroom_threshold_ramp.scad
+magick img/livingroom_assembly.png -trim +repage \
+       -bordercolor '#f7f7f7' -border 24 img/livingroom_assembly.png
+```
+
+The two colours are OpenSCAD's front/back face shading, not an error in the
+model – all the STLs are closed, consistently oriented manifolds.
 
 ## Assembly
 

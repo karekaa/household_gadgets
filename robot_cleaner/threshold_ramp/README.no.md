@@ -6,6 +6,8 @@ Kilerampe som skal la robotstøvsugeren kjøre over en høy dørterskel. Den lig
 på **utsiden** av terskelen (siden uten dørblad); på innsiden klarer roboten seg
 på det trappelignende trinnet som alt er der.
 
+![Den ferdige rampen, 810 mm](img/threshold_ramp_assembly.png)
+
 Profilen er en rettvinklet trekant med kateter **27 mm** (høyde) × **150 mm**
 (dybde) = **10,2° stigning**, total bredde **810 mm**. Rampen er delt i
 **7 moduler à 115,7 mm** som klikkes sammen på stedet, siden 810 mm ikke går på
@@ -52,6 +54,8 @@ opp slark. Sokkelveggen har en fri innkjøringskanal over fordypningen, så
 knotten glir uhindret ned til de siste 2 mm – da må den presses forbi full
 veggtykkelse og klikker på plass.
 
+![To moduler før de skjøtes – sokkelen i kortenden](img/livingroom_joint.png)
+
 Justering:
 
 | Parameter | Effekt |
@@ -90,6 +94,8 @@ ikke, siden 150 > 148.
 Variant for dobbeltdøra til stua. Samme konstruksjon, men **620 mm** bred i
 **5 moduler à 124 mm**, og med to tillegg:
 
+![Den ferdige stuerampen – venstre ende renner ut i gulvet](img/livingroom_assembly.png)
+
 - **En 15 mm leppe over terskelen.** Toppflaten fortsetter flatt 15 mm forbi den
   høye siden og henger i lufta over terskelen, i sporet mellom terskelkanten og
   det lukkede dørbladet. Undersiden av leppa er avfaset 45° (`lip_drop =
@@ -97,6 +103,9 @@ Variant for dobbeltdøra til stua. Samme konstruksjon, men **620 mm** bred i
   hvor langt ut, `lip_tip` = tykkelsen ytterst, `lip_drop` = lengden på fasen.
   Reduser `lip_drop` hvis sporet under dørbladet er lavt (brattere overheng – kan
   trenge støtte), eller sett `lip_enable = false` for ren trekantprofil.
+
+  ![Profilen sett fra kortenden – leppa ut mot venstre, sokkelen i gult](img/livingroom_profile.png)
+
 - **Sideveis rampe i venstre ende.** Det venstre dørbladet står nesten alltid
   lukket, så roboten kan ikke kjøre over rampa der. Venstre ende (y = 0, sett fra
   naborommet) er derfor kuttet ned til gulvet av ett plan over `side_run` =
@@ -104,6 +113,8 @@ Variant for dobbeltdøra til stua. Samme konstruksjon, men **620 mm** bred i
   i en endevegg. Hold `side_run` **kortere enn modullengden**, så avfasingen blir
   liggende inne i modul 1 og ikke rører den første skjøten – det er en `assert`
   på det.
+
+  ![Modul 1 – den sideveis rampen til venstre, tappen i motsatt ende](img/livingroom_start_module.png)
 
 Fottrykk per utskrift: **138 × 165 × 27 mm** – lengden langs Y (148 mm),
 profilen langs X (200 mm). Tre unike deler, ferdig i `stl/`:
@@ -129,6 +140,20 @@ openscad -o stl/ramp_middle.stl -D 'mode="plate"' -D 'part_index=3' threshold_ra
 
 `mode` kan være `assembly` (montert), `plate` (én modul for utskrift) eller
 `all_parts` (alle moduler side ved side).
+
+Bildene i `img/` er rendret på samme måte, med `--render` (F6) slik at de viser
+ferdig geometri og ikke forhåndsvisningen:
+
+```bash
+openscad -o img/livingroom_assembly.png --render --imgsize=1400,900 \
+         --camera=0,0,0,58,0,38,0 --viewall --autocenter \
+         --colorscheme=Tomorrow livingroom_threshold_ramp.scad
+magick img/livingroom_assembly.png -trim +repage \
+       -bordercolor '#f7f7f7' -border 24 img/livingroom_assembly.png
+```
+
+De to fargene er OpenSCADs skyggelegging av for- og baksideflater, ikke en feil i
+modellen – alle STL-ene er lukkede, konsistent orienterte manifolder.
 
 ## Montering
 
