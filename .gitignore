@@ -1,6 +1,9 @@
 # Genererte PDF-utlistinger av koden (lages fra .scad-fila ved behov)
 *_code.pdf
 
+# Utskriftsvennlige PDF-er av READMEene (lages med tools/md2pdf.py ved behov)
+README*.pdf
+
 # Vim swap-/backupfiler
 *.sw[a-p]
 *~
