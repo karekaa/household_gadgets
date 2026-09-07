@@ -4,6 +4,10 @@
 # Utskriftsvennlige PDF-er av READMEene (lages med tools/md2pdf.py ved behov)
 README*.pdf
 
+# HEIC-originaler fra mobilkamera (nedskalerte .jpg-er sjekkes inn istedenfor)
+*.HEIC
+*.heic
+
 # Vim swap-/backupfiler
 *.sw[a-p]
 *~

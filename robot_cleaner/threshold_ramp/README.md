@@ -92,6 +92,17 @@ The other way round does not work, since 150 > 148.
 - The thin end finishes in a razor-sharp edge. The printer gives it a tip of
   ~0.4 mm; sand or heat off the last few millimeters if it frays.
 
+### The printed result
+
+Photos of `ramp_start.stl` and `ramp_middle.stl` from the 810 mm ramp, printed in
+white PETG with 0.2 mm layers:
+
+![ramp_start (left, tenon only) and ramp_middle (right, socket in the short end) before they are joined](img/two_parts.jpg)
+
+![The same two modules clicked together – the grooves continue across the joint and the seam lies flush](img/two_connected.jpg)
+
+![Close-up of the joint: the socket to the left, and the 810x150x27 mm text that `dim_enable` engraves in the socket end](img/middle_closeup.jpg)
+
 ## The living room door – `livingroom_threshold_ramp.scad`
 
 A variant for the living room double door. Same construction, but **620 mm** wide
@@ -145,8 +156,9 @@ openscad -o stl/ramp_middle.stl -D 'mode="plate"' -D 'part_index=3' threshold_ra
 `mode` can be `assembly` (assembled), `plate` (one module for printing) or
 `all_parts` (all modules side by side).
 
-The pictures in `img/` are rendered the same way, with `--render` (F6) so they
-show the finished geometry and not the preview:
+The `.png` pictures in `img/` are rendered the same way, with `--render` (F6) so
+they show the finished geometry and not the preview (the `.jpg` files are photos
+of the printed parts):
 
 ```bash
 openscad -o img/livingroom_assembly.png --render --imgsize=1400,900 \

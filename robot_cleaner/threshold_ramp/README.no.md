@@ -89,6 +89,17 @@ ikke, siden 150 > 148.
 - Den tynne enden ender i en knivskarp kant. Skriveren gir den en tupp på
   ~0,4 mm; slip eller varm av de siste millimeterne hvis den flerrer opp.
 
+### Ferdig printet
+
+Bilder av `ramp_start.stl` og `ramp_middle.stl` fra 810 mm-rampen, printet i hvit
+PETG med 0,2 mm lag:
+
+![ramp_start (til venstre, bare tapp) og ramp_middle (til høyre, sokkel i kortenden) før de skjøtes](img/two_parts.jpg)
+
+![De samme to modulene klikket sammen – rillene fortsetter over skjøten og fugen ligger i flukt](img/two_connected.jpg)
+
+![Nærbilde av skjøten: sokkelen til venstre, og teksten 810x150x27 mm som `dim_enable` graverer i sokkelenden](img/middle_closeup.jpg)
+
 ## Stuedøra – `livingroom_threshold_ramp.scad`
 
 Variant for dobbeltdøra til stua. Samme konstruksjon, men **620 mm** bred i
@@ -141,8 +152,9 @@ openscad -o stl/ramp_middle.stl -D 'mode="plate"' -D 'part_index=3' threshold_ra
 `mode` kan være `assembly` (montert), `plate` (én modul for utskrift) eller
 `all_parts` (alle moduler side ved side).
 
-Bildene i `img/` er rendret på samme måte, med `--render` (F6) slik at de viser
-ferdig geometri og ikke forhåndsvisningen:
+`.png`-bildene i `img/` er rendret på samme måte, med `--render` (F6) slik at de
+viser ferdig geometri og ikke forhåndsvisningen (`.jpg`-filene er fotografier av
+de printede delene):
 
 ```bash
 openscad -o img/livingroom_assembly.png --render --imgsize=1400,900 \
