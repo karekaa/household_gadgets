@@ -1,0 +1,16 @@
+Bruk openscad til å lage en kaffesøl-kopp som hviler både på platen til kaffekanne-holderen (faktisk en kaffesensor-vekt koblet til internett) og med 10 mm utstrekning på bordet. Høyden
+  over platen skal være på 19 mm. Bredden totalt på 80 mm. Dybden regnet fra ytterst kant av platen inn mot kaffevekt(sensor)holderen er 30 mm. Innsiden av skålen som holder kaffesølet bør
+  (særlig i kortendene ha buet innside, slik at 3D-printet kan lages på høykant i forhold til minst problemer med overheng.
+
+
+
+
+Du sa: «Kroken skal bare berøre platen, aldri bordet – ellers går en del av kannevekten forbi lastcella og vekta lyver». Dette stemmer ikke, koppen kan med FORDEL berøre bordet også, da
+  teak-platen og bordet er «død støtte» for det hele. Selve vekt-sensoren sitter inne i, eller oppå den grå delen du ser innenfor den runde store grå «koppen» som selve kaffekannen står i.
+  Grunnen til at jeg sa 19 mm over teakplaten (maks) er at da får vi en del luftrom opp til undersiden av den «store grå koppen» for kaffekannen.
+
+
+
+  Du kan jo for moro skyld lage en «test-STL» som blir f.eks. 2 mm høy, så får jeg egentlig hele profilen som kan ta bort til kaffesensor-holderen for å teste at det ser bra ut
+
+
