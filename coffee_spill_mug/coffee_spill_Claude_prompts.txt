@@ -32,3 +32,6 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
  Jeg har nå testet coffee_spill_mug_clamp, og den gikk innpå den grå «bunnklossen» oppå teakplaten, men den spriket litt ut, og jeg fikk vel heller ikke skjøvet den helt inn. Vi må derfor la åpningen mellom disse gripe-armene bli minst 0,1 mm større - kanskje 0,2 mm? Kanskje vi også la coffee_spill_mug_clamp bli 2,5 mm tykk i stededt for 1,5 mmm, så den blir litt stivere for neste test
 
 
+ Nye rettelser: Lengden på den høyre armen kan være så lang den er, men den venstre vil nå butte i en kontakt, så den må kuttes ned til 14 mm lendge. Så en mer estetisk feil, som ikke påvirker designet på koppen og som jeg så både i koden og den visuliserte sluttproduktet: Teakplaten er 200 x 200 mm (20x20cm) og med et 45 grader avkapp på alle 4 hjørner hvor den lille sidekanten blir på ca 37 mm lenge. Alt forklart kan sees på bilder: [Image #6] [Image #7] [Image #8]
+
+Og jeg burde sagt: Jeg tror vi skal åpne litt til i gapet mellom armene på bare 0,1 mm

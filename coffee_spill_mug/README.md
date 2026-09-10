@@ -24,7 +24,7 @@ the plate, and the front wall carries on down to the table.
 | Depth on the plate | 30 mm | free plate from the front edge in to the grey socle |
 | Overhang | 10 mm | out past the front edge of the plate, so drips that run over the edge are caught too |
 | Body depth | 40 mm | 10 + 30 |
-| Total depth | 58 mm | the two spring arms reach 18 mm further back, alongside the grey socle |
+| Total depth | 58 mm | the right spring arm reaches 18 mm further back, alongside the grey socle. The left one is cut to 14 mm to clear a connector on the rig. |
 | Rim height over the plate | 20.5 mm | the grey socle is 22 mm, and there are several mm of air from its top up to the big grey cup, so the rim has room to spare. Fitted with the 2 mm gauge. |
 | Height of the plate over the table | 20.6 mm | how far the leg reaches down (`plate_height`), fitted with the gauge |
 | Total height | 40.8 mm | from the table to the rim |
@@ -41,6 +41,7 @@ derived from:
 | Grey printed socle, depth backwards | not measured, "a lot", around 76 mm |
 | Teak plate, thickness | 19 mm |
 | Teak plate, top surface over the table | 20.6 mm (`plate_height`, fitted with the gauge) |
+| Teak plate, plan | 200 × 200 mm with all four corners cut at 45°, leaving a short edge of about 37 mm – an octagon. The tray sits centred on the middle of the front edge, which stays flat for about 148 mm, so the corner cuts are nowhere near it. Only the ghost in `mode = "check"` cares. |
 
 ## It may rest on the table
 
@@ -83,31 +84,41 @@ the empty tray in place.
 The thing worth gripping is the **grey printed socle** that carries the sensor: a
 block 76 mm wide standing 22 mm up from the teak plate, right behind the tray. So
 each side wall simply carries on backwards past the rear face as a leaf spring
-18 mm long and 2.1 mm thick, and the pair of them straddles that block.
+2.05 mm thick, and the pair of them straddles that block.
+
+The two arms are **not the same length**. The right one runs the full 18 mm, but
+the left one butts into a connector on the rig a little way back, so it is cut to
+14 mm (`clamp_len_l` / `clamp_len_r`; left and right are seen from the front,
+standing where the overhang points at you, so the left arm is the one at x = 0).
 
 Seen from above, with the rim at the bottom and the arms reaching back:
 
 ![The two arms seen from above](img/coffee_spill_mug_clamp.png)
 
-Because the socle is 4 mm narrower than the tray, the arms are set in 2.1 mm from
+Because the socle is 4 mm narrower than the tray, the arms are set in 2.05 mm from
 the sides – their outer faces are flush with the sides of the tray and the tray
 stays exactly **80 mm wide**, which the old design (jaws hooking down around the
 plate, 84.4 mm across) did not.
 
 | | |
 |---|---|
-| Gripping faces | x = 2.1 and 77.9, i.e. an opening of 75.8 mm: `clamp_squeeze` = 0.2 mm total interference on the 76 mm socle |
-| Arm | 2.1 mm thick, 17.5 mm tall, 18 mm free length |
-| Mouth at the free end | 77.8 mm, relieved `clamp_lead` = 1.0 mm per side so the front corners of the socle wedge the arms apart instead of hitting them head on, closing in over the last 6 mm |
+| Gripping faces | x = 2.05 and 77.95, i.e. an opening of 75.9 mm: `clamp_squeeze` = 0.1 mm total interference on the 76 mm socle |
+| Arm | 2.05 mm thick, 17.5 mm tall, 18 mm free length on the right, 14 mm on the left |
+| Mouth at the free end | 77.9 mm, relieved `clamp_lead` = 1.0 mm per side so the front corners of the socle wedge the arms apart instead of hitting them head on, closing in over the last 6 mm |
 | Bottom of the arm | 1.5 mm above the plate (`clamp_z0`), to clear any fillet or elephant foot at the base of the socle |
 | Top of the arm | 19 mm = `tray_height - edge_r`; any higher and the rounding of the rim would thin the arm to a knife edge |
-| Force | about 1.4 N per side at 0.1 mm deflection, peak stress about 2 MPa – a twenty-fifth of what PETG takes |
+| Force | about 0.7 N at 0.05 mm deflection on the 18 mm arm, peak stress about 1 MPa. Stiffness goes as 1/length³, so the short 14 mm arm pushes roughly twice as hard, near 1.4 N and 1.6 MPa; the tray simply seats a hair off centre because of it. |
 
-The bending happens over the whole 18 mm free length, not in a short root, which
+The bending happens over the whole free length, not in a short root, which
 is what makes the grip springy instead of brittle. `clamp_squeeze` is the number
 to tune if the grip is too weak or the tray is too hard to push on. It started at
 0.4 mm; the first printed `gauge_clamp` did go on to the socle but splayed out and
-could not be pushed all the way home, so it is 0.2 mm now. Keep `clamp_t` equal to
+could not be pushed all the way home, so it went to 0.2 and then to 0.1 mm. That
+last step is worth knowing about: 0.1 mm total is 0.05 mm per side, which is
+inside the dimensional accuracy of the printer, so what is left of the grip rests
+on the roughness of the two surfaces rather than on the interference. If the tray
+comes out loose on the socle, put `clamp_squeeze` back up rather than looking for
+something else. Keep `clamp_t` equal to
 `(tray_width - socle_width + clamp_squeeze) / 2` when tuning it and the outer face
 of the arm stays flush with the side of the tray – an `assert` says so if it does
 not.
@@ -144,7 +155,7 @@ smaller first (`cube([w-2*r, d-2*r, h-2*r])` plus `sphere(r)` gives exactly
 w × d × h), but there is no single scalar to shrink here, and worse: it would
 close the mouth between the spring arms by 2 *r* and make the leg down to the
 table *r* longer – exactly the two dimensions that must not move. `offset()` and
-tangent fillet arcs only ever remove material, so the arm spacing (75.8/76 mm)
+tangent fillet arcs only ever remove material, so the arm spacing (75.9/76 mm)
 and the leg (20.3 mm) come out exactly as measured. Rounding one named corner at
 a time also keeps the concave corners square, which `minkowski()` would do too but
 `offset(r) offset(-r)` would not.
@@ -169,8 +180,8 @@ exactly as drawn. The whole front face becomes the first layer, 80 × 40.8 mm of
 solid contact with the bed, and the floor and the walls of the trough are printed
 as one continuous outline in every single layer, so the corner where they meet is
 not a layer boundary the coffee can seep through. The two arms end up as the last
-18 mm of the print: two fins standing on the rear face, each with a 2.1 × 17.5 mm
-footprint. They print fine, but slow the last layers down if your slicer does not
+14 and 18 mm of the print: two fins standing on the rear face, each with a
+2.05 × 17.5 mm footprint. They print fine, but slow the last layers down if your slicer does not
 do it by itself.
 
 Only two surfaces face the bed in this orientation, and both are dealt with at
@@ -196,7 +207,7 @@ Three cheap prints, in the order they are worth making:
 | `mode` | Cost | What it tells you |
 |---|---|---|
 | `"gauge"` | 2 g | The whole cross section as a 2 mm slice, lying flat. Hook it on the front edge of the plate: does the leg reach the table, does the tongue clear whatever is under the plate, is there air left up to the grey cup? |
-| `"gauge_clamp"` | 2.6 g | A 2.5 mm slice at the top of the arms – a ring of wall plus both arms, held apart at the right spacing, already flat. Do the arms straddle the socle, does the mouth find it, and is there room beside the socle for a 2.1 mm arm? Note that the stiffness of a leaf spring is proportional to its height, so the slice pinches only about 1/7 as hard as the finished tray – judge the position and the entry here, not the friction. It was 1.5 mm at first (1/12), which was too floppy to say anything at all: it simply splayed out. |
+| `"gauge_clamp"` | 2.6 g | A 2.5 mm slice at the top of the arms – a ring of wall plus both arms, held apart at the right spacing, already flat. Do the arms straddle the socle, does the mouth find it, and is there room beside the socle for a 2.05 mm arm? Note that the stiffness of a leaf spring is proportional to its height, so the slice pinches only about 1/7 as hard as the finished tray – judge the position and the entry here, not the friction. It was 1.5 mm at first (1/12), which was too floppy to say anything at all: it simply splayed out. |
 | `"clip"` | 22 g | The rear 12 mm of the tray plus both complete arms, standing on the cut face. This is the real friction test, but it costs nearly half a tray, so it is only worth it if `"gauge_clamp"` leaves you unsure about `clamp_squeeze`. |
 
 ## Printing
@@ -204,10 +215,10 @@ Three cheap prints, in the order they are worth making:
 | | |
 |---|---|
 | Print size | 80 × 40.8 mm footprint, 58 mm tall, lying on the front face (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Material | 38.6 cm³, approx. 49 g |
+| Material | 38.4 cm³, approx. 49 g |
 | Support | none |
 | Brim | not needed – the first layer is the whole front face |
-| Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.1 mm arms come out solid |
+| Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.05 mm arms come out solid |
 
 **Choose PETG rather than PLA.** Coffee straight from the pot is 80–90 °C, and PLA
 starts to soften just above 55 °C. PETG (or ASA/PP) keeps its shape when a full
