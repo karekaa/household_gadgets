@@ -50,6 +50,16 @@
 //  along the print axis - so their inside is a plain fillet and the flat floor
 //  keeps its full width.
 //
+//  MATERIAL: PETG is the right choice and stays the recommendation - coffee from
+//  the pot is 80-90 degrees and PLA softens just above 55. This one is printed in
+//  eSUN PLA+ black anyway, because that is what was on the shelf, and it is
+//  defensible: the drips hang on the dispenser a while before they let go, so they
+//  land cool in an empty tray. PLA+ is stiffer than PETG (E about 2.5-3.5 GPa
+//  against 2.0), so the spring arms come out roughly 1.5 times stiffer than the
+//  figures below. What to watch is creep: the grip is a constant strain, and PLA
+//  relaxes under it, so if the tray works loose after some months, raise
+//  clamp_squeeze or print it again in PETG. See README.md.
+//
 //  The STL files are written like this - see README.md for the reasoning:
 //
 //    openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' coffee_spill_mug.scad

@@ -213,9 +213,33 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | Brim | trengs ikke – førstelaget er hele frontflaten |
 | Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,05 mm armene blir massive |
 
-**Velg PETG framfor PLA.** Kaffe rett fra kannen er 80–90 °C, og PLA begynner å bli
-mykt like over 55 °C. PETG (eller ASA/PP) holder formen når en full kopp havner i
-trauet, og er en bedre fjær enn PLA.
+**PETG er det riktige materialet, og er fortsatt anbefalingen.** Kaffe rett fra
+kannen er 80–90 °C, og PLA begynner å bli mykt like over 55 °C. PETG (eller
+ASA/PP) holder formen selv om en full kopp havner i trauet.
+
+**Denne er printet i det som sto på hylla: eSUN PLA+ svart, 1,75 mm,
+205–225 °C.** Det er et forsvarlig valg her, og verdt å skrive ned framfor å late
+som noe annet:
+
+- Dryppene er få, og de henger en stund på dispenseren før de slipper, så de er
+  langt fra kannetemperatur når de lander i et trau som står tomt og har
+  romtemperatur. Dette er en søl-fanger, ikke en kaffekopp.
+- PLA+ er *stivere* enn PETG (E ≈ 2,5–3,5 GPa mot rundt 2,0), så fjærarmene blir
+  ca. 1,5 ganger stivere enn tallene i tabellen over. Med overlappen nede på
+  0,05 mm per side er det bare en fordel.
+- PLA holder også målene bedre enn PETG, noe som betyr noe når passformen er
+  0,05 mm per side: mindre krymp og mindre utsvelling i hjørnene.
+
+To ting å holde et øye med ved PLA, og begge handler om *vedvarende* last, ikke om
+dryppene:
+
+- **Kryp i armene.** Grepet er en konstant tøyning, og PLA relakserer under
+  konstant tøyning langt lettere enn PETG. Blir koppen løs etter noen måneder, er
+  det dette som har skjedd – øk `clamp_squeeze` og print en ny, eller print den i
+  PETG. Låsetunga og vekta av koppen holder den mot å skli bakover uansett hva
+  armene gjør.
+- **Ikke tøm en varm kopp i den,** og tørk opp et søl heller enn å la nykokt kaffe
+  stå i en 2 mm bunn. Det er det ene tilfellet der PLA faktisk ville blitt mykt.
 
 ## Bygge den om selv
 

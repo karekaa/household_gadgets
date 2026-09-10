@@ -220,9 +220,34 @@ Three cheap prints, in the order they are worth making:
 | Brim | not needed – the first layer is the whole front face |
 | Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.05 mm arms come out solid |
 
-**Choose PETG rather than PLA.** Coffee straight from the pot is 80–90 °C, and PLA
-starts to soften just above 55 °C. PETG (or ASA/PP) keeps its shape when a full
-cup lands in the tray, and it makes a better spring than PLA.
+**PETG is the right material, and remains the recommendation.** Coffee straight
+from the pot is 80–90 °C, and PLA starts to soften just above 55 °C. PETG (or
+ASA/PP) keeps its shape even if a full cup lands in the tray.
+
+**This one is printed in what was on the shelf: eSUN PLA+ black, 1.75 mm,
+205–225 °C.** That is a defensible choice here, and worth writing down rather than
+pretending otherwise:
+
+- The drips are few, and they hang on the dispenser for a while before they let
+  go, so they are nowhere near pot temperature when they land in a tray that is at
+  room temperature and empty. It is a spill catcher, not a cup.
+- PLA+ is *stiffer* than PETG (E ≈ 2.5–3.5 GPa against about 2.0), so the spring
+  arms come out roughly 1.5 times stiffer than the numbers in the table above.
+  With the interference down at 0.05 mm per side that is welcome, not a problem.
+- PLA also holds its dimensions better than PETG, which matters when the fit is
+  0.05 mm per side: less shrinkage, less die swell at the corners.
+
+Two things to keep an eye on with PLA, both about *sustained* load rather than the
+drips:
+
+- **Creep in the arms.** The grip is a constant strain, and PLA relaxes under
+  constant strain far more readily than PETG does. If the tray works loose after
+  some months, that is what happened – raise `clamp_squeeze` and print a new one,
+  or reprint it in PETG. The locating tongue and the weight of the tray hold it
+  against sliding backwards regardless of what the arms do.
+- **Do not empty a hot cup into it,** and wipe a spill out rather than letting a
+  pool of near boiling coffee stand in a 2 mm floor. That is the one case where
+  PLA would actually go soft.
 
 ## Rebuilding it yourself
 
