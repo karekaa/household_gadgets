@@ -14,3 +14,12 @@ Du sa: «Kroken skal bare berøre platen, aldri bordet – ellers går en del av
   Du kan jo for moro skyld lage en «test-STL» som blir f.eks. 2 mm høy, så får jeg egentlig hele profilen som kan ta bort til kaffesensor-holderen for å teste at det ser bra ut
 
 
+
+(Etter testing av malen - med bilder av disse)
+[Image #4] [Image #5] Lengen for støtten mot bordet kan økes med 0,6 mm høyden på «koppen» kan økes med 1,5 mm. Det hadde vært kult hvis vi kunne laget to klemmer på hver side av den 80 mm brede sokkelen for vektsensor-riggen, som hadde «låst» koppen med friksjon til «totalriggen» - når man skyver på den. Problemet er jo da at den ene klemmen ville få 90 graders overheng, og det går ikke. Antydet ikke du at denne modellen kunne printes fra en annen akse?
+
+
+Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 1.5 mm av den øverste delen og som får med seg klemmene, for å teste om de klemmer seg fint på plass med passe friksjon.
+Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 1.5 mm av den øverste delen og som får med seg klemmene, for å teste om de klemmer seg fint på plass med passe friksjon.
+
+
