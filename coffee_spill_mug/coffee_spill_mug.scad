@@ -145,10 +145,15 @@ hook_relief = 1.0;  // 45 degree relief in the inner corner, so a rounded or
 // the socle over clamp_lead_y mm, so the front corners of the socle wedge the
 // arms apart instead of hitting them head on.
 clamp_enable  = true;
-clamp_squeeze = 0.4;    // total, i.e. clamp_squeeze / 2 per side
-clamp_t       = 2.2;    // thickness of the arm - this is the spring. Equal to
-                        // (tray_width - socle_width + clamp_squeeze) / 2 makes
-                        // the outer face flush with the side of the tray.
+clamp_squeeze = 0.2;    // total, i.e. clamp_squeeze / 2 per side. Was 0.4: the
+                        // 1.5 mm gauge went on to the socle but splayed out and
+                        // could not be pushed all the way home, so the mouth was
+                        // opened 0.2 mm. Note that the finished arms are far
+                        // stiffer than any gauge - see clamp_gauge_t below.
+clamp_t       = 2.1;    // thickness of the arm - this is the spring. Keep it
+                        // equal to (tray_width - socle_width + clamp_squeeze) / 2
+                        // and the outer face is flush with the side of the tray;
+                        // the assert below catches it if the two drift apart.
 clamp_len     = 18;     // free length backwards from the rear face
 clamp_z0      = 1.5;    // the arm starts this far above the plate, to clear any
                         // fillet or elephant foot at the base of the socle
@@ -206,11 +211,15 @@ clip_back = 12;  // how much of the tray the mode = "clip" test piece takes alon
 // mode = "gauge_clamp" keeps a clamp_gauge_t mm slice of the tray at the top of
 // the arms. That is a ring of wall all the way round plus the top slice of both
 // arms, held apart at the right spacing, and it is already flat - the cheapest
-// possible check that the arms straddle the socle. Note that the spring force
-// scales with the height of the arm, so a 1.5 mm slice pinches roughly
-// clamp_gauge_t / (clamp_h - clamp_z0) = 1/12 as hard as the finished tray.
-// Judge the fit here and the friction from mode = "clip".
-clamp_gauge_t = 1.5;
+// possible check that the arms straddle the socle.
+//
+// The stiffness of a leaf spring is proportional to its height, so the slice is
+// clamp_gauge_t / (clamp_h - clamp_z0) as stiff as the finished arm: 1/7 at
+// 2.5 mm, 1/12 at 1.5 mm. The first 1.5 mm gauge was too floppy to say anything
+// about the friction - it just splayed out - so it is 2.5 mm now. Even so, the
+// finished tray will feel much tighter than the gauge does. Judge the position
+// and the entry here, and the friction from mode = "clip".
+clamp_gauge_t = 2.5;
 
 $fn = 64;
 

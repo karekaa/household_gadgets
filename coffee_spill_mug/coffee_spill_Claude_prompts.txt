@@ -29,3 +29,6 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
  En ting som hadde vært fint for selve kaffe-spill-koppen, er å fått avrundet de skarpe hjørnene. Hvis du ikke alt har funnet det, så har jeg selv bruk https://openscad.org/cheatsheet/ for å lese dokumentasjon på openscad. minkowski() funksjoneni openscap som du blant annet finner der, er velegnet for å bruke til avrundinger. En personlig erfaring med bruk av minkowski() er at mine opprinnelige mål for enheten har est ut (økt) for en slags tilpassning for funksjonen? Om det er slik, finnes det sikkert en metode for å korrigere. Når alt dette er sagt, er ikke presisjonen i bredden og dybden av «spill-koppen» kritisk. Det er høyden ned fra Teakplaten og til bordet og ikke minst avstanden mellom gripearmene som er kritisk, men disse detaljene behøver jo ingen avrunding.
 
 
+ Jeg har nå testet coffee_spill_mug_clamp, og den gikk innpå den grå «bunnklossen» oppå teakplaten, men den spriket litt ut, og jeg fikk vel heller ikke skjøvet den helt inn. Vi må derfor la åpningen mellom disse gripe-armene bli minst 0,1 mm større - kanskje 0,2 mm? Kanskje vi også la coffee_spill_mug_clamp bli 2,5 mm tykk i stededt for 1,5 mmm, så den blir litt stivere for neste test
+
+

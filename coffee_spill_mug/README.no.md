@@ -81,29 +81,33 @@ plass.
 Det som er verdt å gripe om, er den **grå 3D-printede sokkelen** som bærer
 sensoren: en kloss 76 mm bred som står 22 mm opp fra teakplaten, rett bak koppen.
 Derfor fortsetter hver sidevegg rett og slett bakover forbi bakflaten som en
-bladfjær 18 mm lang og 2,2 mm tykk, og de to sammen griper om den klossen.
+bladfjær 18 mm lang og 2,1 mm tykk, og de to sammen griper om den klossen.
 
 Sett ovenfra, med rimet nederst og armene bakover:
 
 ![De to armene sett ovenfra](img/coffee_spill_mug_clamp.png)
 
-Siden sokkelen er 4 mm smalere enn koppen, ligger armene 2 mm innenfor sidene –
+Siden sokkelen er 4 mm smalere enn koppen, ligger armene 2,1 mm innenfor sidene –
 yttersidene er i flukt med sidene på koppen, og koppen blir stående på nøyaktig
 **80 mm bredde**, noe den forrige løsningen (klør som hektet seg ned rundt platen,
 84,4 mm over alt) ikke gjorde.
 
 | | |
 |---|---|
-| Gripeflater | x = 2,2 og 77,8, altså `clamp_squeeze` = 0,4 mm total overlapp på den 76 mm brede sokkelen |
-| Arm | 2,2 mm tykk, 17,5 mm høy, 18 mm fri lengde |
-| Munn ved frie enden | 77,6 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen kiler armene ut i stedet for å gå rett i dem, og lukker seg inn over de siste 6 mm |
+| Gripeflater | x = 2,1 og 77,9, altså en åpning på 75,8 mm: `clamp_squeeze` = 0,2 mm total overlapp på den 76 mm brede sokkelen |
+| Arm | 2,1 mm tykk, 17,5 mm høy, 18 mm fri lengde |
+| Munn ved frie enden | 77,8 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen kiler armene ut i stedet for å gå rett i dem, og lukker seg inn over de siste 6 mm |
 | Undersiden av armen | 1,5 mm over platen (`clamp_z0`), for å gå klar av en eventuell fillet eller elefantfot ved foten av sokkelen |
 | Toppen av armen | 19 mm = `tray_height - edge_r`; høyere enn det ville avrundingen av rimet tynnet armen ned til en knivsegg |
-| Kraft | ca. 3,2 N per side ved 0,2 mm utbøying, spenningstopp rundt 4 MPa – en tolvdel av hva PETG tåler |
+| Kraft | ca. 1,4 N per side ved 0,1 mm utbøying, spenningstopp rundt 2 MPa – en tjuefemdel av hva PETG tåler |
 
 Bøyningen skjer over hele de 18 mm frie lengden, ikke i en kort rot, og det er det
 som gjør grepet fjærende i stedet for sprøtt. `clamp_squeeze` er tallet du justerer
-hvis grepet er for svakt eller koppen er for tung å skyve på.
+hvis grepet er for svakt eller koppen er for tung å skyve på. Den startet på
+0,4 mm; den første printede `gauge_clamp` gikk innpå sokkelen, men spriket ut og
+lot seg ikke skyve helt inn, så nå er den 0,2 mm. Hold `clamp_t` lik
+`(tray_width - socle_width + clamp_squeeze) / 2` når du justerer, så blir yttersiden
+av armen liggende i flukt med siden på koppen – en `assert` sier fra hvis ikke.
 
 ## Avrundede kanter, og hvorfor ikke `minkowski()`
 
@@ -136,7 +140,7 @@ først (`cube([w-2*r, d-2*r, h-2*r])` pluss `sphere(r)` gir eksakt w × d × h),
 her finnes det ingen enkelt skalar å krympe – og verre: det ville lukket munnen
 mellom fjærarmene 2 *r* og gjort beinet ned til bordet *r* for langt, altså
 nøyaktig de to målene som ikke får flytte seg. `offset()` og tangerende
-fillet-buer fjerner bare materiale, så armavstanden (77,6/76 mm) og beinet
+fillet-buer fjerner bare materiale, så armavstanden (75,8/76 mm) og beinet
 (20,3 mm) kommer ut eksakt som målt. Å runde ett navngitt hjørne av gangen holder
 også de innvendige hjørnene skarpe.
 
@@ -160,7 +164,7 @@ frontflaten blir førstelaget, 80 × 40,8 mm massiv kontakt med bordet, og bunne
 veggene i trauet printes som én sammenhengende kontur i hvert enkelt lag, så
 hjørnet der de møtes ikke er en lagfuge kaffen kan sive gjennom. De to armene blir
 de siste 18 mm av printet: to finner som står på bakflaten, hver med et fotavtrykk
-på 2,2 × 17,5 mm. De printer greit, men senk farten på de siste lagene hvis
+på 2,1 × 17,5 mm. De printer greit, men senk farten på de siste lagene hvis
 sliceren ikke gjør det selv.
 
 Bare to flater vender mot printbordet i denne orienteringen, og begge er løst med
@@ -186,7 +190,7 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | `mode` | Kostnad | Hva den forteller |
 |---|---|---|
 | `"gauge"` | 2 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
-| `"gauge_clamp"` | 1,5 g | En 1,5 mm skive i toppen av armene – en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand, og allerede flat. Griper armene om sokkelen, finner munnen den, og er det plass til en 2,2 mm arm ved siden av sokkelen? Merk at fjærkraften skalerer med høyden på armen, så en 1,5 mm skive klemmer bare ca. 1/12 så hardt som den ferdige koppen – bedøm passformen her, ikke friksjonen. |
+| `"gauge_clamp"` | 2,6 g | En 2,5 mm skive i toppen av armene – en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand, og allerede flat. Griper armene om sokkelen, finner munnen den, og er det plass til en 2,1 mm arm ved siden av sokkelen? Merk at stivheten til en bladfjær er proporsjonal med høyden, så skiva klemmer bare ca. 1/7 så hardt som den ferdige koppen – bedøm plasseringen og innføringen her, ikke friksjonen. Den var 1,5 mm først (1/12), og det var for slapt til å si noe i det hele tatt: den bare spriket ut. |
 | `"clip"` | 22 g | De bakre 12 mm av koppen pluss begge armene komplett, stående på kuttflaten. Dette er den virkelige friksjonstesten, men den koster nesten en halv kopp, så den er bare verdt det hvis `"gauge_clamp"` gjør deg usikker på `clamp_squeeze`. |
 
 ## Printing
@@ -194,10 +198,10 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | | |
 |---|---|
 | Printmål | 80 × 40,8 mm fotavtrykk, 58 mm høy, liggende på frontflaten (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Materialforbruk | 38,7 cm³, ca. 49 g |
+| Materialforbruk | 38,6 cm³, ca. 49 g |
 | Støtte | ingen |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
-| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,2 mm armene blir massive |
+| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,1 mm armene blir massive |
 
 **Velg PETG framfor PLA.** Kaffe rett fra kannen er 80–90 °C, og PLA begynner å bli
 mykt like over 55 °C. PETG (eller ASA/PP) holder formen når en full kopp havner i
