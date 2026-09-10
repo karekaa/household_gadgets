@@ -2,11 +2,10 @@
 //  Coffee spill tray for the internet connected coffee pot scale
 //
 //  A shallow open trough that catches the drips that run down the pot and out
-//  across the plate. It rests on the free part of the plate - the 80 mm wide
-//  socle in front of the load cell holder - and reaches plate_depth mm in
-//  towards the holder. The front overhang mm stick out past the front edge of
-//  the plate, so drips that run all the way over the edge are caught too
-//  instead of ending up on the table.
+//  across the plate. It rests on the free part of the teak plate in front of the
+//  load cell holder and reaches plate_depth mm in towards the holder. The front
+//  overhang mm stick out past the front edge of the plate, so drips that run all
+//  the way over the edge are caught too instead of ending up on the table.
 //
 //  The load cell sits up inside the big grey cup the pot stands in, so the teak
 //  plate and the table are both dead support below the measuring path. The tray
@@ -16,21 +15,30 @@
 //
 //    * a tongue behind the leg, hanging down in front of the front face of the
 //      plate, so the tray cannot slide backwards towards the pot
-//    * two spring clamps, one on each side, that grip the sides of the socle by
-//      friction when the tray is pushed on from the front
+//    * two spring arms reaching backwards from the rear face, one along each
+//      side of the grey printed socle that carries the sensor, gripping it by
+//      friction when the tray is pushed on
 //    * its own weight on the plate
 //
-//  PRINT ORIENTATION: on the front face (mode = "print"), so the print axis runs
-//  backwards along the depth of the tray. That is what makes the clamps possible.
-//  Standing on a short end - the obvious choice for the trough alone - the upper
-//  clamp would have to grow inwards under the tray out of thin air: a clamp can
-//  only grow 45 degrees per layer, so a jaw reaching 5 mm down would have to
-//  stand 5 mm out with a 45 degree inner face that cannot grip a vertical side.
+//  THE GREY SOCLE is the fixed 3D printed block standing on the teak plate
+//  behind the tray: socle_width mm wide, socle_height mm up from the plate and
+//  deep. That is what the arms grip - the sides of a block that stands up above
+//  the plate - so the arms simply continue the side walls backwards, set in
+//  (tray_width - socle_width) / 2 mm from the sides of the tray. The tray
+//  therefore stays exactly tray_width mm wide.
 //
-//  Lying on the front face, every clamp surface that has to be vertical runs
-//  parallel to the print axis, and the whole front face is the first layer. Only
-//  two surfaces face the bed, and both are dealt with at 45 degrees, the steepest
-//  overhang that prints without support:
+//  PRINT ORIENTATION: on the front face (mode = "print"), so the print axis runs
+//  backwards along the depth of the tray. That is what makes the arms possible.
+//  Both gripping faces are planes at constant x; standing the part on a short end
+//  would put the print axis along x, turning those planes into layer planes, and
+//  the inner face of the upper arm into a ceiling hanging over nothing. Standing
+//  the tray upright is worse: the whole underside would be a ceiling 30 x 80 mm
+//  in the air above the leg.
+//
+//  Lying on the front face, every face that has to be vertical runs parallel to
+//  the print axis, and the whole front face is the first layer. Only two surfaces
+//  face the bed, and both are dealt with at 45 degrees, the steepest overhang
+//  that prints without support:
 //
 //    * the inside of the rear wall - the floor rises to the rim over a fillet of
 //      radius rear_fillet, from horizontal up to 45 degrees, and then a straight
@@ -55,15 +63,23 @@
 // ============================================================================
 
 /* [Main dimensions] */
-tray_width  = 80;   // body width, along the front edge of the plate. The spring
-                    // clamps stand clamp_t + clamp_gap mm outside this on each
-                    // side, so the widest point of the part is a little more.
+tray_width  = 80;   // body width, along the front edge of the plate, and the
+                    // widest point of the whole part: the spring arms are set in
+                    // from the sides, they do not stand outside them.
 plate_depth = 30;   // how far in on the plate the tray reaches, measured from
                     // the front edge of the plate towards the sensor holder
+tray_height = 20.5; // height of the rim above the plate surface. The grey socle
+                    // is socle_height = 22 mm, and there are several mm of air
+                    // from its top up to the big grey cup the pot stands in, so
+                    // the rim has room to spare. Fitted with the 2 mm gauge.
 overhang    = 10;   // how far the tray sticks out past the front edge of the plate
-tray_height = 20.5; // height of the rim above the plate surface. Fitted with the
-                    // 2 mm gauge: leaves air up to the underside of the big grey
-                    // cup the pot stands in.
+
+/* [The rig we clamp on to] */
+// The grey 3D printed socle that carries the sensor, standing on the teak plate
+// right behind the tray. Measured with the caliper.
+socle_width  = 76;  // across, at the front face of the socle
+socle_height = 22;  // up from the top of the teak plate
+socle_depth  = 76;  // backwards - not measured exactly, "a lot", about this
 
 /* [Wall thickness] */
 wall_t  = 2.4;      // side, front and rear walls
@@ -88,8 +104,13 @@ arc_steps    = 24;  // facets in the fillets
 // e mm too long lifts the rear edge by 3 e mm and eats into the clearance under
 // the grey cup. 0.3 mm is enough that the leg still takes over as soon as
 // anything presses on the overhang.
+//
+// NOTE: the teak plate itself measures 19 mm thick. plate_height is 1.6 mm more
+// than that because it was fitted with the printed gauge - the plate does not
+// lie flat on the table. If the new gauge shows the leg standing the tray on its
+// heel, set plate_height = 19.3.
 leg_enable   = true;
-plate_height = 20.6;  // fitted with the gauge: 0.6 mm more than first measured
+plate_height = 20.6;
 foot_clear   = 0.3;
 leg_t        = 4;   // thickness of the leg below the plate. Thicker than the
                     // front wall on purpose: with edge_r = 1.5 a 2.4 mm leg
@@ -108,35 +129,35 @@ hook_relief = 1.0;  // 45 degree relief in the inner corner, so a rounded or
                     // slightly chamfered plate edge still seats fully
 
 /* [Side spring clamps] */
-// One on each side. Each clamp is a leaf spring: a bridge across the top ties it
-// to the side wall, an arm runs down the outside of that wall separated by a
-// clamp_gap slot, and at the bottom the arm turns in under the tray into a jaw
-// that grips the side of the socle. Bending happens over the whole clamp_rise mm
-// of the arm, not in a short root, so the grip is springy instead of brittle:
-// about 6 N per side at the numbers below.
+// One on each side: the side wall carried on backwards past the rear face as a
+// leaf spring clamp_len mm long, clamp_t mm thick, standing along the side of the
+// grey socle. The outer face is flush with the side of the tray and the inner
+// face is the gripping face, so the pair of them is clamp_squeeze mm narrower
+// than the socle and has to spread to let it in.
 //
-// clamp_squeeze is the total interference over both sides and is the number to
-// tune if the grip is too weak or the tray is too hard to push on. The gripping
-// face is relieved clamp_lead mm at the front and closes in on the socle over
-// clamp_lead_y mm, so the socle wedges the jaws open as the tray is pushed on.
+// Bending happens over the whole free length, which is what makes the grip
+// springy instead of brittle: about 3.2 N per side at the numbers below, with a
+// peak stress around 4 MPa - a twelfth of what PETG takes. clamp_squeeze is the
+// total interference over both sides and is the number to tune if the grip is
+// too weak or the tray is too hard to push on.
 //
-// MEASURE BEFORE PRINTING: clamp_depth must stay inside the thickness of the
-// socle at its front edge, and clamp_len inside the length over which the socle
-// really is socle_width wide, before it widens out towards the sensor holder.
+// The gripping face is relieved clamp_lead mm at the free end and closes in on
+// the socle over clamp_lead_y mm, so the front corners of the socle wedge the
+// arms apart instead of hitting them head on.
 clamp_enable  = true;
-socle_width   = 80.1;  // measured across the socle with the caliper
-clamp_squeeze = 0.4;   // total, i.e. clamp_squeeze / 2 per side
-clamp_t       = 1.6;   // thickness of the arm - this is the spring
-clamp_gap     = 0.6;   // slot between the arm and the side wall
-clamp_rise    = 12;    // how far up the outside of the wall the arm reaches
-clamp_bridge  = 2.4;   // height of the bridge that ties the arm to the wall
-clamp_depth   = 5;     // how far down the jaw reaches past the top of the plate
-clamp_len     = 26;    // length of the clamp, from the front face backwards
-clamp_lead    = 1.0;   // relief of the gripping face at the front
-clamp_lead_y  = 10;    // ... closing in on the socle over this length
-clamp_slack   = 0.4;   // clearance between the jaw and the underside of the
-                       // tray, so the spring is free to move
-clamp_r       = 0.5;   // rounding of the clamp edges
+clamp_squeeze = 0.4;    // total, i.e. clamp_squeeze / 2 per side
+clamp_t       = 2.2;    // thickness of the arm - this is the spring. Equal to
+                        // (tray_width - socle_width + clamp_squeeze) / 2 makes
+                        // the outer face flush with the side of the tray.
+clamp_len     = 18;     // free length backwards from the rear face
+clamp_z0      = 1.5;    // the arm starts this far above the plate, to clear any
+                        // fillet or elephant foot at the base of the socle
+clamp_h       = 19;     // top of the arm above the plate = tray_height - edge_r.
+                        // Any higher and the rounding of the rim would thin the
+                        // top of the arm down to a knife edge.
+clamp_lead    = 1.0;    // relief of the gripping face at the free end
+clamp_lead_y  = 6;      // ... closing in on the socle over this length
+clamp_r       = 0.4;    // rounding of the free end of the arm
 
 /* [Rim] */
 edge_r = 1.5;       // rounding of the four long outer edges. The front and rear
@@ -146,34 +167,33 @@ edge_r = 1.5;       // rounding of the four long outer edges. The front and rear
 /* [View] */
 // "use"    = as it sits on the plate (z = 0 is the plate surface)
 // "print"  = lying on the front face, ready for the slicer
-// "check"  = as "use", with the socle and the table drawn as ghosts
+// "check"  = as "use", with the plate, the grey socle and the table as ghosts
 // "gauge"  = a thin slice of the cross section, lying flat, ready for the slicer
-// "gauge_clamp" = a thin slice across both clamps, lying flat: the cheap check
-//            that the jaws land on the sides of the socle
-// "clip"   = the front clip_len mm of the tray, in print orientation. Contains
-//            the leg, the tongue and both complete clamps, so it is the real fit
-//            and friction test - see README.md.
+// "gauge_clamp" = the top clamp_gauge_t mm of the tray, i.e. the rim and the two
+//            arms: the cheap check that the arms straddle the socle
+// "clip"   = the rear clip_back mm of the tray plus both complete arms, in print
+//            orientation: the real friction test - see README.md
 // "cavity" = the trough volume up to the rim, as a solid (for measuring it)
 mode = "use";
 
-gauge_t  = 2;   // thickness of the mode = "gauge" slice
-clip_len = 26;  // length of the mode = "clip" test piece
+gauge_t   = 2;   // thickness of the mode = "gauge" slice
+clip_back = 12;  // how much of the tray the mode = "clip" test piece takes along
 
-// mode = "gauge_clamp" cuts a clamp_gauge_t mm thick slice at y = clamp_gauge_y,
-// well inside the gripping length, and lays it flat. It costs a couple of grams
-// and shows whether the jaws sit where they should on the sides of the socle -
-// but note that the spring force scales with the length of the clamp, so a
-// 1.5 mm slice pinches roughly clamp_gauge_t / clamp_len = 1/17 as hard as the
-// finished tray. Judge the fit here and the friction from mode = "clip".
+// mode = "gauge_clamp" keeps a clamp_gauge_t mm slice of the tray at the top of
+// the arms. That is a ring of wall all the way round plus the top slice of both
+// arms, held apart at the right spacing, and it is already flat - the cheapest
+// possible check that the arms straddle the socle. Note that the spring force
+// scales with the height of the arm, so a 1.5 mm slice pinches roughly
+// clamp_gauge_t / (clamp_h - clamp_z0) = 1/12 as hard as the finished tray.
+// Judge the fit here and the friction from mode = "clip".
 clamp_gauge_t = 1.5;
-clamp_gauge_y = 18;
 
 $fn = 64;
 
 // ---------------------------------------------------------------------------
 //  Derived values
 // ---------------------------------------------------------------------------
-tray_depth = overhang + plate_depth;        // total depth of the tray
+tray_depth = overhang + plate_depth;        // total depth of the tray body
 cav_rise   = tray_height - floor_t;         // depth of the trough
 table_z    = -(plate_height - foot_clear);  // where the foot of the leg ends up
 hook_front = overhang - hook_t;             // front face of the locating tongue
@@ -189,10 +209,13 @@ cav_x1 = tray_width - wall_t;               // inside of the right short end
 rear_run  = rear_fillet * sin(45) + (cav_rise - rear_fillet * (1 - cos(45)));
 flat_rear = cav_y1 - rear_run;              // where the rear ramp leaves the floor
 
-grip_x  = (tray_width - socle_width + clamp_squeeze) / 2;  // gripping face, left
-arm_x1  = -clamp_gap;                       // inner face of the arm
-arm_x0  = -clamp_gap - clamp_t;             // outer face of the arm
-part_w  = tray_width - 2 * arm_x0;          // widest point of the whole part
+socle_x0 = (tray_width - socle_width) / 2;  // left side of the grey socle
+grip_x   = socle_x0 + clamp_squeeze / 2;    // gripping face of the left arm
+arm_x0   = grip_x - clamp_t;                // outer face of the left arm
+arm_end  = tray_depth + clamp_len;          // free end of the arms
+part_w   = tray_width - 2 * min(arm_x0, 0); // widest point of the whole part
+part_d   = clamp_enable ? arm_end : tray_depth;
+clip_y0  = tray_depth - clip_back;          // cut plane of the mode = "clip" piece
 
 assert(cav_rise > rear_fillet * (1 - cos(45)),
        "rear_fillet too large for the depth of the trough");
@@ -203,25 +226,37 @@ assert(!hook_enable || hook_lead >= leg_t,
        "the 45 degree chamfer on the tongue starts inside the leg - reduce hook_depth");
 assert(!hook_enable || !leg_enable || hook_depth < plate_height - foot_clear,
        "the locating tongue reaches below the foot of the leg - reduce hook_depth");
-assert(!clamp_enable || clamp_len <= tray_depth,
-       "the clamps reach past the rear face - reduce clamp_len");
-assert(!clamp_enable || clamp_depth < plate_height - foot_clear,
-       "the clamps reach below the foot of the leg - reduce clamp_depth");
-assert(!clamp_enable || clamp_rise + clamp_bridge < tray_height,
-       "the clamp bridge reaches above the rim - reduce clamp_rise");
-assert(!clamp_enable || 2 * clamp_r < clamp_t, "clamp_r too large for clamp_t");
-assert(!clamp_enable || grip_x - clamp_lead < (tray_width - socle_width) / 2,
-       "the mouth of the clamps is narrower than the socle - increase clamp_lead");
+assert(socle_width < tray_width,
+       "the socle is wider than the tray - the arms cannot reach around it");
+assert(!clamp_enable || arm_x0 >= -0.01,
+       "the arms stand outside the sides of the tray - reduce clamp_t");
+assert(!clamp_enable || clamp_t > 1.6,
+       "clamp_t below 1.6 mm is thinner than two perimeters - the spring is too weak");
+assert(!clamp_enable || clamp_h <= socle_height + 1,
+       "the arms stand taller than the socle - reduce clamp_h");
+assert(!clamp_enable || clamp_h <= tray_height - edge_r,
+       "the rim rounding would thin the top of the arms - reduce clamp_h");
+assert(!clamp_enable || clamp_z0 + 5 < clamp_h, "no arm left - reduce clamp_z0");
+assert(!clamp_enable || clamp_len <= socle_depth,
+       "the arms reach past the back of the socle - reduce clamp_len");
+assert(!clamp_enable || clamp_lead_y < clamp_len, "clamp_lead_y longer than the arm");
+assert(!clamp_enable || 2 * clamp_r < clamp_t - clamp_lead,
+       "clamp_r too large for the tip of the arm");
+assert(!clamp_enable || grip_x - clamp_lead < socle_x0,
+       "the mouth of the arms is narrower than the socle - increase clamp_lead");
+assert(clip_back > wall_t, "clip_back must reach in front of the rear wall");
 
 echo(str("Tray ", tray_width, " x ", tray_depth, " x ", tray_height,
          " mm over the plate, ", tray_height - table_z, " mm over the table"));
 echo(str("Flat floor ", cav_x1 - cav_x0 - 2 * inner_fillet, " x ",
          flat_rear - cav_y0 - inner_fillet, " mm, trough ", cav_rise, " mm deep"));
-echo(str("Gripping faces at x = ", grip_x, " and ", tray_width - grip_x,
-         ", i.e. ", clamp_squeeze, " mm total interference on a ",
-         socle_width, " mm socle"));
+echo(str("Arms ", clamp_t, " x ", clamp_h - clamp_z0, " mm, ", clamp_len,
+         " mm long, gripping at x = ", grip_x, " and ", tray_width - grip_x,
+         ": ", clamp_squeeze, " mm total interference on the ", socle_width,
+         " mm socle, mouth ", socle_width - clamp_squeeze + 2 * clamp_lead,
+         " mm at the tip"));
 echo(str("Print footprint ", part_w, " x ", tray_height - table_z,
-         " mm, ", tray_depth, " mm tall"));
+         " mm, ", part_d, " mm tall"));
 
 // ---------------------------------------------------------------------------
 //  Helpers
@@ -280,10 +315,10 @@ function body_section() = concat(
      [tray_depth, tray_height],             // rear face
      [0, tray_height]]);                    // rim, back to the front face
 
-// The four long outer edges, rounded. A prism along the print axis, so the
-// rounding is free; the front and rear faces stay sharp.
+// The four long outer edges of body and arms alike, rounded. A prism along the
+// print axis, so the rounding is free; the front and rear faces stay sharp.
 module rounded_bounds() {
-    extrude_y(-1, tray_depth + 2) round2d(edge_r)
+    extrude_y(-1, part_d + 2) round2d(edge_r)
         translate([0, table_z]) square([tray_width, tray_height - table_z]);
 }
 
@@ -319,38 +354,24 @@ module trough() {
 }
 
 // ---------------------------------------------------------------------------
-//  The side spring clamps. The whole clamp is one profile in (x, z) extruded
-//  along y, i.e. a prism along the print axis, so it has no overhang anywhere.
+//  The side spring clamps. One arm is a flat plate in the (x, y) plane extruded
+//  in z, so every gripping face is parallel to the print axis and comes out
+//  exactly as drawn. It starts inside the rear wall, at cav_y1, so the union
+//  with the body is a solid overlap and not two faces meeting.
 //  Drawn for the left side; the right one is mirrored.
 // ---------------------------------------------------------------------------
-function clamp_profile() = [
-    [arm_x0, -clamp_depth],             // outer bottom corner of the jaw
-    [grip_x, -clamp_depth],             // inner bottom corner of the jaw
-    [grip_x, -clamp_slack],             // the gripping face
-    [arm_x1, -clamp_slack],             // top of the jaw, clear of the tray
-    [arm_x1, clamp_rise],               // inner face of the arm, along the slot
-    [wall_t / 2, clamp_rise],           // underside of the bridge, into the wall
-    [wall_t / 2, clamp_rise + clamp_bridge],
-    [arm_x0, clamp_rise + clamp_bridge] // outer face, back down to the jaw
+function arm_plan() = [
+    [arm_x0, cav_y1],                       // buried in the rear wall
+    [grip_x, cav_y1],
+    [grip_x, arm_end - clamp_lead_y],       // the gripping face
+    [grip_x - clamp_lead, arm_end],         // relieved towards the free end
+    [arm_x0, arm_end]                       // outer face, flush with the tray
 ];
 
-// Relieves the gripping face clamp_lead mm at the front, closing in on the socle
-// over clamp_lead_y mm. Cuts nothing above the jaw.
-module clamp_mouth() {
-    translate([0, 0, -clamp_depth - 1])
-        linear_extrude(height = clamp_depth + 1 - clamp_slack)
-            polygon([[grip_x - clamp_lead, -1],
-                     [grip_x - clamp_lead, 0],
-                     [grip_x, clamp_lead_y],
-                     [grip_x + 10, clamp_lead_y],
-                     [grip_x + 10, -1]]);
-}
-
 module clamp() {
-    difference() {
-        extrude_y(0, clamp_len) round2d(clamp_r) polygon(clamp_profile());
-        clamp_mouth();
-    }
+    translate([0, 0, clamp_z0])
+        linear_extrude(height = clamp_h - clamp_z0)
+            round2d(clamp_r) polygon(arm_plan());
 }
 
 module clamps() {
@@ -363,23 +384,25 @@ module clamps() {
 // ---------------------------------------------------------------------------
 module coffee_spill_tray() {
     difference() {
-        union() {
-            intersection() {
+        intersection() {
+            union() {
                 extrude_x(0, tray_width) polygon(body_section());
-                rounded_bounds();
+                if (clamp_enable) clamps();
             }
-            if (clamp_enable) clamps();
+            rounded_bounds();
         }
         trough();
     }
 }
 
-// The socle and the table, drawn only as a reference in mode = "check"
+// The teak plate, the grey socle and the table, drawn only in mode = "check"
 module ghost_rig() {
-    %translate([(tray_width - socle_width) / 2, overhang, -plate_height])
-        cube([socle_width, plate_depth + 60, plate_height]);
-    %translate([-40, -30, -plate_height - 2])
-        cube([tray_width + 80, plate_depth + 120, 2]);
+    %translate([-0.05, overhang, -plate_height])           // teak plate, 80.1 wide
+        cube([tray_width + 0.1, plate_depth + 100, plate_height]);
+    %translate([socle_x0, tray_depth, 0])                  // the grey socle
+        cube([socle_width, socle_depth, socle_height]);
+    %translate([-40, -30, -plate_height - 2])              // the table
+        cube([tray_width + 80, plate_depth + 160, 2]);
 }
 
 // Lays the part down on its front face, the way it is printed
@@ -395,17 +418,20 @@ else if (mode == "gauge")
     translate([0, -table_z, 0]) linear_extrude(height = gauge_t)
         polygon(body_section());
 else if (mode == "gauge_clamp")
-    // A thin slice across the clamps, laid flat: x is the width of the tray,
-    // y is the height (upside down), z is the thickness of the slice
-    translate([0, 0, -clamp_gauge_y]) on_front_face() intersection() {
+    // A slice at the top of the arms - wall ring plus both arms - already flat,
+    // just dropped down onto the bed
+    translate([0, 0, clamp_gauge_t - clamp_h]) intersection() {
         coffee_spill_tray();
-        translate([-50, clamp_gauge_y, -50])
-            cube([tray_width + 100, clamp_gauge_t, 100]);
+        translate([-50, -50, clamp_h - clamp_gauge_t])
+            cube([tray_width + 100, part_d + 100, clamp_gauge_t]);
     }
 else if (mode == "clip")
-    on_front_face() intersection() {
+    // The rear clip_back mm of the tray plus both complete arms, standing on the
+    // cut plane the same way the whole tray stands on its front face
+    translate([0, 0, -clip_y0]) on_front_face() intersection() {
         coffee_spill_tray();
-        translate([-50, 0, -50]) cube([tray_width + 100, clip_len, 100]);
+        translate([-50, clip_y0, -50])
+            cube([tray_width + 100, part_d - clip_y0, 100]);
     }
 else if (mode == "cavity")
     intersection() {

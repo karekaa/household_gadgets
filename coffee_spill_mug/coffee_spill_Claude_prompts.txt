@@ -23,3 +23,6 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
 Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 1.5 mm av den øverste delen og som får med seg klemmene, for å teste om de klemmer seg fint på plass med passe friksjon.
 
 
+ Den eneste men viktige tilbakemelding på et mål, er bredde på den grå (tidligere 3D-printet) faste sokkelen som vi skal gripe rundt. Den er 76 mm bred (ikke 80,1). Ellers er høyden på teak-plate sokkelen 19 mm (malen jeg tok ut viste at det matchet ganske bra, og høyden på den nevnte grå 3D-printede sokkelen er 22 mm opp fra teakplaten. Luftklaringen opp til den viktige store skålen for selve kaffekannen er flere mm og det er ingen krise om vår nye kopp f.eks. hadde blitt en mm høyere den den faste grå 3D-printede sokkelen. Dybden innover for den nevnte grå sokkel er «mye» - ikke målt, men sikkert 76 mm eller der omkring på den også.  Det er jo til slutt nå interessant å ta ut både den nye «gauge_clamp» og den gamle «gauge» for å sikre at alt ser fornuftig ut.
+
+

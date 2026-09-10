@@ -5,8 +5,8 @@
 Et lavt trau som fanger opp kaffen som renner ned langs kannen og utover platen, i
 stedet for at det ender på bordet og i et tørkepapir. Den står på den frie
 forkanten av teakplaten under den internett-tilkoblede kaffevekten, strekker seg ut
-over ytterkanten av platen, og låser seg til riggen med to fjærklemmer når man
-skyver den på.
+over ytterkanten av platen, og griper om den grå sokkelen bak seg med to fjærarmer
+når man skyver den på.
 
 ![Koppen på plass på platen](img/coffee_spill_mug_on_plate.png)
 
@@ -20,16 +20,26 @@ platekanten, og frontveggen fortsetter ned til bordet.
 
 | Mål | Verdi | Hvor det kommer fra |
 |---|---|---|
-| Bredde på selve koppen | 80 mm | bredden på sokkelen foran på platen, målt til 80,10 mm |
-| Bredeste punkt | 84,4 mm | fjærklemmene står 2,2 mm utenfor koppen på hver side |
-| Dybde på platen | 30 mm | fri plate fra forkanten inn mot sensorholderen |
+| Bredde på selve koppen | 80 mm | bredden på tunga foran på platen, målt til 80,10 mm. Dette er også bredeste punkt på hele delen – fjærarmene ligger *innenfor* sidene, ikke utenfor. |
+| Dybde på platen | 30 mm | fri plate fra forkanten inn mot den grå sokkelen |
 | Utstikk | 10 mm | ut forbi forkanten av platen, så drypp som renner over kanten også fanges |
-| Total dybde | 40 mm | 10 + 30 |
-| Rimhøyde over platen | 20,5 mm | **maksimum** – gir luftrom opp til undersiden av den store grå koppen kannen står i. Tilpasset med 2 mm-malen. |
-| Platens høyde over bordet | 20,6 mm | hvor langt beinet rekker ned (`plate_height`), også tilpasset med malen |
+| Dybde på koppen | 40 mm | 10 + 30 |
+| Total dybde | 58 mm | de to fjærarmene rekker 18 mm lenger bakover, langs sidene av den grå sokkelen |
+| Rimhøyde over platen | 20,5 mm | den grå sokkelen er 22 mm, og det er flere mm luft fra toppen av den opp til den store grå koppen, så rimet har god margin. Tilpasset med 2 mm-malen. |
+| Platens høyde over bordet | 20,6 mm | hvor langt beinet rekker ned (`plate_height`), tilpasset med malen |
 | Total høyde | 40,8 mm | fra bordet til rimet |
 | Vegger / bunn | 2,4 / 2,0 mm | |
 | Trau | 18,5 mm dypt, 35 ml til rimet | målt fra `mode = "cavity"` |
+
+Selve riggen, målt med skyvelær – det er disse tallene klemmingen er utledet fra:
+
+| Riggen | Verdi |
+|---|---|
+| Grå 3D-printet sokkel, bredde | 76 mm |
+| Grå 3D-printet sokkel, høyde over teakplaten | 22 mm |
+| Grå 3D-printet sokkel, dybde innover | ikke målt, «mye», rundt 76 mm |
+| Teakplaten, tykkelse | 19 mm |
+| Teakplaten, overflate over bordet | 20,6 mm (`plate_height`, tilpasset med malen) |
 
 ## Den kan gjerne hvile på bordet
 
@@ -66,37 +76,36 @@ Tre detaljer i snittet som er der med hensikt:
 Koppen veier ca. 50 g, som blir et fast tillegg – **tarér vekta** med tom kopp på
 plass.
 
-## Fjærklemmene på sidene
+## De to fjærarmene
 
-Hver side har en bladfjær som griper om siden av sokkelen, så koppen låser seg til
-riggen når man skyver den på forfra, og løsner med et bestemt løft. Les snittet med
-rimet øverst og platens overflate der bunnen av trauet er:
+Det som er verdt å gripe om, er den **grå 3D-printede sokkelen** som bærer
+sensoren: en kloss 76 mm bred som står 22 mm opp fra teakplaten, rett bak koppen.
+Derfor fortsetter hver sidevegg rett og slett bakover forbi bakflaten som en
+bladfjær 18 mm lang og 2,2 mm tykk, og de to sammen griper om den klossen.
 
-![Tverrsnitt gjennom en klemme](img/coffee_spill_mug_clamp.png)
+Sett ovenfra, med rimet nederst og armene bakover:
 
-Ovenfra og ned: en **bro** binder klemma til sideveggen 12 mm over platen, en
-**arm** på 1,6 mm går ned langs utsiden av den veggen, skilt fra den med en 0,6 mm
-**spalte**, og nederst svinger armen inn under koppen til en **klo** som rekker
-5 mm ned forbi platetoppen og presser mot siden av sokkelen. Klemma er 26 mm lang.
+![De to armene sett ovenfra](img/coffee_spill_mug_clamp.png)
 
-Bøyningen skjer over hele de 12 mm av armen, ikke i en kort rot, og det er det som
-gjør grepet fjærende i stedet for sprøtt: tallene over gir omtrent **6 N per side**
-ved 0,2 mm utbøying, med et spenningstopp rundt 7 MPa – cirka en sjuendedel av hva
-PETG tåler. `clamp_squeeze` (0,4 mm totalt over begge sider) er tallet du justerer
+Siden sokkelen er 4 mm smalere enn koppen, ligger armene 2 mm innenfor sidene –
+yttersidene er i flukt med sidene på koppen, og koppen blir stående på nøyaktig
+**80 mm bredde**, noe den forrige løsningen (klør som hektet seg ned rundt platen,
+84,4 mm over alt) ikke gjorde.
+
+| | |
+|---|---|
+| Gripeflater | x = 2,2 og 77,8, altså `clamp_squeeze` = 0,4 mm total overlapp på den 76 mm brede sokkelen |
+| Arm | 2,2 mm tykk, 17,5 mm høy, 18 mm fri lengde |
+| Munn ved frie enden | 77,6 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen kiler armene ut i stedet for å gå rett i dem, og lukker seg inn over de siste 6 mm |
+| Undersiden av armen | 1,5 mm over platen (`clamp_z0`), for å gå klar av en eventuell fillet eller elefantfot ved foten av sokkelen |
+| Toppen av armen | 19 mm = `tray_height - edge_r`; høyere enn det ville avrundingen av rimet tynnet armen ned til en knivsegg |
+| Kraft | ca. 3,2 N per side ved 0,2 mm utbøying, spenningstopp rundt 4 MPa – en tolvdel av hva PETG tåler |
+
+Bøyningen skjer over hele de 18 mm frie lengden, ikke i en kort rot, og det er det
+som gjør grepet fjærende i stedet for sprøtt. `clamp_squeeze` er tallet du justerer
 hvis grepet er for svakt eller koppen er for tung å skyve på.
 
-Gripeflaten er avlastet `clamp_lead` = 1,0 mm helt foran og nærmer seg sokkelen
-over de første 10 mm, slik at forkanten av sokkelen kiler klørne ut i stedet for å
-gå rett i dem.
-
-**To mål du bør ta før du printer hele koppen:**
-
-- `clamp_depth` = 5 mm må holde seg innenfor tykkelsen på sokkelen ved forkanten,
-  ellers kommer klørne i konflikt med det som er under.
-- `clamp_len` = 26 mm må holde seg innenfor lengden der sokkelen faktisk er
-  80,1 mm bred, før den utvider seg innover mot sensorholderen.
-
-## Printet på frontflaten – og hvorfor det ble endret
+## Printet på frontflaten – og hvorfor
 
 Delen printes **liggende på frontflaten**, slik at printaksen går bakover langs
 dybden av koppen.
@@ -104,15 +113,20 @@ dybden av koppen.
 ![Liggende på frontflaten, klar for sliceren](img/coffee_spill_mug_print.png)
 
 En tidligere versjon sto på en kortende, som er det åpenbare valget for trauet
-alene. Klemmene gjør det umulig: en klemme kan bare vokse 45° per lag, så en klo
-som skal 5 mm ned under koppen måtte stått 5 mm ut fra siden med en 45° innside –
-og en 45°-flate kan ikke klemme mot en loddrett side.
+alene. Armene gjør det umulig: begge gripeflatene er plan med konstant x, og står
+delen på høykant går printaksen langs x – da blir de gripeflatene lagplan, og
+innsiden av den øverste armen blir et tak som henger over ingenting. Å stille
+koppen opp ned eller rett opp er verre: da ville hele undersiden blitt et tak på
+30 × 80 mm i lufta over beinet.
 
 Liggende på frontflaten går alle flater som *må* være loddrette – gripeflatene,
-spalten, armene – parallelt med printaksen og kommer ut nøyaktig som tegnet. Hele
+sidene på armene – parallelt med printaksen og kommer ut nøyaktig som tegnet. Hele
 frontflaten blir førstelaget, 80 × 40,8 mm massiv kontakt med bordet, og bunnen og
 veggene i trauet printes som én sammenhengende kontur i hvert enkelt lag, så
-hjørnet der de møtes ikke er en lagfuge kaffen kan sive gjennom.
+hjørnet der de møtes ikke er en lagfuge kaffen kan sive gjennom. De to armene blir
+de siste 18 mm av printet: to finner som står på bakflaten, hver med et fotavtrykk
+på 2,2 × 17,5 mm. De printer greit, men senk farten på de siste lagene hvis
+sliceren ikke gjør det selv.
 
 Bare to flater vender mot printbordet i denne orienteringen, og begge er løst med
 45°, det bratteste overhenget som printer uten støtte:
@@ -137,18 +151,18 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | `mode` | Kostnad | Hva den forteller |
 |---|---|---|
 | `"gauge"` | 2 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
-| `"gauge_clamp"` | 1 g | En 1,5 mm skive på tvers av begge klemmene, liggende flatt. Lander klørne på sidene av sokkelen, og glir den på? Merk at fjærkraften skalerer med lengden på klemma, så en 1,5 mm skive klemmer bare ca. 1/17 så hardt som den ferdige koppen – bedøm passformen her, ikke friksjonen. |
-| `"clip"` | 28 g | De forreste 26 mm av koppen i printorientering: bein, tunge og begge klemmene komplett. Dette er den virkelige friksjonstesten, men den koster en halv kopp, så den er bare verdt det hvis `"gauge_clamp"` gjør deg usikker på `clamp_squeeze`. |
+| `"gauge_clamp"` | 1,5 g | En 1,5 mm skive i toppen av armene – en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand, og allerede flat. Griper armene om sokkelen, finner munnen den, og er det plass til en 2,2 mm arm ved siden av sokkelen? Merk at fjærkraften skalerer med høyden på armen, så en 1,5 mm skive klemmer bare ca. 1/12 så hardt som den ferdige koppen – bedøm passformen her, ikke friksjonen. |
+| `"clip"` | 22 g | De bakre 12 mm av koppen pluss begge armene komplett, stående på kuttflaten. Dette er den virkelige friksjonstesten, men den koster nesten en halv kopp, så den er bare verdt det hvis `"gauge_clamp"` gjør deg usikker på `clamp_squeeze`. |
 
 ## Printing
 
 | | |
 |---|---|
-| Printmål | 84,4 × 40,8 mm fotavtrykk, 40 mm høy, liggende på frontflaten (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Materialforbruk | 40 cm³, ca. 50 g |
+| Printmål | 80 × 40,8 mm fotavtrykk, 58 mm høy, liggende på frontflaten (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
+| Materialforbruk | 39 cm³, ca. 50 g |
 | Støtte | ingen |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
-| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 1,6 mm klemmearmene blir massive |
+| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,2 mm armene blir massive |
 
 **Velg PETG framfor PLA.** Kaffe rett fra kannen er 80–90 °C, og PLA begynner å bli
 mykt like over 55 °C. PETG (eller ASA/PP) holder formen når en full kopp havner i
@@ -172,13 +186,14 @@ tegnes:
 | `mode` | |
 |---|---|
 | `"use"` | som den står på platen. z = 0 er platetoppen, y = 0 er frontflaten, x = 0 er venstre side av koppen |
-| `"check"` | som `"use"`, med sokkelen og bordet tegnet som spøkelser for visuell passkontroll |
+| `"check"` | som `"use"`, med teakplaten, den grå sokkelen og bordet tegnet som spøkelser for visuell passkontroll |
 | `"print"` | liggende på frontflaten, klar for sliceren |
 | `"gauge"`, `"gauge_clamp"`, `"clip"` | testbitene over, alle klare for sliceren |
 | `"cavity"` | traurommet som et massivt volum, for å måle kapasiteten |
 
 Alle parametrene ligger øverst i fila. `echo` skriver ut ytre mål, den flate
-bunnen, hvor gripeflatene ligger og fotavtrykket i printet; `assert` stopper
+bunnen, armene med gripeflatene sine og fotavtrykket i printet; `assert` stopper
 renderingen hvis bakrampen ikke får plass i dybden, hvis tunga kolliderer med
-beinet eller rekker under foten, hvis en klemme rekker forbi bakflaten eller under
-foten, eller hvis munnen på klemmene blir smalere enn sokkelen.
+beinet eller rekker under foten, hvis en arm havner utenfor siden av koppen, blir
+høyere enn sokkelen, kommer inn i avrundingen av rimet eller rekker forbi baksiden
+av sokkelen, eller hvis munnen på armene blir smalere enn sokkelen.

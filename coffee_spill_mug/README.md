@@ -5,8 +5,8 @@
 A shallow trough that catches the coffee that runs down the outside of the pot and
 out across the plate, instead of letting it end up on the table and in a paper
 towel. It sits on the free front part of the teak plate under the internet
-connected coffee scale, reaches out over the front edge of the plate, and locks
-itself to the rig with two spring clamps when it is pushed on.
+connected coffee scale, reaches out over the front edge of the plate, and grips
+the grey socle behind it with two spring arms when it is pushed on.
 
 ![The tray in place on the plate](img/coffee_spill_mug_on_plate.png)
 
@@ -20,16 +20,27 @@ the plate, and the front wall carries on down to the table.
 
 | Dimension | Value | Where it comes from |
 |---|---|---|
-| Body width | 80 mm | the width of the socle on the front of the plate, measured to 80.10 mm |
-| Widest point | 84.4 mm | the spring clamps stand 2.2 mm outside the body on each side |
-| Depth on the plate | 30 mm | free plate from the front edge in to the sensor holder |
+| Body width | 80 mm | the width of the tongue on the front of the plate, measured to 80.10 mm. This is also the widest point of the part – the spring arms are set *inside* the sides, not outside them. |
+| Depth on the plate | 30 mm | free plate from the front edge in to the grey socle |
 | Overhang | 10 mm | out past the front edge of the plate, so drips that run over the edge are caught too |
-| Total depth | 40 mm | 10 + 30 |
-| Rim height over the plate | 20.5 mm | **maximum** – leaves air up to the underside of the big grey cup the pot stands in. Fitted with the 2 mm gauge. |
-| Height of the plate over the table | 20.6 mm | how far the leg reaches down (`plate_height`), also fitted with the gauge |
+| Body depth | 40 mm | 10 + 30 |
+| Total depth | 58 mm | the two spring arms reach 18 mm further back, alongside the grey socle |
+| Rim height over the plate | 20.5 mm | the grey socle is 22 mm, and there are several mm of air from its top up to the big grey cup, so the rim has room to spare. Fitted with the 2 mm gauge. |
+| Height of the plate over the table | 20.6 mm | how far the leg reaches down (`plate_height`), fitted with the gauge |
 | Total height | 40.8 mm | from the table to the rim |
 | Walls / floor | 2.4 / 2.0 mm | |
 | Trough | 18.5 mm deep, 35 ml to the rim | measured from `mode = "cavity"` |
+
+The rig itself, measured with the caliper – these are the numbers the clamping is
+derived from:
+
+| The rig | Value |
+|---|---|
+| Grey printed socle, width | 76 mm |
+| Grey printed socle, height above the teak plate | 22 mm |
+| Grey printed socle, depth backwards | not measured, "a lot", around 76 mm |
+| Teak plate, thickness | 19 mm |
+| Teak plate, top surface over the table | 20.6 mm (`plate_height`, fitted with the gauge) |
 
 ## It may rest on the table
 
@@ -67,39 +78,36 @@ Three details in the section that are there on purpose:
 The tray weighs about 50 g, which becomes a fixed offset – **tare the scale** with
 the empty tray in place.
 
-## The side spring clamps
+## The two spring arms
 
-Each side carries a leaf spring that grips the side of the socle, so the tray
-locks itself to the rig when it is pushed on from the front and lifts off with a
-firm pull. Read the section with the rim at the top and the plate surface where
-the floor of the trough is:
+The thing worth gripping is the **grey printed socle** that carries the sensor: a
+block 76 mm wide standing 22 mm up from the teak plate, right behind the tray. So
+each side wall simply carries on backwards past the rear face as a leaf spring
+18 mm long and 2.2 mm thick, and the pair of them straddles that block.
 
-![Cross section through one clamp](img/coffee_spill_mug_clamp.png)
+Seen from above, with the rim at the bottom and the arms reaching back:
 
-From the top down: a **bridge** ties the clamp to the side wall 12 mm above the
-plate, an **arm** 1.6 mm thick runs down the outside of that wall separated from
-it by a 0.6 mm **slot**, and at the bottom the arm turns in under the tray into a
-**jaw** that reaches 5 mm down past the top of the plate and presses on the side
-of the socle. The clamp is 26 mm long.
+![The two arms seen from above](img/coffee_spill_mug_clamp.png)
 
-The bending happens over the whole 12 mm of the arm, not in a short root, which is
-what makes the grip springy instead of brittle: the numbers above give roughly
-**6 N per side** at 0.2 mm deflection, with a peak stress around 7 MPa – about a
-seventh of what PETG takes. `clamp_squeeze` (0.4 mm total over both sides) is the
-number to tune if the grip is too weak or the tray is too hard to push on.
+Because the socle is 4 mm narrower than the tray, the arms are set in 2 mm from
+the sides – their outer faces are flush with the sides of the tray and the tray
+stays exactly **80 mm wide**, which the old design (jaws hooking down around the
+plate, 84.4 mm across) did not.
 
-The gripping face is relieved `clamp_lead` = 1.0 mm at the front and closes in on
-the socle over the first 10 mm, so the front edge of the socle wedges the jaws
-apart instead of hitting them head on.
+| | |
+|---|---|
+| Gripping faces | x = 2.2 and 77.8, i.e. `clamp_squeeze` = 0.4 mm total interference on the 76 mm socle |
+| Arm | 2.2 mm thick, 17.5 mm tall, 18 mm free length |
+| Mouth at the free end | 77.6 mm, relieved `clamp_lead` = 1.0 mm per side so the front corners of the socle wedge the arms apart instead of hitting them head on, closing in over the last 6 mm |
+| Bottom of the arm | 1.5 mm above the plate (`clamp_z0`), to clear any fillet or elephant foot at the base of the socle |
+| Top of the arm | 19 mm = `tray_height - edge_r`; any higher and the rounding of the rim would thin the arm to a knife edge |
+| Force | about 3.2 N per side at 0.2 mm deflection, peak stress about 4 MPa – a twelfth of what PETG takes |
 
-**Two things to measure before printing the whole tray:**
+The bending happens over the whole 18 mm free length, not in a short root, which
+is what makes the grip springy instead of brittle. `clamp_squeeze` is the number
+to tune if the grip is too weak or the tray is too hard to push on.
 
-- `clamp_depth` = 5 mm must stay inside the thickness of the socle at its front
-  edge, or the jaws will foul whatever is under it.
-- `clamp_len` = 26 mm must stay inside the length over which the socle really is
-  80.1 mm wide, before it widens out towards the sensor holder.
-
-## Printed on the front face – and why that changed
+## Printed on the front face – and why
 
 The part is printed **lying on its front face**, so the print axis runs backwards
 along the depth of the tray.
@@ -107,16 +115,21 @@ along the depth of the tray.
 ![Lying on the front face, ready for the slicer](img/coffee_spill_mug_print.png)
 
 An earlier version stood on one short end, which is the obvious choice for the
-trough on its own. The clamps make that impossible: a clamp can only grow 45° per
-layer, so a jaw reaching 5 mm down under the tray would have to stand 5 mm out
-from the side with a 45° inner face – and a 45° face cannot grip a vertical side.
+trough on its own. The arms make that impossible: both gripping faces are planes
+at constant x, and standing the part on end puts the print axis along x, which
+turns those planes into layer planes – the inner face of the upper arm becomes a
+ceiling hanging over nothing. Standing the tray upright is worse: the whole
+underside would be a 30 × 80 mm ceiling in the air above the leg.
 
 Lying on the front face, every surface that has to be vertical – the gripping
-faces, the slot, the arms – runs parallel to the print axis and comes out exactly
-as drawn. The whole front face becomes the first layer, 80 × 40.8 mm of solid
-contact with the bed, and the floor and the walls of the trough are printed as one
-continuous outline in every single layer, so the corner where they meet is not a
-layer boundary the coffee can seep through.
+faces, the sides of the arms – runs parallel to the print axis and comes out
+exactly as drawn. The whole front face becomes the first layer, 80 × 40.8 mm of
+solid contact with the bed, and the floor and the walls of the trough are printed
+as one continuous outline in every single layer, so the corner where they meet is
+not a layer boundary the coffee can seep through. The two arms end up as the last
+18 mm of the print: two fins standing on the rear face, each with a 2.2 × 17.5 mm
+footprint. They print fine, but slow the last layers down if your slicer does not
+do it by itself.
 
 Only two surfaces face the bed in this orientation, and both are dealt with at
 45°, the steepest overhang that prints without support:
@@ -141,18 +154,18 @@ Three cheap prints, in the order they are worth making:
 | `mode` | Cost | What it tells you |
 |---|---|---|
 | `"gauge"` | 2 g | The whole cross section as a 2 mm slice, lying flat. Hook it on the front edge of the plate: does the leg reach the table, does the tongue clear whatever is under the plate, is there air left up to the grey cup? |
-| `"gauge_clamp"` | 1 g | A 1.5 mm slice across both clamps, lying flat. Do the jaws land on the sides of the socle, and does it slide on? Note that the spring force scales with the length of the clamp, so a 1.5 mm slice pinches roughly 1/17 as hard as the finished tray – judge the fit here, not the friction. |
-| `"clip"` | 28 g | The front 26 mm of the tray in print orientation: leg, tongue and both complete clamps. This is the real friction test, but it costs half a tray, so it is only worth it if `"gauge_clamp"` leaves you unsure about `clamp_squeeze`. |
+| `"gauge_clamp"` | 1.5 g | A 1.5 mm slice at the top of the arms – a ring of wall plus both arms, held apart at the right spacing, already flat. Do the arms straddle the socle, does the mouth find it, and is there room beside the socle for a 2.2 mm arm? Note that the spring force scales with the height of the arm, so a 1.5 mm slice pinches roughly 1/12 as hard as the finished tray – judge the fit here, not the friction. |
+| `"clip"` | 22 g | The rear 12 mm of the tray plus both complete arms, standing on the cut face. This is the real friction test, but it costs nearly half a tray, so it is only worth it if `"gauge_clamp"` leaves you unsure about `clamp_squeeze`. |
 
 ## Printing
 
 | | |
 |---|---|
-| Print size | 84.4 × 40.8 mm footprint, 40 mm tall, lying on the front face (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Material | 40 cm³, approx. 50 g |
+| Print size | 80 × 40.8 mm footprint, 58 mm tall, lying on the front face (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
+| Material | 39 cm³, approx. 50 g |
 | Support | none |
 | Brim | not needed – the first layer is the whole front face |
-| Walls | at least 3 perimeters, so the 2.4 mm walls and the 1.6 mm clamp arms come out solid |
+| Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.2 mm arms come out solid |
 
 **Choose PETG rather than PLA.** Coffee straight from the pot is 80–90 °C, and PLA
 starts to soften just above 55 °C. PETG (or ASA/PP) keeps its shape when a full
@@ -175,14 +188,15 @@ Open `coffee_spill_mug.scad` to look at it instead. `mode` decides what is drawn
 | `mode` | |
 |---|---|
 | `"use"` | as it sits on the plate. z = 0 is the top of the plate, y = 0 is the front face, x = 0 is the left side of the body |
-| `"check"` | as `"use"`, with the socle and the table drawn as ghosts for a visual fit check |
+| `"check"` | as `"use"`, with the teak plate, the grey socle and the table drawn as ghosts for a visual fit check |
 | `"print"` | lying on the front face, ready for the slicer |
 | `"gauge"`, `"gauge_clamp"`, `"clip"` | the test pieces above, all ready for the slicer |
 | `"cavity"` | the trough volume as a solid, for measuring the capacity |
 
 All the parameters sit at the top of the file. `echo` prints the outer dimensions,
-the flat floor, the position of the gripping faces and the print footprint;
-`assert` stops the rendering if the rear ramp does not fit in the depth, if the
-tongue collides with the leg or reaches below the foot, if a clamp reaches past the
-rear face or below the foot, or if the mouth of the clamps ends up narrower than
+the flat floor, the arms with the position of their gripping faces, and the print
+footprint; `assert` stops the rendering if the rear ramp does not fit in the depth,
+if the tongue collides with the leg or reaches below the foot, if an arm ends up
+outside the side of the tray, taller than the socle, into the rounding of the rim
+or past the back of the socle, or if the mouth of the arms ends up narrower than
 the socle.
