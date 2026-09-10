@@ -159,10 +159,34 @@ clamp_lead    = 1.0;    // relief of the gripping face at the free end
 clamp_lead_y  = 6;      // ... closing in on the socle over this length
 clamp_r       = 0.4;    // rounding of the free end of the arm
 
-/* [Rim] */
-edge_r = 1.5;       // rounding of the four long outer edges. The front and rear
-                    // faces are left sharp on purpose: the front face is the
-                    // first layer and wants full contact with the bed.
+/* [Rounded edges] */
+// Everything that meets the print bed - the whole perimeter of the front face,
+// and the two front corners seen from above - is broken with a 45 degree chamfer
+// rather than a fillet. A fillet there is tangent to the bed, so the first layer
+// would be inset and the next one would hang 0.8 mm out over nothing: it prints
+// as a rough drooping lip. 45 degrees is the steepest overhang that comes out
+// clean, and a chamfered edge is no longer a sharp edge to the hand.
+//
+// Everything else is a true fillet, and free: the four long edges are prisms
+// along the print axis, and the fillets on the rear face and the underside only
+// shrink the cross section as the print grows upwards.
+//
+// minkowski() with a sphere would round the lot in one line, but it grows every
+// outward face by the radius - the mouth between the spring arms would close by
+// 2 r and the leg down to the table would grow r longer, i.e. exactly the two
+// dimensions that must not move. (The usual correction is to build the source
+// solid r smaller first, but there is no single scalar to shrink here.) offset()
+// and fillet arcs only ever remove material, so the critical dimensions stay
+// exactly as measured.
+edge_r   = 1.5;     // the four long outer edges, running along the depth
+front_c  = 1.0;     // 45 degree chamfer round the whole front face
+corner_c = 3;       // 45 degree cut across the two front corners, in plan
+rear_r   = 1.5;     // rear edge of the rim
+under_r  = 0.8;     // rear edge of the underside
+foot_r   = 0.6;     // inner edge of the foot and the edges of the tongue
+arm_r    = 0.8;     // top and bottom edges of the spring arms, outer side only:
+                    // the gripping faces keep their full height
+fillet_steps = 8;   // facets per fillet arc
 
 /* [View] */
 // "use"    = as it sits on the plate (z = 0 is the plate surface)
@@ -245,6 +269,17 @@ assert(!clamp_enable || 2 * clamp_r < clamp_t - clamp_lead,
 assert(!clamp_enable || grip_x - clamp_lead < socle_x0,
        "the mouth of the arms is narrower than the socle - increase clamp_lead");
 assert(clip_back > wall_t, "clip_back must reach in front of the rear wall");
+assert(!leg_enable || front_c + foot_r + 1 < leg_t,
+       "no flat foot left to bear on - reduce front_c or foot_r");
+assert(front_c < wall_t && rear_r < wall_t && front_c + edge_r < tray_width / 2,
+       "front_c or rear_r larger than the wall they break");
+assert(2 * corner_c < tray_width && corner_c < overhang,
+       "corner_c too large - it would cut into the plate edge");
+assert(under_r + rear_r < tray_height, "under_r and rear_r meet in the rear face");
+assert(!hook_enable || 2 * foot_r < min(hook_t, hook_depth - hook_relief),
+       "foot_r too large for the locating tongue");
+assert(!clamp_enable || (arm_r < clamp_t && 2 * arm_r < clamp_h - clamp_z0),
+       "arm_r too large for the spring arms");
 
 echo(str("Tray ", tray_width, " x ", tray_depth, " x ", tray_height,
          " mm over the plate, ", tray_height - table_z, " mm over the table"));
@@ -284,6 +319,33 @@ module extrude_y(y0, len) {
 
 function reverse(v) = [for (i = [len(v) - 1 : -1 : 0]) v[i]];
 
+function unit(v) = v / norm(v);
+
+// Replaces the corner p1 of a polyline p0-p1-p2 with a tangent arc of radius r,
+// so a fillet can be asked for one named corner at a time instead of offsetting
+// the whole outline. r = 0 leaves the corner as it is.
+function corner_arc(p0, p1, p2, r) =
+    r <= 0 ? [p1] :
+    let (v1 = unit(p0 - p1),
+         v2 = unit(p2 - p1),
+         a  = acos(max(-1, min(1, v1 * v2))),   // angle at the corner
+         t  = r / tan(a / 2),                   // tangent distance along the legs
+         c  = p1 + unit(v1 + v2) * (r / sin(a / 2)),
+         s1 = p1 + v1 * t,
+         s2 = p1 + v2 * t,
+         a1 = atan2(s1[1] - c[1], s1[0] - c[0]),
+         a2 = atan2(s2[1] - c[1], s2[0] - c[0]),
+         d  = ((a2 - a1) + 540) % 360 - 180)    // the short way round
+    [for (i = [0 : fillet_steps])
+        let (w = a1 + d * i / fillet_steps) c + r * [cos(w), sin(w)]];
+
+// Takes a closed outline as [[point, radius], ...] and returns the points
+function round_poly(pv) =
+    let (n = len(pv))
+    [for (i = [0 : n - 1])
+        each corner_arc(pv[(i + n - 1) % n][0], pv[i][0], pv[(i + 1) % n][0],
+                        pv[i][1])];
+
 // A quarter fillet of radius r, tangent to the floor at distance r from the
 // wall. Points run from the wall (top of the fillet) down to the floor.
 function fillet_up(wall, dir, r, floor) =
@@ -297,29 +359,67 @@ function fillet_up(wall, dir, r, floor) =
 //  z = table_z is the table. Traversed from the foot of the leg, backwards along
 //  the underside, up the rear face and forwards along the rim.
 // ---------------------------------------------------------------------------
-function body_section() = concat(
+//  Each corner carries its own fillet radius; the two on the front face are 0,
+//  they are chamfered by front_chamfer_mask() instead.
+function body_pts() = concat(
     leg_enable
-    ? [[0, table_z],                        // outer bottom corner of the leg
-       [leg_t, table_z],                    // inner bottom corner of the leg
-       [leg_t, 0]]                          // up the back of the leg
-    : [[0, 0]],
+    ? [[[0, table_z], 0],                   // outer bottom corner of the leg
+       [[leg_t, table_z], foot_r],          // inner bottom corner of the leg
+       [[leg_t, 0], 0]]                     // up the back of the leg
+    : [[[0, 0], 0]],
     hook_enable
-    ? concat(hook_lead > leg_t ? [[hook_lead, 0]] : [],
-             [[hook_front, -hook_depth],    // bottom front corner of the tongue,
-                                            // reached at 45 degrees from the leg
-              [overhang, -hook_depth],      // bottom of the tongue
-              [overhang, -hook_relief],     // inside of the tongue, on the plate edge
-              [overhang + hook_relief, 0]]) // relief in the inner corner
+    ? concat(hook_lead > leg_t ? [[[hook_lead, 0], 0]] : [],
+             [[[hook_front, -hook_depth], foot_r],  // bottom front corner of the
+                                            // tongue, reached at 45 degrees
+              [[overhang, -hook_depth], foot_r],    // bottom of the tongue
+              [[overhang, -hook_relief], 0],   // inside, on the plate edge
+              [[overhang + hook_relief, 0], 0]])   // relief in the inner corner
     : [],
-    [[tray_depth, 0],                       // underside, resting on the plate
-     [tray_depth, tray_height],             // rear face
-     [0, tray_height]]);                    // rim, back to the front face
+    [[[tray_depth, 0], under_r],            // underside, resting on the plate
+     [[tray_depth, tray_height], rear_r],   // rear face
+     [[0, tray_height], 0]]);               // rim, back to the front face
 
-// The four long outer edges of body and arms alike, rounded. A prism along the
-// print axis, so the rounding is free; the front and rear faces stay sharp.
+function body_section() = round_poly(body_pts());
+
+// The outline of the front face, in (x, z), with the four long outer edges
+// rounded. A prism along the print axis, so that rounding is free.
+module front_outline() {
+    round2d(edge_r) translate([0, table_z]) square([tray_width, tray_height - table_z]);
+}
+
 module rounded_bounds() {
-    extrude_y(-1, part_d + 2) round2d(edge_r)
-        translate([0, table_z]) square([tray_width, tray_height - table_z]);
+    extrude_y(-1, part_d + 2) front_outline();
+}
+
+// Cuts the two front corners at 45 degrees, seen from above. A fillet here would
+// be tangent to the bed; this rises from the first layer at exactly 45 degrees.
+module plan_mask() {
+    translate([0, 0, table_z - 1])
+        linear_extrude(height = tray_height - table_z + 2)
+            polygon([[corner_c, 0], [tray_width - corner_c, 0],
+                     [tray_width, corner_c], [tray_width, part_d + 1],
+                     [0, part_d + 1], [0, corner_c]]);
+}
+
+// A 45 degree chamfer all the way round the front face, i.e. round the first
+// layer: the outline at y = 0 is inset front_c mm and opens out to full size
+// front_c mm up.
+module front_chamfer_mask() {
+    union() {
+        hull() {
+            extrude_y(0, 0.01) offset(r = -front_c) front_outline();
+            extrude_y(front_c, 0.01) front_outline();
+        }
+        translate([-1, front_c, table_z - 1])
+            cube([tray_width + 2, part_d + 2, tray_height - table_z + 2]);
+    }
+}
+
+// Rounds the top and bottom edges of the spring arms, on the outer side only -
+// the mask spans the full width, so it never touches the gripping faces.
+module arm_mask() {
+    extrude_y(cav_y1, arm_end - cav_y1) round2d(arm_r)
+        translate([0, clamp_z0]) square([tray_width, clamp_h - clamp_z0]);
 }
 
 // ---------------------------------------------------------------------------
@@ -387,9 +487,11 @@ module coffee_spill_tray() {
         intersection() {
             union() {
                 extrude_x(0, tray_width) polygon(body_section());
-                if (clamp_enable) clamps();
+                if (clamp_enable) intersection() { clamps(); arm_mask(); }
             }
             rounded_bounds();
+            plan_mask();
+            front_chamfer_mask();
         }
         trough();
     }

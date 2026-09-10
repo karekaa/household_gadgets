@@ -75,7 +75,7 @@ Three details in the section that are there on purpose:
   underside meets the tongue, so a rounded or slightly chamfered plate edge still
   lets the tray seat flat.
 
-The tray weighs about 50 g, which becomes a fixed offset – **tare the scale** with
+The tray weighs about 49 g, which becomes a fixed offset – **tare the scale** with
 the empty tray in place.
 
 ## The two spring arms
@@ -106,6 +106,43 @@ plate, 84.4 mm across) did not.
 The bending happens over the whole 18 mm free length, not in a short root, which
 is what makes the grip springy instead of brittle. `clamp_squeeze` is the number
 to tune if the grip is too weak or the tray is too hard to push on.
+
+## Rounded edges, and why not `minkowski()`
+
+| Edge | Treatment |
+|---|---|
+| The four long outer edges, running along the depth | fillet `edge_r` = 1.5 mm |
+| The whole perimeter of the front face | 45° chamfer `front_c` = 1.0 mm |
+| The two front corners, seen from above | 45° cut `corner_c` = 3 mm |
+| Rear edge of the rim | fillet `rear_r` = 1.5 mm |
+| Rear edge of the underside | fillet `under_r` = 0.8 mm |
+| Inner edge of the foot, edges of the locating tongue | fillet `foot_r` = 0.6 mm |
+| Top and bottom of the spring arms, outer side | fillet `arm_r` = 0.8 mm |
+| Free end of the arms, seen from above | fillet `clamp_r` = 0.4 mm |
+| The rear corners seen from above, and the gripping faces | left square – they butt against the socle, and the arms are rooted in those corners |
+
+**Everything that meets the print bed is chamfered at 45°, not filleted.** A fillet
+along the bottom edge is tangent to the bed, so the first layer comes out inset
+and the second one hangs about 0.8 mm out over nothing; it prints as a rough
+drooping lip. 45° is the steepest overhang that comes out clean, and a chamfered
+edge is no longer sharp to the hand. Everything else is a true fillet, and costs
+nothing in the print: the long edges are prisms along the print axis, and the
+fillets on the rear face and the underside only shrink the cross section as the
+print grows upwards. Measured on the finished STL, no surface in the part faces
+the bed at more than exactly 45°.
+
+`minkowski()` with a sphere would round the lot in one line, and it is the right
+tool on a plain box. Not here: a Minkowski sum replaces every point of the solid
+with a ball of radius *r*, so **every outward face grows by *r*** – that is the
+definition, not a quirk. The usual correction is to build the source solid *r*
+smaller first (`cube([w-2*r, d-2*r, h-2*r])` plus `sphere(r)` gives exactly
+w × d × h), but there is no single scalar to shrink here, and worse: it would
+close the mouth between the spring arms by 2 *r* and make the leg down to the
+table *r* longer – exactly the two dimensions that must not move. `offset()` and
+tangent fillet arcs only ever remove material, so the arm spacing (77.6/76 mm)
+and the leg (20.3 mm) come out exactly as measured. Rounding one named corner at
+a time also keeps the concave corners square, which `minkowski()` would do too but
+`offset(r) offset(-r)` would not.
 
 ## Printed on the front face – and why
 
@@ -162,7 +199,7 @@ Three cheap prints, in the order they are worth making:
 | | |
 |---|---|
 | Print size | 80 × 40.8 mm footprint, 58 mm tall, lying on the front face (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Material | 39 cm³, approx. 50 g |
+| Material | 38.7 cm³, approx. 49 g |
 | Support | none |
 | Brim | not needed – the first layer is the whole front face |
 | Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.2 mm arms come out solid |
@@ -198,5 +235,6 @@ the flat floor, the arms with the position of their gripping faces, and the prin
 footprint; `assert` stops the rendering if the rear ramp does not fit in the depth,
 if the tongue collides with the leg or reaches below the foot, if an arm ends up
 outside the side of the tray, taller than the socle, into the rounding of the rim
-or past the back of the socle, or if the mouth of the arms ends up narrower than
-the socle.
+or past the back of the socle, if the mouth of the arms ends up narrower than the
+socle, or if a fillet or chamfer is too large for the feature it is supposed to
+break.

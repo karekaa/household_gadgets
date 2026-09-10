@@ -73,7 +73,7 @@ Tre detaljer i snittet som er der med hensikt:
   undersiden møter tunga, så en avrundet eller lett fasa platekant likevel lar
   koppen sette seg helt ned.
 
-Koppen veier ca. 50 g, som blir et fast tillegg – **tarér vekta** med tom kopp på
+Koppen veier ca. 49 g, som blir et fast tillegg – **tarér vekta** med tom kopp på
 plass.
 
 ## De to fjærarmene
@@ -104,6 +104,41 @@ yttersidene er i flukt med sidene på koppen, og koppen blir stående på nøyak
 Bøyningen skjer over hele de 18 mm frie lengden, ikke i en kort rot, og det er det
 som gjør grepet fjærende i stedet for sprøtt. `clamp_squeeze` er tallet du justerer
 hvis grepet er for svakt eller koppen er for tung å skyve på.
+
+## Avrundede kanter, og hvorfor ikke `minkowski()`
+
+| Kant | Behandling |
+|---|---|
+| De fire lange ytterkantene, langs dybden | fillet `edge_r` = 1,5 mm |
+| Hele omkretsen av frontflaten | 45°-fas `front_c` = 1,0 mm |
+| De to fremre hjørnene, sett ovenfra | 45°-kutt `corner_c` = 3 mm |
+| Bakkanten av rimet | fillet `rear_r` = 1,5 mm |
+| Bakkanten av undersiden | fillet `under_r` = 0,8 mm |
+| Innerkanten av foten, kantene på låsetunga | fillet `foot_r` = 0,6 mm |
+| Topp og bunn av fjærarmene, yttersiden | fillet `arm_r` = 0,8 mm |
+| Frie enden av armene, sett ovenfra | fillet `clamp_r` = 0,4 mm |
+| De bakre hjørnene sett ovenfra, og gripeflatene | står skarpe – de ligger mot sokkelen, og armene har rota si i de hjørnene |
+
+**Alt som møter printbordet er fasa 45°, ikke avrundet.** En fillet langs
+underkanten er tangent til bordet, så førstelaget blir liggende innenfor og
+andrelaget henger ca. 0,8 mm ut i lufta; det printer som en ru, hengende leppe.
+45° er det bratteste overhenget som kommer rent ut, og en fasa kant er ikke lenger
+skarp mot handa. Alt annet er ekte filleter, og de er gratis i printet: de lange
+kantene er prismer langs printaksen, og filletene på bakflaten og undersiden bare
+krymper tverrsnittet etter hvert som printet vokser oppover. Målt på den ferdige
+STL-fila vender ingen flate i delen mot bordet med mer enn nøyaktig 45°.
+
+`minkowski()` med en kule ville avrundet alt på én linje, og på en enkel kloss er
+det riktig verktøy. Ikke her: en Minkowski-sum bytter hvert punkt i objektet med
+en kule med radius *r*, så **alle utoverflater vokser *r*** – det er definisjonen,
+ikke en tilpasning. Den vanlige korreksjonen er å bygge kildeobjektet *r* mindre
+først (`cube([w-2*r, d-2*r, h-2*r])` pluss `sphere(r)` gir eksakt w × d × h), men
+her finnes det ingen enkelt skalar å krympe – og verre: det ville lukket munnen
+mellom fjærarmene 2 *r* og gjort beinet ned til bordet *r* for langt, altså
+nøyaktig de to målene som ikke får flytte seg. `offset()` og tangerende
+fillet-buer fjerner bare materiale, så armavstanden (77,6/76 mm) og beinet
+(20,3 mm) kommer ut eksakt som målt. Å runde ett navngitt hjørne av gangen holder
+også de innvendige hjørnene skarpe.
 
 ## Printet på frontflaten – og hvorfor
 
@@ -159,7 +194,7 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | | |
 |---|---|
 | Printmål | 80 × 40,8 mm fotavtrykk, 58 mm høy, liggende på frontflaten (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Materialforbruk | 39 cm³, ca. 50 g |
+| Materialforbruk | 38,7 cm³, ca. 49 g |
 | Støtte | ingen |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
 | Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,2 mm armene blir massive |
@@ -196,4 +231,5 @@ bunnen, armene med gripeflatene sine og fotavtrykket i printet; `assert` stopper
 renderingen hvis bakrampen ikke får plass i dybden, hvis tunga kolliderer med
 beinet eller rekker under foten, hvis en arm havner utenfor siden av koppen, blir
 høyere enn sokkelen, kommer inn i avrundingen av rimet eller rekker forbi baksiden
-av sokkelen, eller hvis munnen på armene blir smalere enn sokkelen.
+av sokkelen, hvis munnen på armene blir smalere enn sokkelen, eller hvis en fillet
+eller fas er for stor for kanten den skal bryte.
