@@ -25,9 +25,18 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
  Jeg har nå testet coffee_spill_mug_clamp, og den gikk innpå den grå «bunnklossen» oppå teakplaten, men den spriket litt ut, og jeg fikk vel heller ikke skjøvet den helt inn. Vi må derfor la åpningen mellom disse gripe-armene bli minst 0,1 mm større - kanskje 0,2 mm? Kanskje vi også la coffee_spill_mug_clamp bli 2,5 mm tykk i stededt for 1,5 mmm, så den blir litt stivere for neste test
 
 
+Er også mode «clip» en kjapp test-print for å kjenne på friksjon sier du?
+
+
  Nye rettelser: Lengden på den høyre armen kan være så lang den er, men den venstre vil nå butte i en kontakt, så den må kuttes ned til 14 mm lendge. Så en mer estetisk feil, som ikke påvirker designet på koppen og som jeg så både i koden og den visuliserte sluttproduktet: Teakplaten er 200 x 200 mm (20x20cm) og med et 45 grader avkapp på alle 4 hjørner hvor den lille sidekanten blir på ca 37 mm lenge. Alt forklart kan sees på bilder: [Image #6] [Image #7] [Image #8]
 
 
 Og jeg burde sagt: Jeg tror vi skal åpne litt til i gapet mellom armene på bare 0,1 mm
 
+Jeg må også tilføye: 100% enig i at PETG burde vi brukt, og bør gjerne fortsatt anbefales beskrivelsene. Nå blir den laget med det vi har på lager: 1.75mm PLA+3D filament Black-5kg(N.W) fra esun3d.com: [Image #9]. Mengden kaffedråper som kommer er få, de henger typisk en stund på dispenseren før de faller ned, og er nok ikke så varme når de treffer koppen.
+
 Kan vi få til en liten tekst i det som blir fronten (altså det som ligger ned mot printplaten)? F.eks: SpareBank 1 kaffsølsamler\nTrekk ut for tømming. Vedlagt foto viser at overhenget er litt bratt. Løsningen kan vel være å ha en slakere stigning. Vi kan godt lage koppen f.eks. 10 mm bredere og kanske 8 mm dypere? [Image #10]
+
+Vi kan faktisk åpne f.eks. 0.1 til 0.2 mm mer i gapet - da den bør ikke komme ut med ett rykk, så kafferester skulper ut når den trekkes frem.
+
+A cool feature of the new longer slope in the cup where the a little hot coffee drops is hitting, these will disperse themself over a biger surface while they run down to the bottom and cooling at the same time.
