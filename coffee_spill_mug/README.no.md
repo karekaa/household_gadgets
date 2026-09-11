@@ -5,20 +5,91 @@
 Et lavt trau som fanger opp kaffen som renner ned langs kannen og utover platen, i
 stedet for at det ender på bordet og i et tørkepapir. Den står på den frie
 forkanten av teakplaten under den internett-tilkoblede kaffevekten, strekker seg ut
-over ytterkanten av platen, og griper rundt den grå sokkelen bak seg med to armer.
+over ytterkanten av platen, og lukker seg bak mot det riggen har stående der.
+
+Det finnes **to slags rigger**, og parameteren `base` velger hvilken av dem
+byggingen gjelder – `"box"` for den grå elektronikkboksen, `"round"` for et buet
+fundament under vektskålen. Alt annet er felles. Begynn med
+[To rigger, én fil](#to-rigger-én-fil) om du er usikker på hvilken du har.
 
 ![Koppen på plass på platen](img/coffee_spill_mug_on_plate.png)
 
-Selve koppen er **90 × 48 × 20,5 mm** over platen og holder **ca. 46 ml**. Den
-hviler på platen over de bakre 30 mm, de forreste 18 mm stikker ut forbi
-platekanten, og frontveggen fortsetter ned til bordet – med to linjer tekst gravert
-i seg:
+Selve koppen er **90 × 48 × 20,5 mm** over platen og holder **ca. 46 ml** på
+firkantbasen, 90 × 60 mm og ca. 51 ml på den runde. Den hviler på platen over de
+bakre 30 mm, de forreste 18 mm stikker ut forbi platekanten, og frontveggen
+fortsetter ned til bordet – med to linjer tekst gravert i seg:
 
 ![Frontflaten, som også er førstelaget i printet](img/coffee_spill_mug_front.png)
 
 ![Koppen sett ovenfra](img/coffee_spill_mug_iso.png)
 
+## To rigger, én fil
+
+En runde til de andre kaffesensorene avdekket noe den første koppen ikke hadde tatt
+høyde for: **de fleste riggene har ikke den grå firkantede elektronikkboksen i det
+hele tatt.** De har et buet fundament under vektskålen, og der har en flat bakflate
+med to armer ingenting å gripe i. Baksiden av koppen er derfor gjort valgbar:
+
+| `base` | Hva som står bak koppen | Hvordan koppen lukker seg mot det |
+|---|---|---|
+| `"box"` | den grå 3D-printede elektronikkboksen, en firkantet kloss 76 mm bred og 22 mm høy | en flat bakflate pluss to armer, én langs hver side av den |
+| `"round"` | et buet fundament, R 87 mm, tegnet som en bue på 120° | en konkav bue på R 87,4 mm som legger seg inntil det. Ingen armer i det hele tatt. |
+
+Dette er én fil med en bryter og ikke to filer, fordi de to variantene deler
+trauet, rampen, beinet, tunga, teksten, printorienteringen og hver eneste fillet.
+Bakflaten er virkelig alt som skiller dem, og en fork ville doblet alt framtidig
+arbeid – inkludert to README-er.
+
+**Buen er en bedre styring enn armene noen gang var.** To buede flater med samme
+radius som holdes mot hverandre styrer hverandre i *begge* akser samtidig: koppen
+sentrerer seg selv sideveis og retter seg opp mens den skyves inn, uten en
+passform-toleranse å gjette på, uten fjærarmer og uten noe som slipper med et rykk.
+De 0,4 mm `base_clear` er der for at de to flatene skal ligge inntil hverandre langs
+hele buen i stedet for å hake seg fast på en høy flekk i den ene printen.
+
+![Koppen med rund base på plass](img/coffee_spill_mug_round_on_plate.png)
+
+Den gir også gratis kapasitet. Fundamentet buer seg *bort* fra koppen ut mot sidene,
+så der den flatbakete versjonen måtte stoppe ved det nærmeste punktet, fortsetter
+buen:
+
+| Rund base | Verdi |
+|---|---|
+| Dybde på senterlinjen | 47,6 mm |
+| Dybde i hjørnene | 60,1 mm – 12,5 mm lenger bak, og alt av det er trau og ikke vegg |
+| Kapasitet | 50,6 ml, mot 46,5 på firkantbasen |
+| Total dybde på delen | 60,1 mm; firkantversjonen er 66 mm på grunn av armene |
+| Materialforbruk | 52,6 cm³, ca. 67 g |
+| Buen | R 87,4 mm utvendig, R 89,8 mm innvendig, sentrum 135 mm bak frontflaten, `base_fn` = 240 segmenter (kordefeil 0,007 mm) |
+| Bakre hjørner i planet | avrundet `rear_corner_r` = 3 mm, noe firkantversjonen ikke kan – se under |
+
+![Koppen med rund base sett ovenfra](img/coffee_spill_mug_round_iso.png)
+
+Bunnen er en salflate: bakrampen er 35°-profilen rotert om aksen til buen, så den
+svinger oppover mot baksiden og mot hjørnene på én gang, og den flate delen av
+bunnen er dypest tvers over forkanten.
+
+![Den konkave buen sett rett ovenfra](img/coffee_spill_mug_round_top.png)
+
+Fire tall i den runde delen av fila er fortsatt **plassholdere som trenger et
+skyvelær**, og de er merket `MEASURE THIS` i kilden:
+
+| Parameter | Plassholder | Hva som skal måles |
+|---|---|---|
+| `plate_depth_round` | 30 mm, kopiert fra firkantriggen | fri plate fra forkanten inn til det *nærmeste* punktet på det buete fundamentet. Dette er tallet som flytter alt annet: det bestemmer hvor langt bak buen ligger. Print `mode = "gauge"` og hold den mot riggen. |
+| `base_h` | 20 mm | høyden på det buete fundamentet over platen. Bare spøkelset i `mode = "check"` bruker den, men den er det som forteller om buen er høy nok til å være verdt noe. |
+| `disc_r` | 95 mm | radius på vektskålen, som henger ut over fundamentet – godt synlig på bildene av riggene |
+| `disc_z` | 24 mm | høyden på undersiden av den skålen over platen. Sammen med `disc_clear` = 1,5 mm er det den som begrenser `tray_height`, og en `assert` håndhever det. |
+
+`base_r` = 87 mm er ikke gjettet: den er hentet fra CAD-tegningen av fundamentet,
+som gir R 87,00, diameter 174,00 og buelengde 182,25 mm. 182,25 / 87 = 2,094 rad =
+**120,0°**, så fundamentet er en tilsiktet bue på 120° med korde 150,7 mm, og den
+90 mm brede koppen dekker ±31° av den – godt innenfor endene.
+
 ## Hovedmål
+
+Dette er tallene for firkantbasen; den runde basen skiller seg bare på det som står
+i tabellen over.
 
 | Mål | Verdi | Hvor det kommer fra |
 |---|---|---|
@@ -36,7 +107,7 @@ i seg:
 
 Selve riggen, målt med skyvelær – det er disse tallene passformen er utledet fra:
 
-| Riggen | Verdi |
+| Riggen (firkantbasen) | Verdi |
 |---|---|
 | Grå 3D-printet sokkel, bredde | 76 mm |
 | Grå 3D-printet sokkel, høyde over teakplaten | 22 mm |
@@ -69,7 +140,9 @@ Tre detaljer i snittet som er der med hensikt:
   klaringen under den grå koppen – det lengre utstikket hjelper her, det var *3 e*
   før. 0,3 mm er lite nok at beinet overtar så snart noe
   presser på utstikket, og nok til at koppen aldri vipper. Sett den til 0 for fast
-  kontakt.
+  kontakt. På den runde basen ligger de bakre hjørnene 42 mm bak vippepunktet i
+  stedet for 30, så et for langt bein løfter dem *2,3 e* – det er det ene stedet den
+  ekstra dybden koster noe, og grunnen til at `disc_z` er verdt å måle framfor å anta.
 - **En 45°-fas på forsiden av tunga**, fra baksiden av beinet ned til det nedre
   fremre hjørnet på tunga. Den flaten ville ellers blitt et tak i printet – se
   under. Fasen fyller mellomrommet mellom beinet og tunga med en kile, og det er
@@ -78,10 +151,13 @@ Tre detaljer i snittet som er der med hensikt:
   undersiden møter tunga, så en avrundet eller lett fasa platekant likevel lar
   koppen sette seg helt ned.
 
-Koppen veier ca. 65 g, som blir et fast tillegg – **tarér vekta** med tom kopp på
-plass.
+Koppen veier ca. 65 g – 67 g på den runde basen – som blir et fast tillegg uansett:
+**tarér vekta** med tom kopp på plass.
 
 ## De to armene – en glidepassform, med vilje
+
+*Gjelder bare firkantbasen. På den runde basen ses `clamp_enable` bort fra, det
+finnes ingen armer, og buen gjør denne jobben bedre – se over.*
 
 Det som er verdt å gripe rundt, er den **grå 3D-printede sokkelen** som bærer
 sensoren: en kloss 76 mm bred som står 22 mm opp fra teakplaten, rett bak koppen.
@@ -137,7 +213,9 @@ koblet fra hverandre – `clamp_t` er den tykkelsen finna trenger, og armene lig
 | Innerkanten av foten, kantene på låsetunga | fillet `foot_r` = 0,6 mm |
 | Topp og bunn av armene, yttersiden | fillet `arm_r` = 0,8 mm |
 | Frie enden av armene, sett ovenfra | fillet `clamp_r` = 0,4 mm |
-| De bakre hjørnene sett ovenfra, og styreflatene | står skarpe – de ligger mot sokkelen, og armene har rota si i de hjørnene |
+| De bakre hjørnene sett ovenfra | står skarpe på firkantbasen – de ligger mot sokkelen, og armene har rota si i de hjørnene. Avrundet `rear_corner_r` = 3 mm på den runde basen, der ingenting har rota si i dem og et hjørne ytterst på 60 mm rekkevidde er nøyaktig det du henger en erme fast i. Det er gratis i printet: en loddrett kant i modellen ligger *langs* printaksen, så å avrunde den i planet bare kurver konturen i hvert lag. De fremre hjørnene er unntaket og blir stående som 45°-faser, siden en fillet der ville tangert printbordet. |
+| Styreflatene | står skarpe – det er de flatene som ligger mot sokkelen |
+| Over- og underkanten av buen | samme `rear_r` = 1,5 mm og `under_r` = 0,8 mm som på den flate bakflaten, rotert rundt buen |
 
 **Alt som møter printbordet er fasa 45°, ikke avrundet.** En fillet langs
 underkanten er tangent til bordet, så førstelaget blir liggende innenfor og
@@ -174,6 +252,14 @@ innsiden av den øverste armen blir et tak som henger over ingenting. Å stille
 koppen opp ned eller rett opp er verre: da ville hele undersiden blitt et tak på
 30 × 90 mm i lufta over beinet.
 
+Den runde basen vil ha samme orientering, men av en annen grunn. Den konkave buen
+vender bakover, så liggende på frontflaten vender den rett *opp* – den ene retningen
+som aldri er et overheng – og som en rotasjonsflate om en loddrett akse er den et
+prisme langs printaksen overalt der den ikke blir filletert. Den trenger heller
+ingen støtte.
+
+![Den runde basen liggende på frontflaten](img/coffee_spill_mug_round_print.png)
+
 Liggende på frontflaten går alle flater som *må* være loddrette – styreflatene,
 sidene på armene – parallelt med printaksen og kommer ut nøyaktig som tegnet. Hele
 frontflaten blir førstelaget, 90 × 40,8 mm massiv kontakt med bordet, og bunnen og
@@ -209,6 +295,14 @@ Bare to flater vender mot printbordet i denne orienteringen:
 
 Målt på den ferdige STL-fila vender 2423 mm² av flatene mot bordet med 35°
 (rampen) og 943 mm² med nøyaktig 45° (fasene). Ingenting er brattere.
+
+På den runde basen er rampen samme profil rotert om aksen til buen, og det å rotere
+den *hjelper*: etter hvert som rampen svinger rundt ut mot sidene får normalen en
+x-komponent, så det bratteste overhenget på hele rampen er de 35° på senterlinjen og
+alt til side for det er slakere. Målt på `coffee_spill_mug_round.stl`: 907 mm² på
+35°, ytterligere 1686 mm² fordelt fra 34° ned til 30° etter hvert som rampen svinger
+rundt, resten slakere igjen, og 943 mm² på nøyaktig 45° – de samme fasene, uendret.
+Ingenting brattere enn 45° noe sted i noen av variantene.
 
 De to kortendene trenger ingen slik behandling her – de er prismer langs
 printaksen – så innsiden av dem er en rein `inner_fillet` = 5 mm avrunding, og den
@@ -249,15 +343,15 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | `mode` | Kostnad | Hva den forteller |
 |---|---|---|
 | `"gauge"` | 3 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
-| `"gauge_clamp"` | 3 g | En 2,5 mm skive i toppen av armene – en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand, og allerede flat. Går armene ned langs sokkelen, finner munnen den, og er det plass til en 2,05 mm arm ved siden av sokkelen? Den var 1,5 mm først, og det var for slapt til å si noe i det hele tatt: den bare spriket ut. Nå som passformen er en glidepassform, er det heller ingenting å bedømme om friksjonen her – bedøm plasseringen og innføringen. |
-| `"clip"` | 26 g | De bakre 12 mm av koppen pluss begge armene komplett, stående på kuttflaten. Den eneste testen som viser hvordan koppen virkelig går på og av, men den koster en tredjedel av en kopp, så den er bare verdt det hvis `"gauge_clamp"` gjør deg usikker på `clamp_squeeze`. |
+| `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 2,05 mm arm ved siden? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
+| `"clip"` | 26 g firkant, 31 g rund | Baksiden av koppen, `clip_back` = 12 mm foran bakveggen, stående på kuttflaten – på firkantbasen de bakre 12 mm pluss begge armene komplett, på den runde hele de 24,5 mm som buen dekker (å måle 12 mm bakover fra *hjørnene* ville kuttet bort senterlinjen og etterlatt to vinger). Den eneste testen som viser hvordan koppen virkelig går på og av, men den koster en tredjedel av en kopp, så den er bare verdt det hvis `"gauge_rear"` gjør deg usikker. |
 
 ## Printing
 
 | | |
 |---|---|
-| Printmål | 90 × 40,8 mm fotavtrykk, 66 mm høy, liggende på frontflaten (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Materialforbruk | 51,0 cm³, ca. 65 g |
+| Printmål | 90 × 40,8 mm fotavtrykk, liggende på frontflaten; 66 mm høy på firkantbasen, 60,1 mm på den runde (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
+| Materialforbruk | 51,0 cm³ ≈ 65 g på firkantbasen, 52,6 cm³ ≈ 67 g på den runde |
 | Støtte | ingen |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
 | Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,05 mm armene blir massive |
@@ -295,15 +389,28 @@ dryppene:
 
 ## Bygge den om selv
 
-```sh
-# koppen, liggende på frontflaten, klar for sliceren
-openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' coffee_spill_mug.scad
+Filene for firkantbasen er de opprinnelige og beholder de enkle navnene; de for den
+runde basen har `_round` i navnet:
 
-# testbitene
-openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'       coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_clamp"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'        coffee_spill_mug.scad
+```sh
+# firkantbasen - koppen, liggende på frontflaten, klar for sliceren
+openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' -D 'base="box"' coffee_spill_mug.scad
+
+# ... og testbitene for den
+openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
+
+# den runde basen
+openscad -o stl/coffee_spill_mug_round.stl -D 'mode="print"' -D 'base="round"' coffee_spill_mug.scad
+
+openscad -o stl/coffee_spill_mug_round_gauge.stl      -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_gauge_rear.stl -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_clip.stl       -D 'mode="clip"'       -D 'base="round"' coffee_spill_mug.scad
 ```
+
+`base` står som `"round"` i fila, siden det er det de fleste riggene viser seg å ha
+– send `-D 'base="box"'` for den opprinnelige, som over.
 
 Åpne `coffee_spill_mug.scad` for å se på den i stedet. `mode` bestemmer hva som
 tegnes:
@@ -311,16 +418,23 @@ tegnes:
 | `mode` | |
 |---|---|
 | `"use"` | som den står på platen. z = 0 er platetoppen, y = 0 er frontflaten, x = 0 er venstre side av koppen |
-| `"check"` | som `"use"`, med teakplaten, den grå sokkelen og bordet tegnet som spøkelser for visuell passkontroll |
+| `"check"` | som `"use"`, med teakplaten, bordet og basen bak koppen tegnet som spøkelser for visuell passkontroll – den grå boksen eller det buete fundamentet pluss vektskålen som henger ut over det, alt etter hva `base` sier |
 | `"print"` | liggende på frontflaten, klar for sliceren |
-| `"gauge"`, `"gauge_clamp"`, `"clip"` | testbitene over, alle klare for sliceren |
+| `"gauge"`, `"gauge_rear"`, `"clip"` | testbitene over, alle klare for sliceren |
 | `"cavity"` | traurommet som et massivt volum, for å måle kapasiteten |
 
-Alle parametrene ligger øverst i fila. `echo` skriver ut ytre mål, den flate
-bunnen, armene med styreflatene sine og fotavtrykket i printet; `assert` stopper
-renderingen hvis bakrampen ikke får plass i dybden, hvis tunga kolliderer med
-beinet eller rekker under foten, hvis en arm havner utenfor siden av koppen, blir
-høyere enn sokkelen, kommer inn i avrundingen av rimet eller rekker forbi baksiden
-av sokkelen, hvis munnen på armene blir smalere enn sokkelen, hvis tekstfordypningen
-etterlater mindre enn 1,2 mm frontvegg, eller hvis en fillet eller fas er for stor
-for kanten den skal bryte.
+Alle parametrene ligger øverst i fila, med `base` først. `echo` skriver ut hvilken
+base som er aktiv, ytre mål, den flate bunnen, fotavtrykket i printet, og så enten
+armene med styreflatene sine eller de to radiene i buen med dybden den rekker på
+senterlinjen og i hjørnene.
+
+`assert` stopper renderingen hvis bakrampen ikke får plass i dybden, hvis tunga
+kolliderer med beinet eller rekker under foten, hvis tekstfordypningen etterlater
+mindre enn 1,2 mm frontvegg, eller hvis en fillet eller fas er for stor for kanten
+den skal bryte. På firkantbasen sjekker den i tillegg at ingen arm havner utenfor
+siden av koppen, blir høyere enn sokkelen, kommer inn i avrundingen av rimet eller
+rekker forbi baksiden av sokkelen, og at munnen på armene ikke blir smalere enn
+sokkelen. På den runde basen sjekker den i stedet at buen har stor nok radius til å
+rekke ut til sidene i det hele tatt, at koppen ikke er bredere enn den buete delen av
+fundamentet, at den roterte rampen etterlater en flat bunn, og at rimet går klar av
+undersiden av den utstikkende vektskålen.

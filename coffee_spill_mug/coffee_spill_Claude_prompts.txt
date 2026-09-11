@@ -40,3 +40,5 @@ Kan vi få til en liten tekst i det som blir fronten (altså det som ligger ned 
 Vi kan faktisk åpne f.eks. 0.1 til 0.2 mm mer i gapet - da den bør ikke komme ut med ett rykk, så kafferester skulper ut når den trekkes frem.
 
 A cool feature of the new longer slope in the cup where the a little hot coffee drops is hitting, these will disperse themself over a biger surface while they run down to the bottom and cooling at the same time.
+
+Når jeg gikk rundt til de andre kaffesensorene, viste det seg at de fleste andre hadde en buet fundament under «vektskålen» for kaffekannen, i stedet for vår inntil nå grå firkantboks for elektronikken. Det betyr at vi må vekk med «armene» og lage en tilsvarende buet motstykke som møter dette buete fundamentet. Kanskje er det riktig å forke prosjektet til en ny .scad fil? Men det avgjør du - kanskje er det like greit med et argument/opsjon for hvilket støtteanlegg vi skal bruke? [Image #11] [Image #12] [Image #13]

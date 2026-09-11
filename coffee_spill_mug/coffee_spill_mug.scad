@@ -11,26 +11,39 @@
 //  plate and the table are both dead support below the measuring path. The tray
 //  may therefore rest on the table as well, and that is what it does: the front
 //  wall carries on down past the plate edge and stands on the table, which
-//  stiffens the overhang. Three things hold the tray on the rig:
+//  stiffens the overhang.
 //
-//    * a tongue behind the leg, hanging down in front of the front face of the
-//      plate, so the tray cannot slide backwards towards the pot
-//    * two arms reaching backwards from the rear face, one along each side of the
-//      grey printed socle that carries the sensor, straddling it
-//    * its own weight on the plate
+//  TWO RIGS. What stands on the plate behind the tray is not the same everywhere,
+//  and the parameter "base" picks which one this build is for. Everything else -
+//  the trough, the ramp, the leg, the tongue, the text, the print orientation and
+//  every fillet - is shared, which is why both live in one file.
 //
-//  THE GREY SOCLE is the fixed 3D printed block standing on the teak plate
-//  behind the tray: socle_width mm wide, socle_height mm up from the plate and
-//  deep. That is what the arms straddle - the sides of a block that stands up
-//  above the plate - as two thin fins set in arm_x0 mm from the sides of the
-//  tray, at the width the socle needs rather than flush with the sides.
+//    base = "box"    the grey 3D printed box for the electronics, a square block
+//                    socle_width mm wide standing socle_height mm up from the
+//                    plate. The tray meets it with a flat rear face and straddles
+//                    it with two arms, one along each side, as two thin fins set
+//                    in arm_x0 mm from the sides at the width the socle needs
+//                    rather than flush with them. The arms are a deliberate SLIP
+//                    FIT, not a clamp: clamp_squeeze is negative, so the opening
+//                    is a touch wider than the socle. They locate the tray
+//                    sideways and keep it square, and the tongue plus the weight
+//                    do the holding. A grip that has to be broken releases with a
+//                    jerk, and a tray full of coffee residue being pulled forwards
+//                    for emptying is the last place you want a jerk. Raise
+//                    clamp_squeeze above 0 to get a real grip back.
+//    base = "round"  a curved base under the weighing bowl, which is what most of
+//                    the rigs turn out to have. No arms at all: the rear face is a
+//                    concave arc of radius base_r + base_clear that nests into it.
+//                    That arc is a better locator than the arms were - it centres
+//                    the tray by itself, in both axes at once, and because the
+//                    base curves away from the tray towards the sides the trough
+//                    reaches a good 12 mm further back at the corners than on the
+//                    centreline, which is capacity for nothing.
 //
-//  The arms are a deliberate SLIP FIT, not a clamp: clamp_squeeze is negative, so
-//  the opening is a touch wider than the socle. They locate the tray sideways and
-//  keep it square, and the tongue plus the weight of the tray do the holding. That
-//  is on purpose - a grip that has to be broken releases with a jerk, and a tray
-//  full of coffee residue being pulled forwards for emptying is the last place you
-//  want a jerk. Raise clamp_squeeze above 0 to get a real grip back.
+//  So what holds the tray on the rig is: the tongue behind the leg, hanging down
+//  in front of the front face of the plate so the tray cannot slide backwards
+//  towards the pot; the rear of the tray closing off against the base, by arms or
+//  by arc; and its own weight on the plate.
 //
 //  PRINT ORIENTATION: on the front face (mode = "print"), so the print axis runs
 //  backwards along the depth of the tray. That is what makes the arms possible.
@@ -38,7 +51,11 @@
 //  would put the print axis along x, turning those planes into layer planes, and
 //  the inner face of the upper arm into a ceiling hanging over nothing. Standing
 //  the tray upright is worse: the whole underside would be a ceiling
-//  plate_depth x tray_width mm in the air above the leg.
+//  plate_depth x tray_width mm in the air above the leg. The round base wants the
+//  same orientation for a different reason: the concave arc faces backwards, so
+//  laid on its front face it faces straight up and is never an overhang at all,
+//  and being a surface of revolution about a vertical axis it is a prism along the
+//  print axis wherever it is not being filleted.
 //
 //  Lying on the front face, every face that has to be vertical runs parallel to
 //  the print axis, and the whole front face is the first layer - which is also
@@ -50,7 +67,11 @@
 //      textbook limit and it printed rough, so this is 35: each layer steps only
 //      0.7 of its own height sideways instead of a full height. It also makes the
 //      trough deepest at the front, so a spill collects out over the table edge,
-//      away from the rig.
+//      away from the rig. On the round base that ramp is the same profile revolved
+//      about the axis of the arc, and revolving it helps: as it curves round
+//      towards the sides its normal picks up an x component, so the steepest
+//      overhang on the whole ramp is the rear_angle degrees on the centreline and
+//      everything either side of that is shallower.
 //    * the front face of the locating tongue - chamfered at 45 degrees
 //
 //  The short ends need no such treatment in this orientation - they are prisms
@@ -62,38 +83,76 @@
 //  eSUN PLA+ black anyway, because that is what was on the shelf, and it is
 //  defensible: the drips hang on the dispenser a while before they let go, so they
 //  land cool in an empty tray. PLA+ is stiffer than PETG (E about 2.5-3.5 GPa
-//  against 2.0), so the spring arms come out roughly 1.5 times stiffer than the
-//  figures below. What to watch is creep: the grip is a constant strain, and PLA
-//  relaxes under it, so if the tray works loose after some months, raise
-//  clamp_squeeze or print it again in PETG. See README.md.
+//  against 2.0), so the box base arms come out roughly 1.5 times stiffer than the
+//  figures below. Creep only matters under sustained strain, and there is none in
+//  a slip fit or in an arc that only rests against the base - it would matter if
+//  clamp_squeeze were raised above 0, and then the grip would fade over months.
+//  See README.md.
 //
-//  The STL files are written like this - see README.md for the reasoning:
+//  The STL files are written like this - see README.md for the reasoning. The
+//  round base files carry _round in the name, the box base ones are the originals
+//  and keep the plain names:
 //
-//    openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' coffee_spill_mug.scad
-//    openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'       coffee_spill_mug.scad
-//    openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_clamp"' coffee_spill_mug.scad
-//    openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'        coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
+//
+//    openscad -o stl/coffee_spill_mug_round.stl            -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_round_gauge.stl       -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_round_gauge_rear.stl  -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_round_clip.stl        -D 'mode="clip"'       -D 'base="round"' coffee_spill_mug.scad
 //
 //  Origin: x = 0 is the left side of the tray body, y = 0 is the front face (the
 //  one out over the table), z = 0 is the top surface of the plate and
 //  z = -plate_height is the table. All units in mm.
 // ============================================================================
 
+/* [Which rig] */
+// There are two kinds of sensor rig out there, and the only thing that differs
+// between them is what stands on the teak plate behind the tray - i.e. how the
+// rear of the tray has to be closed off:
+//
+//   "box"   the grey 3D printed box for the electronics: a square block. The tray
+//           meets it with a flat rear face and reaches past it with two arms, one
+//           along each side. This is the original rig, the one the first tray was
+//           printed for.
+//   "round" a curved base under the weighing bowl, which turns out to be what most
+//           of the rigs have. The tray has no arms at all: the rear face is a
+//           concave arc of the same radius that nests into it, and that arc is a
+//           better locator than the arms ever were - it centres the tray by
+//           itself, and the trough gets deeper at the corners into the bargain.
+//
+// Everything else - the trough, the ramp, the leg, the tongue, the text, the print
+// orientation, all the rounding - is shared, which is why this is one file with a
+// switch rather than two files that would have to be edited twice.
+base = "round";
+
 /* [Main dimensions] */
 tray_width  = 90;   // body width, along the front edge of the plate, and the
-                    // widest point of the whole part: the spring arms are set in
-                    // from the sides, they do not stand outside them. Was 80,
-                    // which came from the width of the tongue on the plate; it is
-                    // 90 now to give the text on the front face room to breathe.
-plate_depth = 30;   // how far in on the plate the tray reaches, measured from
-                    // the front edge of the plate towards the sensor holder.
-                    // FIXED BY THE RIG: the grey socle stands this far in, so the
-                    // body cannot get any deeper at the back. Extra depth has to
-                    // come out of overhang, at the front.
-tray_height = 20.5; // height of the rim above the plate surface. The grey socle
-                    // is socle_height = 22 mm, and there are several mm of air
-                    // from its top up to the big grey cup the pot stands in, so
-                    // the rim has room to spare. Fitted with the 2 mm gauge.
+                    // widest point of the whole part: neither the arms (base =
+                    // "box") nor the arc (base = "round") stands outside the
+                    // sides. Was 80, which came from the width of the tongue on
+                    // the plate; it is 90 now to give the text on the front face
+                    // room to breathe.
+
+// How far in on the plate the tray reaches, measured from the front edge of the
+// plate to the nearest point of whatever stands behind it. FIXED BY THE RIG: the
+// body cannot get any deeper at the back, so extra depth has to come out of
+// overhang, at the front. One value per rig, because the two are not the same
+// distance in.
+plate_depth_box   = 30;
+plate_depth_round = 30; // MEASURE THIS on a round rig: plate edge to the nearest
+                        // point of the curved base. 30 is a placeholder copied
+                        // from the box rig. Check it with mode = "gauge" before
+                        // printing a whole tray - the 2 mm profile shows exactly
+                        // whether the tongue seats before the arc touches.
+tray_height = 20.5; // height of the rim above the plate surface. On the box rig
+                    // the socle is socle_height = 22 mm, and there are several mm
+                    // of air from its top up to the big grey cup the pot stands
+                    // in, so the rim has room to spare. Fitted with the 2 mm
+                    // gauge. On a round rig the weighing bowl overhangs the base,
+                    // so check disc_z instead - an assert does it for you.
 overhang    = 18;   // how far the tray sticks out past the front edge of the
                     // plate. Was 10. The rear ramp had to get shallower than 45
                     // degrees to print cleanly (see rear_angle), which costs
@@ -103,12 +162,44 @@ overhang    = 18;   // how far the tray sticks out past the front edge of the
                     // overhang is carried, not cantilevered, and the pivot lever
                     // gets better rather than worse (see foot_clear).
 
-/* [The rig we clamp on to] */
+/* [The box rig] */
 // The grey 3D printed socle that carries the sensor, standing on the teak plate
-// right behind the tray. Measured with the caliper.
+// right behind the tray. Measured with the caliper. Only used when base = "box".
 socle_width  = 76;  // across, at the front face of the socle
 socle_height = 22;  // up from the top of the teak plate
 socle_depth  = 76;  // backwards - not measured exactly, "a lot", about this
+
+/* [The round rig] */
+// The curved base under the weighing bowl. Only used when base = "round".
+//
+// base_r is straight out of the CAD file for the base: the measured edge has
+// radius 87.00 mm and length 182.25 mm, and 182.25 / 87 = 2.094 rad = 120.0
+// degrees, so it is a designed 120 degree arc, 150.7 mm across the chord. Our
+// 90 mm tray sits well inside that: it spans +/- 31 degrees of it.
+base_r     = 87;    // radius of the curved face we nest into
+base_arc   = 120;   // how much of the circle the base actually is (ghost only)
+base_h     = 20;    // MEASURE THIS: height of the curved base above the teak
+                    // plate. Only used for the ghost and for the assert below.
+base_clear = 0.4;   // radial gap between the arc and the base. Small on purpose:
+                    // the tongue at the plate edge is what sets the position, so
+                    // this only has to swallow the error in plate_depth_round.
+                    // Too big and it is a visible slot for a drip to run into.
+base_fn    = 240;   // facets on the full circle for the arc. 240 puts the chord
+                    // error at 87 * (1 - cos(0.75 deg)) = 0.007 mm, which is
+                    // nothing; $fn = 64 would leave 0.10 mm of flat spots.
+rear_corner_r = 3;  // rounding of the two rear corners in plan, where the sides
+                    // of the tray run into the arc. Those are the deepest points
+                    // of the part and they end up at the very top of the print,
+                    // where a rounding is free - it is a prism along the print
+                    // axis, not an overhang.
+
+// The weighing bowl sits on top of the curved base and overhangs it, so the rim of
+// the tray has to pass under that overhang. Both of these are for the ghost in
+// mode = "check" and for the assert that the rim clears the bowl.
+disc_r     = 95;    // MEASURE THIS: radius of the overhanging weighing bowl
+disc_z     = 24;    // MEASURE THIS: height of the *underside* of the bowl above
+                    // the teak plate
+disc_clear = 1.5;   // air we want to leave between the rim and that underside
 
 // The teak plate itself. Only drawn as a ghost in mode = "check", so these two
 // affect nothing but the picture: the tray is held by the front edge of the plate
@@ -313,22 +404,51 @@ $fn = 64;
 // ---------------------------------------------------------------------------
 //  Derived values
 // ---------------------------------------------------------------------------
-tray_depth = overhang + plate_depth;        // total depth of the tray body
+round_base = (base == "round");
+clamps_on  = clamp_enable && !round_base;   // no arms on a round rig: the arc does
+                                            // the locating all by itself
+plate_depth = round_base ? plate_depth_round : plate_depth_box;
+
+// The two radii of the arc, and where its centre sits. base_x is the centreline of
+// the tray, base_y is measured from the front face of the tray: plate edge, plus
+// the free plate, plus the radius. arc_out is the outer face of the tray and
+// arc_in the inner face of the same wall, so the rear wall is exactly wall_t thick
+// measured radially, all the way round.
+base_x  = tray_width / 2;
+base_y  = overhang + plate_depth + base_r;
+arc_out = base_r + base_clear;
+arc_in  = arc_out + wall_t;
+
+// How far back the tray reaches. On the box rig that is the flat rear face; on a
+// round rig the sides of the tray run on until they meet the arc, which is
+// base_r - sqrt(base_r^2 - (tray_width/2)^2) further back than the centreline is.
+// That depth is a gift: it is trough, not wall.
+function arc_y(r, dx) = base_y - sqrt(r * r - dx * dx);
+tray_depth = round_base ? arc_y(arc_out, tray_width / 2)
+                        : overhang + plate_depth;
 cav_rise   = tray_height - floor_t;         // depth of the trough
 table_z    = -(plate_height - foot_clear);  // where the foot of the leg ends up
 hook_front = overhang - hook_t;             // front face of the locating tongue
 hook_lead  = hook_front - hook_depth;       // where its 45 degree chamfer starts
 
 cav_y0 = wall_t;                            // inside of the front wall
-cav_y1 = tray_depth - wall_t;               // inside of the rear wall
+cav_y1 = tray_depth - wall_t;               // inside of the rear wall, box rig
 cav_x0 = wall_t;                            // inside of the left short end
 cav_x1 = tray_width - wall_t;               // inside of the right short end
 
+// How far back the inside of the trough goes, i.e. how far the profile across the
+// width has to be extruded before the rear wall closes it off
+cav_y_end = round_base ? arc_y(arc_in, tray_width / 2 - wall_t) : cav_y1;
+
 // Depth eaten by the rear ramp: a fillet from horizontal up to rear_angle, then a
-// straight run at rear_angle that hits the rim exactly at the inside of the wall
+// straight run at rear_angle that hits the rim exactly at the inside of the wall.
+// On the box rig it is measured back from cav_y1; on a round rig it is a radius,
+// measured out from arc_in, and the ramp is a surface of revolution about the same
+// axis as the arc - so it hits the rim exactly at arc_in, all the way round.
 rear_run  = rear_fillet * sin(rear_angle)
           + (cav_rise - rear_fillet * (1 - cos(rear_angle))) / tan(rear_angle);
 flat_rear = cav_y1 - rear_run;              // where the rear ramp leaves the floor
+ramp_foot = arc_in + rear_run;              // ... as a radius, on a round rig
 
 socle_x0 = (tray_width - socle_width) / 2;  // left side of the grey socle
 grip_x   = socle_x0 + clamp_squeeze / 2;    // gripping face of the left arm
@@ -337,38 +457,59 @@ arm_end_l = tray_depth + clamp_len_l;       // free end of the left arm
 arm_end_r = tray_depth + clamp_len_r;       // ... and of the right one
 arm_end   = max(arm_end_l, arm_end_r);      // the deepest point of the part
 part_w   = tray_width - 2 * min(arm_x0, 0); // widest point of the whole part
-part_d   = clamp_enable ? arm_end : tray_depth;
-clip_y0  = tray_depth - clip_back;          // cut plane of the mode = "clip" piece
+part_d   = clamps_on ? arm_end : tray_depth;
+// Cut plane of the mode = "clip" test piece, clip_back mm in front of the rear
+// wall. On the round base tray_depth is the depth at the corners, and the rear
+// face on the centreline sits base_y - arc_out, i.e. a good 12 mm, in front of
+// that - measuring from the corners would cut the centreline away and leave two
+// wings. So measure from the nearest point of the arc, which makes the round
+// clip piece deeper: it carries the whole arc, which is the thing to test.
+clip_ref = round_base ? base_y - arc_out : tray_depth;
+clip_y0  = clip_ref - clip_back;
 
 assert(cav_rise > rear_fillet * (1 - cos(45)),
        "rear_fillet too large for the depth of the trough");
-assert(flat_rear > cav_y0 + inner_fillet,
+assert(round_base || flat_rear > cav_y0 + inner_fillet,
        "no flat floor left - reduce rear_fillet, inner_fillet or plate_depth");
+assert(!round_base || base_y - ramp_foot > cav_y0 + inner_fillet,
+       "no flat floor left - reduce rear_fillet, inner_fillet or plate_depth_round");
+assert(!round_base || arc_in > tray_width / 2 + 5,
+       "the curved base is too small a radius for a tray this wide - the arc would
+        close in on itself before it reached the sides");
+assert(!round_base || base_arc / 2 > asin(tray_width / 2 / base_r) + 5,
+       "the tray is wider than the curved part of the base - it would land on the
+        corner where the arc ends");
+assert(!round_base || tray_height + disc_clear <= disc_z || arc_out > disc_r,
+       "the rim would foul the overhanging weighing bowl - reduce tray_height");
+assert(!round_base || base_h > 8,
+       "base_h looks unmeasured - the arc needs something to nest against");
+assert(!round_base || 2 * rear_corner_r < tray_width / 2,
+       "rear_corner_r too large for the rear corners");
 assert(2 * inner_fillet < cav_x1 - cav_x0, "inner_fillet too large for the width");
 assert(!hook_enable || hook_lead >= leg_t,
        "the 45 degree chamfer on the tongue starts inside the leg - reduce hook_depth");
 assert(!hook_enable || !leg_enable || hook_depth < plate_height - foot_clear,
        "the locating tongue reaches below the foot of the leg - reduce hook_depth");
-assert(socle_width < tray_width,
+assert(round_base || socle_width < tray_width,
        "the socle is wider than the tray - the arms cannot reach around it");
-assert(!clamp_enable || arm_x0 >= -0.01,
+assert(!clamps_on || arm_x0 >= -0.01,
        "the arms stand outside the sides of the tray - reduce clamp_t");
 assert(!text_enable || text_depth < wall_t - 1.2,
        "the text recess leaves less than 1.2 mm of front wall - reduce text_depth");
-assert(!clamp_enable || clamp_t > 1.6,
+assert(!clamps_on || clamp_t > 1.6,
        "clamp_t below 1.6 mm is thinner than two perimeters - the spring is too weak");
-assert(!clamp_enable || clamp_h <= socle_height + 1,
+assert(!clamps_on || clamp_h <= socle_height + 1,
        "the arms stand taller than the socle - reduce clamp_h");
-assert(!clamp_enable || clamp_h <= tray_height - edge_r,
+assert(!clamps_on || clamp_h <= tray_height - edge_r,
        "the rim rounding would thin the top of the arms - reduce clamp_h");
-assert(!clamp_enable || clamp_z0 + 5 < clamp_h, "no arm left - reduce clamp_z0");
-assert(!clamp_enable || max(clamp_len_l, clamp_len_r) <= socle_depth,
+assert(!clamps_on || clamp_z0 + 5 < clamp_h, "no arm left - reduce clamp_z0");
+assert(!clamps_on || max(clamp_len_l, clamp_len_r) <= socle_depth,
        "the arms reach past the back of the socle - reduce clamp_len_l/clamp_len_r");
-assert(!clamp_enable || clamp_lead_y < min(clamp_len_l, clamp_len_r),
+assert(!clamps_on || clamp_lead_y < min(clamp_len_l, clamp_len_r),
        "clamp_lead_y longer than the shorter arm");
-assert(!clamp_enable || 2 * clamp_r < clamp_t - clamp_lead,
+assert(!clamps_on || 2 * clamp_r < clamp_t - clamp_lead,
        "clamp_r too large for the tip of the arm");
-assert(!clamp_enable || grip_x - clamp_lead < socle_x0,
+assert(!clamps_on || grip_x - clamp_lead < socle_x0,
        "the mouth of the arms is narrower than the socle - increase clamp_lead");
 assert(clip_back > wall_t, "clip_back must reach in front of the rear wall");
 assert(!leg_enable || front_c + foot_r + 1 < leg_t,
@@ -380,14 +521,25 @@ assert(2 * corner_c < tray_width && corner_c < overhang,
 assert(under_r + rear_r < tray_height, "under_r and rear_r meet in the rear face");
 assert(!hook_enable || 2 * foot_r < min(hook_t, hook_depth - hook_relief),
        "foot_r too large for the locating tongue");
-assert(!clamp_enable || (arm_r < clamp_t && 2 * arm_r < clamp_h - clamp_z0),
+assert(!clamps_on || (arm_r < clamp_t && 2 * arm_r < clamp_h - clamp_z0),
        "arm_r too large for the spring arms");
 
+echo(str("=== base = \"", base, "\": ",
+         round_base ? "no arms, concave arc of R " : "two arms alongside a box ",
+         round_base ? str(arc_out, " mm at the rear") : "socle"));
 echo(str("Tray ", tray_width, " x ", tray_depth, " x ", tray_height,
          " mm over the plate, ", tray_height - table_z, " mm over the table"));
 echo(str("Flat floor ", cav_x1 - cav_x0 - 2 * inner_fillet, " x ",
-         flat_rear - cav_y0 - inner_fillet, " mm, trough ", cav_rise, " mm deep"));
-echo(str("Arms ", clamp_t, " x ", clamp_h - clamp_z0, " mm, left ", clamp_len_l,
+         (round_base ? base_y - ramp_foot : flat_rear) - cav_y0 - inner_fillet,
+         " mm on the centreline, trough ", cav_rise, " mm deep"));
+if (round_base)
+    echo(str("Rear arc: R ", arc_out, " outside and R ", arc_in, " inside, ",
+             base_clear, " mm off the R ", base_r, " base. Rear face ",
+             base_y - arc_out, " mm deep on the centreline and ", tray_depth,
+             " mm at the corners, i.e. ", tray_depth - (base_y - arc_out),
+             " mm of extra trough at the sides"));
+else
+    echo(str("Arms ", clamp_t, " x ", clamp_h - clamp_z0, " mm, left ", clamp_len_l,
          " mm and right ", clamp_len_r,
          " mm long, gripping at x = ", grip_x, " and ", tray_width - grip_x,
          ": ", clamp_squeeze, " mm total interference on the ", socle_width,
@@ -543,9 +695,61 @@ module arm_mask() {
 }
 
 // ---------------------------------------------------------------------------
-//  The trough. Two profiles intersected: one across the width, with a plain
-//  fillet at each short end, and one along the depth, with the 45 degree rear
-//  ramp. Both are left open above the rim.
+//  The concave rear arc, for base = "round". Two masks, both about the vertical
+//  axis through (base_x, base_y):
+//
+//    plan_round_mask()  an intersection mask - the plan outline, i.e. the sides of
+//                       the tray running back until they meet the arc, with those
+//                       two corners rounded. This one defines the arc face itself.
+//    base_mask()        a difference mask - a surface of revolution that carries
+//                       the under_r and rear_r fillets along the top and bottom
+//                       edges of the arc, the same two radii the flat rear face
+//                       gets on the box rig. Its straight section is set 0.05 mm
+//                       inside the arc so it never forms the face itself; two
+//                       coincident cylinders would only give CGAL something to
+//                       argue about.
+//
+//  Neither is an overhang in the print. The arc faces backwards, which is upwards
+//  once the part is lying on its front face, and the two rear corners are vertical
+//  edges in the model, i.e. lines along the print axis: rounding them is free.
+// ---------------------------------------------------------------------------
+module plan_round_mask() {
+    if (round_base)
+        translate([0, 0, table_z - 1])
+            linear_extrude(height = tray_height - table_z + 2)
+                round2d(rear_corner_r) difference() {
+                    translate([0, -5]) square([tray_width, tray_depth + 6]);
+                    translate([base_x, base_y]) circle(r = arc_out, $fn = base_fn);
+                }
+    else                                        // a mask that masks nothing
+        translate([-1, -1, table_z - 1])
+            cube([tray_width + 2, part_d + 2, tray_height - table_z + 2]);
+}
+
+// The profile of the mask, in (radius, z). Bottom up: out along the plate, up over
+// the under_r fillet, straight up the arc, out over the rear_r fillet at the rim,
+// and away above it.
+function base_mask_profile() =
+    let (r0 = arc_out - 0.05)
+    concat([[0, table_z - 1], [r0 + under_r, table_z - 1]],
+           reverse(fillet_up(r0, +1, under_r, 0)),
+           [for (i = [0 : arc_steps])                   // the fillet at the rim:
+               let (a = 90 * i / arc_steps)             // fillet_up turned upside
+               [r0 + rear_r * (1 - cos(a)),             // down
+                tray_height - rear_r * (1 - sin(a))]],
+           [[r0 + rear_r, tray_height + 10], [0, tray_height + 10]]);
+
+module base_mask() {
+    translate([base_x, base_y, 0])
+        rotate_extrude($fn = base_fn) polygon(base_mask_profile());
+}
+
+// ---------------------------------------------------------------------------
+//  The trough. Profiles intersected: one across the width, with a plain fillet at
+//  each short end, one along the depth with the front wall and the floor, and the
+//  rear ramp - which is a prism at constant y on the box rig, and a surface of
+//  revolution about the same axis as the arc on a round rig. All of them are left
+//  open above the rim.
 // ---------------------------------------------------------------------------
 function end_profile() = concat(
     [[cav_x0, tray_height + 1]],
@@ -563,15 +767,45 @@ function rear_ramp() = concat(
     // 1 mm further at the same slope so the outline closes above the rim
     [[cav_y1 + 1, tray_height + tan(rear_angle)]]);
 
-function rear_profile() = concat(
+// The front wall and the floor, in (y, z): the inner_fillet rising out of the floor
+// at the inside of the front wall, and then the floor running backwards past
+// anything the rear can do with it. Open above the rim.
+function front_profile() = concat(
     [[cav_y0, tray_height + 1]],
     fillet_up(cav_y0, +1, inner_fillet, floor_t),
+    [[tray_depth + 1, floor_t], [tray_depth + 1, tray_height + 1]]);
+
+// The rear ramp of the box rig as its own profile in (y, z), so it can be
+// intersected with the one above rather than drawn as part of it
+function rear_ramp_profile() = concat(
+    [[cav_y0 - 1, tray_height + 1], [cav_y0 - 1, floor_t]],
     rear_ramp());
+
+// The same ramp for a round rig, in (radius, z), revolved about the arc axis: out
+// from the rim at arc_in, down the straight run at rear_angle, round the fillet on
+// to the floor at ramp_foot, and then the floor carries on outwards. Every layer of
+// the print is a constant y, and this surface only ever tips *away* from the print
+// axis as it curves round, so it is a shade less of an overhang than the flat ramp
+// on the box rig - never more.
+function rear_bowl_profile() = concat(
+    [[arc_in, tray_height + 1], [arc_in, tray_height]],
+    [for (i = [arc_steps : -1 : 0])
+        let (a = rear_angle * i / arc_steps)
+        [ramp_foot - rear_fillet * sin(a), floor_t + rear_fillet * (1 - cos(a))]],
+    [[ramp_foot + 2 * base_r, floor_t],
+     [ramp_foot + 2 * base_r, tray_height + 1]]);
+
+module rear_bowl() {
+    translate([base_x, base_y, 0])
+        rotate_extrude($fn = base_fn) polygon(rear_bowl_profile());
+}
 
 module trough() {
     intersection() {
-        extrude_y(cav_y0, cav_y1 - cav_y0) polygon(end_profile());
-        extrude_x(-1, tray_width + 2) polygon(rear_profile());
+        extrude_y(cav_y0, cav_y_end + 1 - cav_y0) polygon(end_profile());
+        extrude_x(-1, tray_width + 2) polygon(front_profile());
+        if (round_base) rear_bowl();
+        else extrude_x(-1, tray_width + 2) polygon(rear_ramp_profile());
     }
 }
 
@@ -612,14 +846,16 @@ module coffee_spill_tray() {
         intersection() {
             union() {
                 extrude_x(0, tray_width) polygon(body_section());
-                if (clamp_enable) intersection() { clamps(); arm_mask(); }
+                if (clamps_on) intersection() { clamps(); arm_mask(); }
             }
             rounded_bounds();
             plan_mask();
             front_chamfer_mask();
+            plan_round_mask();
         }
         trough();
         if (text_enable) front_text();
+        if (round_base) base_mask();
     }
 }
 
@@ -636,11 +872,27 @@ module ghost_plate() {
         linear_extrude(height = plate_height) polygon(plate_plan());
 }
 
-// The teak plate, the grey socle and the table, drawn only in mode = "check"
+// The curved base of a round rig, as the circular segment it looks like in the
+// photos: the base_arc degrees of the circle that face the tray, closed off by the
+// chord behind. Only a ghost, so the back of it does not have to be right.
+function base_plan() =
+    [for (i = [0 : base_fn])
+        let (a = -90 - base_arc / 2 + base_arc * i / base_fn)
+        [base_r * cos(a), base_r * sin(a)]];
+
+// The teak plate, whatever stands behind the tray, and the table: ghosts drawn only
+// in mode = "check"
 module ghost_rig() {
     %ghost_plate();
-    %translate([socle_x0, tray_depth, 0])                  // the grey socle
-        cube([socle_width, socle_depth, socle_height]);
+    if (round_base) {
+        %translate([base_x, base_y, 0])                    // the curved base
+            linear_extrude(height = base_h) polygon(base_plan());
+        %translate([base_x, base_y, disc_z])               // the weighing bowl
+            cylinder(r = disc_r, h = 8, $fn = base_fn);
+    } else {
+        %translate([socle_x0, tray_depth, 0])              // the grey socle
+            cube([socle_width, socle_depth, socle_height]);
+    }
     %translate([(tray_width - plate_size) / 2 - 40, -40, -plate_height - 2])
         cube([plate_size + 80, plate_size + overhang + 60, 2]);    // the table
 }
@@ -657,9 +909,13 @@ else if (mode == "gauge")
     // y is the height over the table
     translate([0, -table_z, 0]) linear_extrude(height = gauge_t)
         polygon(body_section());
-else if (mode == "gauge_clamp")
-    // A slice at the top of the arms - wall ring plus both arms - already flat,
-    // just dropped down onto the bed
+else if (mode == "gauge_rear" || mode == "gauge_clamp")
+    // A slice at the top of the tray, already flat, just dropped down onto the
+    // bed. It is the gauge for whatever closes the rear off: on the box base a
+    // wall ring plus both arms, held at the right spacing; on the round base a
+    // wall ring whose back is the full concave arc, to lay against the curved
+    // base and see whether the radius is right. "gauge_clamp" is the old name
+    // for it, from when the box base and its arms were all there was.
     translate([0, 0, clamp_gauge_t - clamp_h]) intersection() {
         coffee_spill_tray();
         translate([-50, -50, clamp_h - clamp_gauge_t])

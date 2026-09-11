@@ -5,21 +5,91 @@
 A shallow trough that catches the coffee that runs down the outside of the pot and
 out across the plate, instead of letting it end up on the table and in a paper
 towel. It sits on the free front part of the teak plate under the internet
-connected coffee scale, reaches out over the front edge of the plate, and
-straddles the grey socle behind it with two arms.
+connected coffee scale, reaches out over the front edge of the plate, and closes
+off at the back against whatever the sensor rig has standing there.
+
+There are **two kinds of rig**, and the parameter `base` picks which one the build
+is for – `"box"` for the grey electronics box, `"round"` for a curved base under
+the weighing bowl. Everything else is shared. Start at
+[Two rigs, one file](#two-rigs-one-file) if you are not sure which one you have.
 
 ![The tray in place on the plate](img/coffee_spill_mug_on_plate.png)
 
-The body is **90 × 48 × 20.5 mm** over the plate and holds **about 46 ml**. It
-rests on the plate over the rear 30 mm, the front 18 mm reach out past the edge of
-the plate, and the front wall carries on down to the table – with two lines
-engraved in it:
+The body is **90 × 48 × 20.5 mm** over the plate and holds **about 46 ml** on the
+box base, 90 × 60 mm and about 51 ml on the round one. It rests on the plate over
+the rear 30 mm, the front 18 mm reach out past the edge of the plate, and the front
+wall carries on down to the table – with two lines engraved in it:
 
 ![The front face, which is also the first layer of the print](img/coffee_spill_mug_front.png)
 
 ![The tray seen from above](img/coffee_spill_mug_iso.png)
 
+## Two rigs, one file
+
+Walking round to the other coffee sensors turned up something the first tray had
+not accounted for: **most of the rigs do not have the grey square electronics box
+at all.** They have a curved base under the weighing bowl, and a flat rear face
+with two arms has nothing to grip there. So the rear of the tray is switchable:
+
+| `base` | What stands behind the tray | How the tray closes off against it |
+|---|---|---|
+| `"box"` | the grey 3D printed electronics box, a square block 76 mm wide and 22 mm tall | a flat rear face plus two arms, one down each side of it |
+| `"round"` | a curved base, R 87 mm, drawn as a 120° arc | a concave arc of R 87.4 mm that nests into it. No arms at all. |
+
+This is one file with a switch rather than two files, because the two variants
+share the trough, the ramp, the leg, the tongue, the text, the print orientation
+and every last fillet. The rear face is genuinely all that differs, and a fork
+would have doubled every future edit – including two READMEs.
+
+**The arc is a better locator than the arms ever were.** Two curved surfaces of the
+same radius held together locate each other in *both* axes at once: the tray
+centres itself sideways and squares itself up as it is pushed home, with no fit
+tolerance to guess at, no spring arms, and nothing to break loose with a jerk. The
+0.4 mm `base_clear` is there so the two surfaces touch along the whole arc instead
+of binding on the high spot of one print.
+
+![The round base tray in place](img/coffee_spill_mug_round_on_plate.png)
+
+It also gains capacity for nothing. The base curves *away* from the tray towards
+the sides, so where the flat-backed version had to stop at the nearest point, the
+arc keeps going:
+
+| Round base | Value |
+|---|---|
+| Depth on the centreline | 47.6 mm |
+| Depth at the corners | 60.1 mm – 12.5 mm further back, and all of it trough rather than wall |
+| Capacity | 50.6 ml, against 46.5 on the box base |
+| Total depth of the part | 60.1 mm; the box version is 66 mm because of the arms |
+| Material | 52.6 cm³, approx. 67 g |
+| Arc | R 87.4 mm outside, R 89.8 mm inside, centred 135 mm behind the front face, `base_fn` = 240 segments (chord error 0.007 mm) |
+| Rear corners in plan | filleted `rear_corner_r` = 3 mm, which the box version cannot do – see below |
+
+![The round base tray seen from above](img/coffee_spill_mug_round_iso.png)
+
+The floor is a saddle: the rear ramp is the 35° profile revolved about the axis of
+the arc, so it sweeps up towards the back and the corners at once, and the flat part
+of the floor is deepest right across the front.
+
+![The concave arc in plan](img/coffee_spill_mug_round_top.png)
+
+Four numbers in the round section of the file are still **placeholders that want a
+caliper**, and they are marked `MEASURE THIS` in the source:
+
+| Parameter | Placeholder | What to measure |
+|---|---|---|
+| `plate_depth_round` | 30 mm, copied from the box rig | free plate from the front edge in to the *nearest* point of the curved base. This is the one that moves everything: it sets how far back the arc sits. Print `mode = "gauge"` and check it against the rig. |
+| `base_h` | 20 mm | height of the curved base above the plate. Only the ghost in `mode = "check"` uses it, but it is what tells you the arc is tall enough to be worth having. |
+| `disc_r` | 95 mm | radius of the weighing bowl, which overhangs the base – clearly visible in the photos of the rigs |
+| `disc_z` | 24 mm | height of the underside of that bowl above the plate. Together with `disc_clear` = 1.5 mm it is what limits `tray_height`, and an `assert` enforces it. |
+
+`base_r` = 87 mm itself is not a guess: it is off the CAD drawing of the base, which
+gives R 87.00, diameter 174.00 and arc length 182.25 mm. 182.25 / 87 = 2.094 rad =
+**120.0°**, so the base is a designed 120° arc of chord 150.7 mm, and the 90 mm
+tray spans ±31° of it – well inside the ends.
+
 ## Main dimensions
+
+These are the box base numbers; the round base differs only in the table above.
 
 | Dimension | Value | Where it comes from |
 |---|---|---|
@@ -38,7 +108,7 @@ engraved in it:
 The rig itself, measured with the caliper – these are the numbers the fit is
 derived from:
 
-| The rig | Value |
+| The rig (box base) | Value |
 |---|---|
 | Grey printed socle, width | 76 mm |
 | Grey printed socle, height above the teak plate | 22 mm |
@@ -72,7 +142,10 @@ Three details in the section that are there on purpose:
   *1.7 e* mm and eats into the clearance under the grey cup – the longer overhang
   helps here, it used to be *3 e*. 0.3 mm is little enough
   that the leg takes over as soon as anything presses on the overhang, and enough
-  that the tray never rocks. Set it to 0 for firm contact.
+  that the tray never rocks. Set it to 0 for firm contact. On the round base the
+  rear corners are 42 mm behind the pivot rather than 30, so a long leg lifts them
+  *2.3 e* – which is the one place the extra depth costs something, and the reason
+  `disc_z` is worth measuring rather than assuming.
 - **A 45° chamfer on the front face of the tongue**, from the back of the leg down
   to the bottom front corner of the tongue. That face would otherwise be a ceiling
   in the print – see below. It fills the gap between the leg and the tongue with a
@@ -81,10 +154,13 @@ Three details in the section that are there on purpose:
   underside meets the tongue, so a rounded or slightly chamfered plate edge still
   lets the tray seat flat.
 
-The tray weighs about 65 g, which becomes a fixed offset – **tare the scale** with
-the empty tray in place.
+The tray weighs about 65 g – 67 g on the round base – which becomes a fixed offset
+either way: **tare the scale** with the empty tray in place.
 
 ## The two arms – a slip fit, on purpose
+
+*Box base only. On the round base `clamp_enable` is ignored, there are no arms, and
+the arc does this job better – see above.*
 
 The thing worth reaching around is the **grey printed socle** that carries the
 sensor: a block 76 mm wide standing 22 mm up from the teak plate, right behind the
@@ -142,7 +218,9 @@ from the sides of the body wherever the socle puts them.
 | Inner edge of the foot, edges of the locating tongue | fillet `foot_r` = 0.6 mm |
 | Top and bottom of the arms, outer side | fillet `arm_r` = 0.8 mm |
 | Free end of the arms, seen from above | fillet `clamp_r` = 0.4 mm |
-| The rear corners seen from above, and the guiding faces | left square – they face the socle, and the arms are rooted in those corners |
+| The rear corners seen from above | left square on the box base – they face the socle, and the arms are rooted in those corners. Filleted `rear_corner_r` = 3 mm on the round base, where nothing is rooted there and a corner at the far end of a 60 mm reach is exactly the one you catch a sleeve on. It is free in the print: a vertical edge in the model lies *along* the print axis, so rounding it in plan just curves the outline of each layer. The front corners are the exception, and stay 45° chamfers, because there the fillet would be tangent to the bed. |
+| The guiding faces | left square – they are the faces that touch the socle |
+| The concave arc, top and bottom edges | the same `rear_r` = 1.5 mm and `under_r` = 0.8 mm fillets as the flat rear face, revolved round the arc |
 
 **Everything that meets the print bed is chamfered at 45°, not filleted.** A fillet
 along the bottom edge is tangent to the bed, so the first layer comes out inset
@@ -181,6 +259,14 @@ turns those planes into layer planes – the inner face of the upper arm becomes
 ceiling hanging over nothing. Standing the tray upright is worse: the whole
 underside would be a 30 × 90 mm ceiling in the air above the leg.
 
+The round base wants the same orientation for a different reason. The concave arc
+faces backwards, so laid on the front face it faces straight *up* – the one
+direction that is never an overhang – and being a surface of revolution about a
+vertical axis it is a prism along the print axis everywhere it is not being
+filleted. It needs no support either.
+
+![The round base tray lying on its front face](img/coffee_spill_mug_round_print.png)
+
 Lying on the front face, every surface that has to be vertical – the guiding
 faces, the sides of the arms – runs parallel to the print axis and comes out
 exactly as drawn. The whole front face becomes the first layer, 90 × 40.8 mm of
@@ -217,6 +303,14 @@ Only two surfaces face the bed in this orientation:
 
 Measured on the finished STL, 2423 mm² of surface faces the bed at 35° (the ramp)
 and 943 mm² at exactly 45° (the chamfers). Nothing is steeper.
+
+On the round base that ramp is the same profile revolved about the axis of the arc,
+and revolving it *helps*: as the ramp curves round towards the sides, its normal
+picks up an x component, so the steepest overhang on the whole ramp is the 35° on
+the centreline and everything either side of it is shallower. Measured on
+`coffee_spill_mug_round.stl`: 907 mm² at 35°, another 1686 mm² spread from 34° down
+to 30° as the ramp swings round, the rest shallower still, and 943 mm² at exactly 45° – the same chamfers,
+unchanged. Nothing steeper than 45° anywhere in either variant.
 
 The two short ends need no such treatment here – they are prisms along the print
 axis – so their inside is a plain `inner_fillet` = 5 mm rounding and the flat floor
@@ -256,15 +350,15 @@ Three cheap prints, in the order they are worth making:
 | `mode` | Cost | What it tells you |
 |---|---|---|
 | `"gauge"` | 3 g | The whole cross section as a 2 mm slice, lying flat. Hook it on the front edge of the plate: does the leg reach the table, does the tongue clear whatever is under the plate, is there air left up to the grey cup? |
-| `"gauge_clamp"` | 3 g | A 2.5 mm slice at the top of the arms – a ring of wall plus both arms, held apart at the right spacing, already flat. Do the arms straddle the socle, does the mouth find it, and is there room beside the socle for a 2.05 mm arm? It was 1.5 mm at first, which was too floppy to say anything at all: it simply splayed out. Now that the fit is a slip fit there is nothing to judge about the friction here anyway – judge the position and the entry. |
-| `"clip"` | 26 g | The rear 12 mm of the tray plus both complete arms, standing on the cut face. The only test that shows how the tray really goes on and comes off, but it costs a third of a tray, so it is only worth it if `"gauge_clamp"` leaves you unsure about `clamp_squeeze`. |
+| `"gauge_rear"` | 3 g | A 2.5 mm slice at the top of the tray – whatever closes the rear off, already lying flat. On the box base a ring of wall plus both arms, held apart at the right spacing: do they straddle the socle, does the mouth find it, is there room beside it for a 2.05 mm arm? It was 1.5 mm at first, too floppy to say anything at all – it simply splayed out. On the round base the back of the ring is the full concave arc: lay it against the curved base and see whether the radius is right and it touches all the way along instead of rocking on the middle. `"gauge_clamp"` still works as a name for it. |
+| `"clip"` | 26 g box, 31 g round | The rear of the tray, `clip_back` = 12 mm in front of the rear wall, standing on the cut face – on the box base that is the rear 12 mm plus both complete arms, on the round base the whole 24.5 mm that the arc spans (measuring 12 mm back from the *corners* would cut the centreline away and leave two wings). The only test that shows how the tray really goes on and comes off, but it costs a third of a tray, so it is only worth it if `"gauge_rear"` leaves you unsure. |
 
 ## Printing
 
 | | |
 |---|---|
-| Print size | 90 × 40.8 mm footprint, 66 mm tall, lying on the front face (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Material | 51.0 cm³, approx. 65 g |
+| Print size | 90 × 40.8 mm footprint, lying on the front face; 66 mm tall on the box base, 60.1 mm on the round one (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
+| Material | 51.0 cm³ ≈ 65 g on the box base, 52.6 cm³ ≈ 67 g on the round one |
 | Support | none |
 | Brim | not needed – the first layer is the whole front face |
 | Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.05 mm arms come out solid |
@@ -302,31 +396,51 @@ drips:
 
 ## Rebuilding it yourself
 
-```sh
-# the tray, lying on the front face, ready for the slicer
-openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' coffee_spill_mug.scad
+The box base files are the originals and keep the plain names; the round base ones
+carry `_round`:
 
-# the test pieces
-openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'       coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_clamp"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'        coffee_spill_mug.scad
+```sh
+# the box base rig - the tray, lying on the front face, ready for the slicer
+openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' -D 'base="box"' coffee_spill_mug.scad
+
+# ... and its test pieces
+openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
+
+# the round base rig
+openscad -o stl/coffee_spill_mug_round.stl -D 'mode="print"' -D 'base="round"' coffee_spill_mug.scad
+
+openscad -o stl/coffee_spill_mug_round_gauge.stl      -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_gauge_rear.stl -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_clip.stl       -D 'mode="clip"'       -D 'base="round"' coffee_spill_mug.scad
 ```
+
+`base` defaults to `"round"` in the file, since that is what most of the rigs turn
+out to have – pass `-D 'base="box"'` for the original one, as above.
 
 Open `coffee_spill_mug.scad` to look at it instead. `mode` decides what is drawn:
 
 | `mode` | |
 |---|---|
 | `"use"` | as it sits on the plate. z = 0 is the top of the plate, y = 0 is the front face, x = 0 is the left side of the body |
-| `"check"` | as `"use"`, with the teak plate, the grey socle and the table drawn as ghosts for a visual fit check |
+| `"check"` | as `"use"`, with the teak plate, the table and the base behind the tray drawn as ghosts for a visual fit check – the grey box or the curved base plus the weighing bowl that overhangs it, whichever `base` says |
 | `"print"` | lying on the front face, ready for the slicer |
-| `"gauge"`, `"gauge_clamp"`, `"clip"` | the test pieces above, all ready for the slicer |
+| `"gauge"`, `"gauge_rear"`, `"clip"` | the test pieces above, all ready for the slicer |
 | `"cavity"` | the trough volume as a solid, for measuring the capacity |
 
-All the parameters sit at the top of the file. `echo` prints the outer dimensions,
-the flat floor, the arms with the position of their guiding faces, and the print
-footprint; `assert` stops the rendering if the rear ramp does not fit in the depth,
-if the tongue collides with the leg or reaches below the foot, if an arm ends up
-outside the side of the tray, taller than the socle, into the rounding of the rim
-or past the back of the socle, if the mouth of the arms ends up narrower than the
-socle, if the text recess leaves less than 1.2 mm of front wall, or if a fillet or
-chamfer is too large for the feature it is supposed to break.
+All the parameters sit at the top of the file, `base` first. `echo` prints which
+base is active, the outer dimensions, the flat floor, the print footprint, and then
+either the arms with the position of their guiding faces or the two radii of the arc
+with the depth it reaches on the centreline and at the corners.
+
+`assert` stops the rendering if the rear ramp does not fit in the depth, if the
+tongue collides with the leg or reaches below the foot, if the text recess leaves
+less than 1.2 mm of front wall, or if a fillet or chamfer is too large for the
+feature it is supposed to break. On the box base it also checks that no arm ends up
+outside the side of the tray, taller than the socle, into the rounding of the rim or
+past the back of the socle, and that the mouth of the arms is not narrower than the
+socle. On the round base it checks instead that the arc is a large enough radius to
+reach the sides at all, that the tray is not wider than the curved part of the base,
+that the revolved ramp leaves a flat floor, and that the rim clears the underside of
+the overhanging weighing bowl.
