@@ -3,23 +3,16 @@ Bruk openscad til å lage en kaffesøl-kopp som hviler både på platen til kaff
   (særlig i kortendene ha buet innside, slik at 3D-printet kan lages på høykant i forhold til minst problemer med overheng.
 
 
+Du sa: «Kroken skal bare berøre platen, aldri bordet – ellers går en del av kannevekten forbi lastcella og vekta lyver». Dette stemmer ikke, koppen kan med FORDEL berøre bordet også, da teak-platen og bordet er «død støtte» for det hele. Selve vekt-sensoren sitter inne i, eller oppå den grå delen du ser innenfor den runde store grå «koppen» som selve kaffekannen står i. Grunnen til at jeg sa 19 mm over teakplaten (maks) er at da får vi en del luftrom opp til undersiden av den «store grå koppen» for kaffekannen.
 
 
-Du sa: «Kroken skal bare berøre platen, aldri bordet – ellers går en del av kannevekten forbi lastcella og vekta lyver». Dette stemmer ikke, koppen kan med FORDEL berøre bordet også, da
-  teak-platen og bordet er «død støtte» for det hele. Selve vekt-sensoren sitter inne i, eller oppå den grå delen du ser innenfor den runde store grå «koppen» som selve kaffekannen står i.
-  Grunnen til at jeg sa 19 mm over teakplaten (maks) er at da får vi en del luftrom opp til undersiden av den «store grå koppen» for kaffekannen.
+Du kan jo for moro skyld lage en «test-STL» som blir f.eks. 2 mm høy, så får jeg egentlig hele profilen som kan ta bort til kaffesensor-holderen for å teste at det ser bra ut
 
 
-
-  Du kan jo for moro skyld lage en «test-STL» som blir f.eks. 2 mm høy, så får jeg egentlig hele profilen som kan ta bort til kaffesensor-holderen for å teste at det ser bra ut
-
-
-
-(Etter testing av malen - med bilder av disse)
+(Etter testing av malen - med bilder av disse):
 [Image #4] [Image #5] Lengen for støtten mot bordet kan økes med 0,6 mm høyden på «koppen» kan økes med 1,5 mm. Det hadde vært kult hvis vi kunne laget to klemmer på hver side av den 80 mm brede sokkelen for vektsensor-riggen, som hadde «låst» koppen med friksjon til «totalriggen» - når man skyver på den. Problemet er jo da at den ene klemmen ville få 90 graders overheng, og det går ikke. Antydet ikke du at denne modellen kunne printes fra en annen akse?
 
 
-Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 1.5 mm av den øverste delen og som får med seg klemmene, for å teste om de klemmer seg fint på plass med passe friksjon.
 Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 1.5 mm av den øverste delen og som får med seg klemmene, for å teste om de klemmer seg fint på plass med passe friksjon.
 
 
@@ -34,4 +27,5 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
 
  Nye rettelser: Lengden på den høyre armen kan være så lang den er, men den venstre vil nå butte i en kontakt, så den må kuttes ned til 14 mm lendge. Så en mer estetisk feil, som ikke påvirker designet på koppen og som jeg så både i koden og den visuliserte sluttproduktet: Teakplaten er 200 x 200 mm (20x20cm) og med et 45 grader avkapp på alle 4 hjørner hvor den lille sidekanten blir på ca 37 mm lenge. Alt forklart kan sees på bilder: [Image #6] [Image #7] [Image #8]
 
+|
 Og jeg burde sagt: Jeg tror vi skal åpne litt til i gapet mellom armene på bare 0,1 mm
