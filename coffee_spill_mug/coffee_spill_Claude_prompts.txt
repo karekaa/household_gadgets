@@ -27,5 +27,7 @@ Vi bør lage en STL «mode» som heter noe lik «gauge_cramp» som printer bare 
 
  Nye rettelser: Lengden på den høyre armen kan være så lang den er, men den venstre vil nå butte i en kontakt, så den må kuttes ned til 14 mm lendge. Så en mer estetisk feil, som ikke påvirker designet på koppen og som jeg så både i koden og den visuliserte sluttproduktet: Teakplaten er 200 x 200 mm (20x20cm) og med et 45 grader avkapp på alle 4 hjørner hvor den lille sidekanten blir på ca 37 mm lenge. Alt forklart kan sees på bilder: [Image #6] [Image #7] [Image #8]
 
-|
+
 Og jeg burde sagt: Jeg tror vi skal åpne litt til i gapet mellom armene på bare 0,1 mm
+
+Kan vi få til en liten tekst i det som blir fronten (altså det som ligger ned mot printplaten)? F.eks: SpareBank 1 kaffsølsamler\nTrekk ut for tømming. Vedlagt foto viser at overhenget er litt bratt. Løsningen kan vel være å ha en slakere stigning. Vi kan godt lage koppen f.eks. 10 mm bredere og kanske 8 mm dypere? [Image #10]

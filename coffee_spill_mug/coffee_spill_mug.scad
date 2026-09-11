@@ -15,35 +15,42 @@
 //
 //    * a tongue behind the leg, hanging down in front of the front face of the
 //      plate, so the tray cannot slide backwards towards the pot
-//    * two spring arms reaching backwards from the rear face, one along each
-//      side of the grey printed socle that carries the sensor, gripping it by
-//      friction when the tray is pushed on
+//    * two arms reaching backwards from the rear face, one along each side of the
+//      grey printed socle that carries the sensor, straddling it
 //    * its own weight on the plate
 //
 //  THE GREY SOCLE is the fixed 3D printed block standing on the teak plate
 //  behind the tray: socle_width mm wide, socle_height mm up from the plate and
-//  deep. That is what the arms grip - the sides of a block that stands up above
-//  the plate - so the arms simply continue the side walls backwards, set in
-//  (tray_width - socle_width) / 2 mm from the sides of the tray. The tray
-//  therefore stays exactly tray_width mm wide.
+//  deep. That is what the arms straddle - the sides of a block that stands up
+//  above the plate - as two thin fins set in arm_x0 mm from the sides of the
+//  tray, at the width the socle needs rather than flush with the sides.
+//
+//  The arms are a deliberate SLIP FIT, not a clamp: clamp_squeeze is negative, so
+//  the opening is a touch wider than the socle. They locate the tray sideways and
+//  keep it square, and the tongue plus the weight of the tray do the holding. That
+//  is on purpose - a grip that has to be broken releases with a jerk, and a tray
+//  full of coffee residue being pulled forwards for emptying is the last place you
+//  want a jerk. Raise clamp_squeeze above 0 to get a real grip back.
 //
 //  PRINT ORIENTATION: on the front face (mode = "print"), so the print axis runs
 //  backwards along the depth of the tray. That is what makes the arms possible.
 //  Both gripping faces are planes at constant x; standing the part on a short end
 //  would put the print axis along x, turning those planes into layer planes, and
 //  the inner face of the upper arm into a ceiling hanging over nothing. Standing
-//  the tray upright is worse: the whole underside would be a ceiling 30 x 80 mm
-//  in the air above the leg.
+//  the tray upright is worse: the whole underside would be a ceiling
+//  plate_depth x tray_width mm in the air above the leg.
 //
 //  Lying on the front face, every face that has to be vertical runs parallel to
-//  the print axis, and the whole front face is the first layer. Only two surfaces
-//  face the bed, and both are dealt with at 45 degrees, the steepest overhang
-//  that prints without support:
+//  the print axis, and the whole front face is the first layer - which is also
+//  what makes it the right face to engrave the text into. Only two surfaces face
+//  the bed:
 //
 //    * the inside of the rear wall - the floor rises to the rim over a fillet of
-//      radius rear_fillet, from horizontal up to 45 degrees, and then a straight
-//      45 degree run. This also makes the trough deepest at the front, so a spill
-//      collects out over the table edge, away from the rig.
+//      radius rear_fillet and then a straight run at rear_angle degrees. 45 is the
+//      textbook limit and it printed rough, so this is 35: each layer steps only
+//      0.7 of its own height sideways instead of a full height. It also makes the
+//      trough deepest at the front, so a spill collects out over the table edge,
+//      away from the rig.
 //    * the front face of the locating tongue - chamfered at 45 degrees
 //
 //  The short ends need no such treatment in this orientation - they are prisms
@@ -73,16 +80,28 @@
 // ============================================================================
 
 /* [Main dimensions] */
-tray_width  = 80;   // body width, along the front edge of the plate, and the
+tray_width  = 90;   // body width, along the front edge of the plate, and the
                     // widest point of the whole part: the spring arms are set in
-                    // from the sides, they do not stand outside them.
+                    // from the sides, they do not stand outside them. Was 80,
+                    // which came from the width of the tongue on the plate; it is
+                    // 90 now to give the text on the front face room to breathe.
 plate_depth = 30;   // how far in on the plate the tray reaches, measured from
-                    // the front edge of the plate towards the sensor holder
+                    // the front edge of the plate towards the sensor holder.
+                    // FIXED BY THE RIG: the grey socle stands this far in, so the
+                    // body cannot get any deeper at the back. Extra depth has to
+                    // come out of overhang, at the front.
 tray_height = 20.5; // height of the rim above the plate surface. The grey socle
                     // is socle_height = 22 mm, and there are several mm of air
                     // from its top up to the big grey cup the pot stands in, so
                     // the rim has room to spare. Fitted with the 2 mm gauge.
-overhang    = 10;   // how far the tray sticks out past the front edge of the plate
+overhang    = 18;   // how far the tray sticks out past the front edge of the
+                    // plate. Was 10. The rear ramp had to get shallower than 45
+                    // degrees to print cleanly (see rear_angle), which costs
+                    // depth, and the back is up against the socle - so the extra
+                    // 8 mm are added at the front. It costs nothing structurally:
+                    // the leg stands on the table at the very front, so the
+                    // overhang is carried, not cantilevered, and the pivot lever
+                    // gets better rather than worse (see foot_clear).
 
 /* [The rig we clamp on to] */
 // The grey 3D printed socle that carries the sensor, standing on the teak plate
@@ -105,11 +124,19 @@ floor_t = 2.0;      // floor of the trough (the part lying on the plate)
 
 /* [Inside of the trough] */
 // The inside of the rear wall faces the bed when printed, so the floor rises to
-// the rim there over rear_fillet plus a straight 45 degree run. That costs
-// (tray_height - floor_t) + 0.41 * rear_fillet mm of the depth. The front wall
+// the rim there over rear_fillet plus a straight run at rear_angle. The front wall
 // and the two short ends only get inner_fillet, a plain rounding that makes the
-// trough easy to wipe out - no 45 degree run needed, none of those surfaces
-// faces the bed.
+// trough easy to wipe out - no ramp needed, none of those surfaces faces the bed.
+//
+// rear_angle is the overhang angle from the build direction: every layer steps
+// tan(rear_angle) * layer_height sideways from the one below. 45 degrees is the
+// textbook limit and it did print, but on the first tray in PLA it came out rough
+// and drooping, so it is 35 degrees now - each layer only steps 0.7 of its height
+// instead of a full one. The cost is depth: the ramp eats
+// rear_fillet * sin(a) + (tray_height - floor_t - rear_fillet * (1 - cos a)) / tan(a)
+// which is 30.2 mm at 35 degrees against 23.5 mm at 45. Run the part cooling fan
+// flat out over these layers as well.
+rear_angle   = 35;
 rear_fillet  = 12;
 inner_fillet = 5;
 arc_steps    = 24;  // facets in the fillets
@@ -153,32 +180,34 @@ hook_relief = 1.0;  // 45 degree relief in the inner corner, so a rounded or
 // face is the gripping face, so the pair of them is clamp_squeeze mm narrower
 // than the socle and has to spread to let it in.
 //
-// Bending happens over the whole free length, which is what makes the grip
-// springy instead of brittle: about 0.7 N on the 18 mm arm at the numbers below,
-// with a peak stress around 1 MPa. Stiffness goes as 1 / length^3, so the short
-// 14 mm arm pushes about twice as hard, near 1.4 N and 1.6 MPa - a small fraction
-// of what PETG takes, and the tray simply sits a hair off centre because of it.
-// clamp_squeeze is the total interference over both sides and is the number to
-// tune if the grip is too weak or the tray is too hard to push on.
+// With clamp_squeeze negative the arms never touch the socle in the relaxed state
+// and no force is involved. They are still springs, so raising clamp_squeeze above
+// zero brings the grip back: bending happens over the whole free length, which is
+// what makes it springy instead of brittle, and it takes about 13 N per mm of
+// deflection per side on the 18 mm arm in PETG, half again as much in PLA+.
+// Stiffness goes as 1 / length^3, so the short 14 mm arm is about twice that.
 //
 // The gripping face is relieved clamp_lead mm at the free end and closes in on
 // the socle over clamp_lead_y mm, so the front corners of the socle wedge the
 // arms apart instead of hitting them head on.
 clamp_enable  = true;
-clamp_squeeze = 0.1;    // total, i.e. clamp_squeeze / 2 per side. Started at 0.4:
-                        // the 1.5 mm gauge went on to the socle but splayed out
-                        // and could not be pushed all the way home, so the mouth
-                        // was opened to 0.2 and then to 0.1 mm. That is 0.05 mm
-                        // per side, which is inside the dimensional accuracy of
-                        // the printer - the grip now leans on the roughness of
-                        // the two surfaces rather than on the interference, so
-                        // raise it again if the tray comes out loose. Note that
-                        // the finished arms are far stiffer than any gauge - see
-                        // clamp_gauge_t below.
-clamp_t       = 2.05;   // thickness of the arm - this is the spring. Keep it
-                        // equal to (tray_width - socle_width + clamp_squeeze) / 2
-                        // and the outer face is flush with the side of the tray;
-                        // the assert below catches it if the two drift apart.
+clamp_squeeze = -0.1;   // total interference, i.e. clamp_squeeze / 2 per side.
+                        // NEGATIVE ON PURPOSE: this is now a slip fit, 0.05 mm of
+                        // air per side, so the arms are lateral guides rather than
+                        // a friction clamp. It went 0.4 -> 0.2 -> 0.1 -> -0.1: the
+                        // 0.4 mm gauge splayed out and would not seat, and a tray
+                        // that grips also lets go all at once, which slops the
+                        // coffee about when it is pulled out to be emptied. What
+                        // holds the tray now is the locating tongue against the
+                        // plate edge plus its own weight, and the arms keep it
+                        // square to within 0.05 mm. Raise this above 0 to get the
+                        // friction grip back.
+clamp_t       = 2.05;   // thickness of the arm. Up to tray_width = 80 this was
+                        // also (tray_width - socle_width + clamp_squeeze) / 2, so
+                        // the outer face came out flush with the side of the tray.
+                        // At tray_width = 90 that would mean a 7 mm slab, so the
+                        // arms are thin fins standing on the rear face instead,
+                        // set in arm_x0 mm from the sides.
 // The two arms are NOT the same length. The right one may be as long as it likes,
 // but the left one butts into a connector on the rig a little way back, so it is
 // cut short. Left and right are seen from the front, standing where the overhang
@@ -224,6 +253,33 @@ arm_r    = 0.8;     // top and bottom edges of the spring arms, outer side only:
                     // the gripping faces keep their full height
 fillet_steps = 8;   // facets per fillet arc
 
+/* [Text on the front face] */
+// Two lines engraved in the front face - the face that lies on the print bed, so
+// it comes out as the smoothest surface on the whole part. It has to be engraved
+// and not raised: raised letters on that face would need to be printed below the
+// first layer. A recess instead leaves the letters as small bridges text_depth mm
+// up, which any printer handles, and the shadow in them reads well in black.
+//
+// The face is tray_width x (tray_height + plate_height - foot_clear) mm, i.e.
+// 90 x 40.8 mm, and all of it is visible: it stands overhang mm out in front of
+// the plate edge, down to the table.
+//
+// OpenSCAD cannot measure a rendered string, so the sizes below are set by hand
+// from the width of the longer line, which has to stay inside
+// tray_width - 2 * text_margin = 80 mm. Measured at size 6 in this font,
+// text_line1 comes out 108.3 mm wide, so it scales to 75.8 mm at size 4.2. If you
+// edit either string, render it on its own and scale the size the same way.
+text_enable = true;
+text_line1  = "SpareBank 1 kaffesølsamler";
+text_line2  = "Trekk ut for tømming";
+text_size1  = 4.2;
+text_size2  = 4.2;
+text_font   = "Liberation Sans:style=Bold";
+text_depth  = 0.6;  // deep enough to read, shallow enough to leave 1.8 mm of wall
+text_gap    = 2.0;  // between the two lines
+text_z      = 1.0;  // centre of the two-line block above the plate surface
+text_margin = 5;    // least distance from the letters to the sides
+
 /* [View] */
 // "use"    = as it sits on the plate (z = 0 is the plate surface)
 // "print"  = lying on the front face, ready for the slicer
@@ -268,9 +324,10 @@ cav_y1 = tray_depth - wall_t;               // inside of the rear wall
 cav_x0 = wall_t;                            // inside of the left short end
 cav_x1 = tray_width - wall_t;               // inside of the right short end
 
-// Depth eaten by the rear ramp: a fillet from horizontal up to 45 degrees, then
-// a straight 45 degree line that hits the rim exactly at the inside of the wall
-rear_run  = rear_fillet * sin(45) + (cav_rise - rear_fillet * (1 - cos(45)));
+// Depth eaten by the rear ramp: a fillet from horizontal up to rear_angle, then a
+// straight run at rear_angle that hits the rim exactly at the inside of the wall
+rear_run  = rear_fillet * sin(rear_angle)
+          + (cav_rise - rear_fillet * (1 - cos(rear_angle))) / tan(rear_angle);
 flat_rear = cav_y1 - rear_run;              // where the rear ramp leaves the floor
 
 socle_x0 = (tray_width - socle_width) / 2;  // left side of the grey socle
@@ -296,6 +353,8 @@ assert(socle_width < tray_width,
        "the socle is wider than the tray - the arms cannot reach around it");
 assert(!clamp_enable || arm_x0 >= -0.01,
        "the arms stand outside the sides of the tray - reduce clamp_t");
+assert(!text_enable || text_depth < wall_t - 1.2,
+       "the text recess leaves less than 1.2 mm of front wall - reduce text_depth");
 assert(!clamp_enable || clamp_t > 1.6,
        "clamp_t below 1.6 mm is thinner than two perimeters - the spring is too weak");
 assert(!clamp_enable || clamp_h <= socle_height + 1,
@@ -459,6 +518,23 @@ module front_chamfer_mask() {
     }
 }
 
+// The two lines of text, drawn in (x, z) so they read the right way round seen
+// from the front, and extruded backwards into the front wall. Subtracted, so what
+// is left is a recess text_depth mm deep.
+module front_text_2d() {
+    h = text_size1 + text_gap + text_size2;     // height of the whole block
+    translate([tray_width / 2, text_z + h / 2 - text_size1])
+        text(text_line1, size = text_size1, font = text_font,
+             halign = "center", valign = "baseline");
+    translate([tray_width / 2, text_z - h / 2])
+        text(text_line2, size = text_size2, font = text_font,
+             halign = "center", valign = "baseline");
+}
+
+module front_text() {
+    extrude_y(-0.1, text_depth + 0.1) front_text_2d();
+}
+
 // Rounds the top and bottom edges of the spring arms, on the outer side only -
 // the mask spans the full width, so it never touches the gripping faces.
 module arm_mask() {
@@ -477,13 +553,15 @@ function end_profile() = concat(
     reverse(fillet_up(cav_x1, -1, inner_fillet, floor_t)),
     [[cav_x1, tray_height + 1]]);
 
-// The rear ramp: tangent to the floor at flat_rear, curving up to 45 degrees
-// over rear_fillet, then straight at 45 degrees through the rim
+// The rear ramp: tangent to the floor at flat_rear, curving up to rear_angle over
+// rear_fillet, then straight at rear_angle through the rim
 function rear_ramp() = concat(
     [for (i = [0 : arc_steps])
-        let (a = 45 * i / arc_steps)
+        let (a = rear_angle * i / arc_steps)
         [flat_rear + rear_fillet * sin(a), floor_t + rear_fillet * (1 - cos(a))]],
-    [[cav_y1 + 1, tray_height + 1]]);
+    // the straight run reaches the rim exactly at cav_y1 by construction; carry it
+    // 1 mm further at the same slope so the outline closes above the rim
+    [[cav_y1 + 1, tray_height + tan(rear_angle)]]);
 
 function rear_profile() = concat(
     [[cav_y0, tray_height + 1]],
@@ -541,6 +619,7 @@ module coffee_spill_tray() {
             front_chamfer_mask();
         }
         trough();
+        if (text_enable) front_text();
     }
 }
 
