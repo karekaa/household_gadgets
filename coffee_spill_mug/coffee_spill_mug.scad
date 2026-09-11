@@ -467,7 +467,11 @@ part_d   = clamps_on ? arm_end : tray_depth;
 clip_ref = round_base ? base_y - arc_out : tray_depth;
 clip_y0  = clip_ref - clip_back;
 
-assert(cav_rise > rear_fillet * (1 - cos(45)),
+// The fillet at the foot of the rear ramp eats rear_fillet * (1 - cos(rear_angle))
+// of the rise before the straight run even starts, so there has to be more rise
+// than that left. This used to say cos(45) from when the ramp was 45 degrees, which
+// happened to be stricter than needed at 35 and would have been too lax above 45.
+assert(cav_rise > rear_fillet * (1 - cos(rear_angle)),
        "rear_fillet too large for the depth of the trough");
 assert(round_base || flat_rear > cav_y0 + inner_fillet,
        "no flat floor left - reduce rear_fillet, inner_fillet or plate_depth");
