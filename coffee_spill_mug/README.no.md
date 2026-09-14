@@ -17,7 +17,8 @@ fundament under vektskålen. Alt annet er felles. Begynn med
 Selve koppen er **90 × 48 × 20,5 mm** over platen og holder **ca. 46 ml** på
 firkantbasen, 90 × 60 mm og ca. 51 ml på den runde. Den hviler på platen over de
 bakre 30 mm, de forreste 18 mm stikker ut forbi platekanten, og frontveggen
-fortsetter ned til bordet – med to linjer tekst gravert i seg:
+fortsetter ned til bordet – og bærer en merking på fire linjer, senket ned i den
+svarte kroppen og fylt med hvitt fra den andre ekstruderen:
 
 ![Frontflaten, som også er førstelaget i printet](img/coffee_spill_mug_front.png)
 
@@ -103,7 +104,7 @@ i tabellen over.
 | Total høyde | 40,8 mm | fra bordet til rimet |
 | Vegger / bunn | 2,4 / 2,0 mm | |
 | Trau | 18,5 mm dypt, 46 ml til rimet | målt fra `mode = "cavity"` |
-| Tekst på frontflaten | to linjer, 4,2 mm, gravert 0,6 mm dypt | `text_line1` / `text_line2`, se under |
+| Tekst på frontflaten | fire linjer, 6,5 mm, forsenket 0,6 mm, hvitt innlegg | `text_lines` / `text_size`, se under |
 
 Selve riggen, målt med skyvelær – det er disse tallene passformen er utledet fra:
 
@@ -161,20 +162,57 @@ finnes ingen armer, og buen gjør denne jobben bedre – se over.*
 
 Det som er verdt å gripe rundt, er den **grå 3D-printede sokkelen** som bærer
 sensoren: en kloss 76 mm bred som står 22 mm opp fra teakplaten, rett bak koppen.
-To finner 2,05 mm tykke rekker bakover fra bakflaten, én langs hver side av den.
+To finner 3,2 mm tykke rekker bakover fra bakflaten, én langs hver side av den.
 
 De begynte som fjærarmer som klemte om sokkelen, og det er de **ikke lenger**.
-`clamp_squeeze` er **−0,1 mm**, altså er åpningen 0,1 mm *videre* enn sokkelen i
+`clamp_squeeze` er **−0,4 mm**, altså er åpningen 0,4 mm *videre* enn sokkelen i
 stedet for smalere. Armene styrer koppen sideveis og holder den i vinkel med
 riggen; låsetunga og vekta av koppen står for holdet. Et grep som må brytes,
 slipper med et rykk, og en kopp med kafferester i som trekkes fram for tømming er
 det siste stedet du vil ha et rykk. Sett `clamp_squeeze` over 0 for å få et
-virkelig grep tilbake – formen er den samme, tallet er hele forskjellen.
+virkelig grep tilbake – men les neste avsnitt først.
 
-Dit kom vi over tre printede tester: 0,4 mm total overlapp, som spriket
-`gauge_clamp` ut så den ikke lot seg skyve inn, så 0,2, så 0,1, og til slutt forbi
-null til −0,1. Under omtrent 0,1 mm er tallene akademiske uansett: 0,05 mm per side
-ligger innenfor målnøyaktigheten til printeren.
+Dit kom vi over fire printede tester: 0,4 mm total overlapp, som spriket
+`gauge_clamp` ut så den ikke lot seg skyve inn, så 0,2, så 0,1, så forbi null til
+−0,1 – og så **brakk den ene armen på den ferdige koppen mens den ble satt på
+plass**, så nå er den −0,4.
+
+### Hvorfor en arm brakk, og de tre tingene som er endret
+
+0,05 mm overlapp skal ikke være noe, og etter bjelkeformelen i tabellen under er
+det heller ikke noe: en brøkdel av en newton. Formelen er ikke problemet.
+**Lagretningen** er det.
+
+Koppen printes på frontflaten, så armene vokser *langs printaksen* – hvert lag
+legger på en skive arm, og laggrensene løper på tvers av armen fra utsiden til
+styreflaten. Å bøye en arm sideveis, som er nøyaktig det som skjer når koppen
+presses ned over en sokkel som er en anelse for bred for den, drar de laggrensene
+fra hverandre i strekk. En laggrense i PLA+ er det svakeste planet i hele delen,
+grovt regnet halvparten av styrken i massivt materiale, og den er ikke duktil: den
+bøyer seg ikke og spretter tilbake, den flerrer opp. Det er det bjelkeformelen,
+som forutsetter et isotropt materiale, ikke har noen mulighet til å fortelle deg.
+
+Tre endringer følger av det, og fila gjør alle tre:
+
+1. **Ta bort overlappen.** `clamp_squeeze` −0,1 → **−0,4**, de 0,3 mm ekstra som
+   ble bedt om. En arm som aldri tar i noe, blir aldri påkjent, og 0,2 mm luft per
+   side ligger fremdeles langt innenfor det sideveis sluret som ville betydd noe.
+2. **Gjør armen tykkere.** `clamp_t` 2,05 → **3,2 mm**. Mot en *last* – et støt, en
+   hånd, å komme skjevt ned over riggen – går spenningen som 1/tykkelse², så dette
+   halverer den med god margin. Merk at det bare hjelper *fordi* (1) er gjort: hvis
+   armen fortsatt ble tvunget ut en fast avstand, ville en tykkere arm fått **mer**
+   spenning, ikke mindre, for ved påtvunget utbøying går spenningen som tykkelse ×
+   utbøying. Tykkelse og klaring er ikke uavhengige knapper.
+3. **Utvid roten.** `clamp_root` = **2,5 mm** legger på en 45° kile der armen går ut
+   fra bakflaten – punktet med det største bøyemomentet, og tidligere et skarpt
+   innvendig hjørne som konsentrerte det ytterligere. Den kan bare legges på
+   *utsiden*, siden styreflaten må være plan i hele sin lengde, så armen er 5,7 mm
+   tykk ved roten og tynnes til 3,2 mm over de første 2,5 mm. Den er gratis å
+   printe: tegnet i planet er kilen en skråflate som ligger langs printaksen, ingen
+   overheng og ingen støtte.
+
+Printer du i PETG i stedet, er alt dette mindre presserende – PETG har mye bedre
+lagbinding enn PLA+ – men geometrien koster ingenting uansett.
 
 De to armene er **ikke like lange**. Den høyre går hele 18 mm, men den venstre
 butter i en kontakt på riggen et stykke bakover, så den er kuttet ned til 14 mm
@@ -190,16 +228,19 @@ Armene ligger **ikke lenger i flukt med sidene**. Det gjorde de da koppen var
 80 mm og sokkelen 76: 2,05 mm tykkelse traff nøyaktig det 2 mm store trinnet på
 hver side. Ved 90 mm ville den samme regelen krevd en 7 mm plate, så de to er
 koblet fra hverandre – `clamp_t` er den tykkelsen finna trenger, og armene ligger
-4,9 mm innenfor sidene, der sokkelen setter dem.
+3,6 mm innenfor sidene, der sokkelen setter dem. Det innrykket er samtidig taket på
+armen: kilen må holde seg innenfor bredden på koppen, noe som begrenser
+`clamp_t + clamp_root` til 7 mm, så `clamp_t` kan ikke gå forbi omtrent 4,3 mm ved
+`clamp_root` = 2,5. En assert sier det.
 
 | | |
 |---|---|
-| Styreflater | x = 6,95 og 83,05, altså en åpning på 76,1 mm på den 76 mm brede sokkelen: 0,05 mm klaring per side |
-| Arm | 2,05 mm tykk, 17,5 mm høy, 18 mm fri lengde til høyre, 14 mm til venstre |
-| Munn ved frie enden | 78,1 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen leder koppen inn i stedet for å hake seg fast i armtippene, og lukker seg inn over de siste 6 mm |
+| Styreflater | x = 6,8 og 83,2, altså en åpning på 76,4 mm på den 76 mm brede sokkelen: 0,2 mm klaring per side |
+| Arm | 3,2 mm tykk, 5,7 mm ved den utvidede roten, 17,5 mm høy, 18 mm fri lengde til høyre, 14 mm til venstre |
+| Munn ved frie enden | 78,4 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen leder koppen inn i stedet for å hake seg fast i armtippene, og lukker seg inn over de siste 6 mm |
 | Undersiden av armen | 1,5 mm over platen (`clamp_z0`), for å gå klar av en eventuell fillet eller elefantfot ved foten av sokkelen |
 | Toppen av armen | 19 mm = `tray_height - edge_r`; høyere enn det ville avrundingen av rimet tynnet armen ned til en knivsegg |
-| Hvis du legger overlapp tilbake | armen er en bladfjær: `k = 3EI/L³` med `I = b·t³/12` gir ca. 13 N/mm på den 18 mm lange armen i PETG, halvparten mer i PLA+. Stivheten går som 1/lengde³, så den korte 14 mm-armen er 2,1 ganger stivere, og koppen setter seg en hårsbredd ut av senter. |
+| Hvis du legger overlapp tilbake | som isotrop bladfjær gir `k = 3EI/L³` med `I = b·t³/12` ca. 50 N/mm på den 18 mm lange armen i PETG ved 3,2 mm tykkelse, halvparten mer i PLA+, og stivheten går som 1/lengde³, så den korte 14 mm-armen er 2,1 ganger stivere igjen. **Men armen er ikke isotrop** – se avsnittet over om hvorfor den ene flerret opp langs en laggrense. Se på disse tallene som en øvre grense for hva armen tåler, ikke som et designmål. |
 
 ## Avrundede kanter, og hvorfor ikke `minkowski()`
 
@@ -234,7 +275,7 @@ først (`cube([w-2*r, d-2*r, h-2*r])` pluss `sphere(r)` gir eksakt w × d × h),
 her finnes det ingen enkelt skalar å krympe – og verre: det ville lukket munnen
 mellom armene 2 *r* og gjort beinet ned til bordet *r* for langt, altså
 nøyaktig de to målene som ikke får flytte seg. `offset()` og tangerende
-fillet-buer fjerner bare materiale, så armavstanden (76,1/76 mm) og beinet
+fillet-buer fjerner bare materiale, så armavstanden (76,4/76 mm) og beinet
 (20,3 mm) kommer ut eksakt som målt. Å runde ett navngitt hjørne av gangen holder
 også de innvendige hjørnene skarpe.
 
@@ -266,7 +307,7 @@ frontflaten blir førstelaget, 90 × 40,8 mm massiv kontakt med bordet, og bunne
 veggene i trauet printes som én sammenhengende kontur i hvert enkelt lag, så
 hjørnet der de møtes ikke er en lagfuge kaffen kan sive gjennom. De to armene blir
 de siste 14 og 18 mm av printet: to finner som står på bakflaten, hver med et fotavtrykk
-på 2,05 × 17,5 mm. De printer greit, men senk farten på de siste lagene hvis
+på 3,2 × 17,5 mm (5,7 mm ved den utvidede roten). De printer greit, men senk farten på de siste lagene hvis
 sliceren ikke gjør det selv.
 
 Bare to flater vender mot printbordet i denne orienteringen:
@@ -312,38 +353,179 @@ flate bunnen beholder full bredde.
 
 Siden frontflaten er førstelaget, kommer den ut som den glatteste flata på hele
 delen – som gjør den til rett sted for en merking, og som bestemmer hvordan
-merkingen må lages. Den er **gravert, ikke hevet**: hevede bokstaver på den flata
-måtte vært printet *under* førstelaget, og det går ikke. `text_depth` = 0,6 mm
-fordypning printes som en liten bro over bokstavformene, noe enhver printer klarer,
-og i svart filament leser skyggen i fordypningen bedre enn hevede bokstaver ville
-gjort.
+merkingen må lages. Den er **nedsenket, ikke hevet**: hevede bokstaver på den flata
+måtte vært printet *under* førstelaget, og det går ikke.
+
+![Merkingen, svart kropp og hvitt innlegg](img/coffee_spill_mug_text_two_tone.png)
+
+### Første forsøk mislyktes, på to måter
+
+Den første koppen ble printet i én farge med teksten senket 0,6 mm ned, og
+merkingen ble så godt som uleselig – i beste fall lesbar med en lampe holdt i
+riktig vinkel. To helt forskjellige feil, og det er verdt å skille dem, for de har
+ulik løsning:
+
+1. **Ingen kontrast.** En tidligere versjon av denne fila hevdet at i svart
+   filament leser skyggen i fordypningen bedre enn hevede bokstaver ville gjort.
+   Det var feil. En 0,6 mm fordypning i matt svart plast kaster nesten ingen
+   skygge, og en merking du må lyse på i vinkel er ingen merking.
+2. **For tynne streker til å printes.** I Liberation Sans Bold er stor *I* bare en
+   stamme, så bredden på den *er* strekbredden. Målt med `mode="text_measure"` er
+   den 2,000 mm ved `text_size` = 10, altså:
+
+   > **strekbredde = 0,20 · `text_size`**
+
+   Ved den gamle størrelsen 4,2 blir det **0,84 mm**, altså 2,1 ekstruderinger med
+   en 0,4 mm dyse. To og litt ekstruderinger kan ikke holde en bokstavform:
+   omkretsene smelter sammen, hullene i *e*, *a* og *ø* fylles igjen, og resultatet
+   er grøt. Regelen nå er **minst tre dysebredder**, `0,20 · text_size ≥ 1,2 mm`,
+   altså `text_size ≥ 6,0`. En `assert` nekter blankt alt under 0,8 mm strekbredde,
+   og en `echo` advarer mellom 0,8 og 1,2.
+
+### Slik er den nå
 
 | | |
 |---|---|
-| Linjer | `text_line1` = «SpareBank 1 kaffesølsamler», `text_line2` = «Trekk ut for tømming» |
-| Størrelse | 4,2 mm på begge linjer, `text_gap` = 2,0 mm mellom dem, `text_font` = Liberation Sans Bold |
-| Dybde | 0,6 mm, så det står igjen 1,8 mm av den 2,4 mm tykke veggen – en `assert` holder minst 1,2 mm |
-| Plassering | midtstilt i bredden, senter av tekstblokka `text_z` = 1,0 mm over plateflata |
+| Linjer | `text_lines` = «SpareBank 1» / «kaffesølsamler» / «Trekk ut» / «for tømming» |
+| Størrelse | `text_size` = 6,5 mm → 1,30 mm strek = 3,25 ekstruderinger à 0,4 mm |
+| Avstand | `text_gap` = 2,3 mm mellom linjene, ≈ 0,35 · `text_size` |
+| Font | `text_font` = Liberation Sans Bold |
+| Dybde | `text_depth` = 0,6 mm, så det står igjen 1,8 mm av den 2,4 mm tykke veggen – en `assert` holder minst 1,2 mm – og 3 lag à 0,2 mm, nok til at innlegget leser som heldekkende hvitt |
+| Plassering | midtstilt i bredden, senter av blokka `text_z` = 0 (flata går fra −20,6 til +20,5, så 0 midtstiller den) |
+| Blokk | 32,9 mm nominelt, 34,9 mm virkelig blekk, på en 40,8 mm høy flate; 61,1 mm bred av de 80 tillatte |
 
-OpenSCAD kan ikke måle en rendret tekst, så størrelsene er satt for hånd: linje 1
-er 108,3 mm bred ved størrelse 6 i denne fonten, altså 75,8 mm ved 4,2, innenfor de
-`tray_width - 2 · text_margin` = 80 mm som er tilgjengelig. Endrer du en av
-strengene, render den for seg og skalér størrelsen på samme måte. Merk at kilden
-sier *kaffesølsamler* med e; ta den bort i `text_line1` hvis du vil ha
-*kaffsølsamler*.
+Å rette strekbredden tvang fram ny ombrekking. **Bredden, ikke høyden, er det som
+begrenser:** bare `tray_width − 2 · text_margin` = 80 mm er tilgjengelig, og ved
+størrelse 6,5 er de gamle lange linjene altfor brede. Så merkingen ble fire korte
+linjer i stedet for to lange. Målte bredder ved størrelse 10 – del på 10 og gang
+med den størrelsen du vil ha:
+
+| Streng | Bredde ved størrelse 10 | Ved 6,5 |
+|---|---|---|
+| «SpareBank 1» | 81,6 mm | 53,0 mm |
+| «kaffesølsamler» | 93,9 mm | 61,1 mm ← den bredeste linja |
+| «Trekk ut» | 51,8 mm | 33,7 mm |
+| «for tømming» | 78,1 mm | 50,8 mm |
+| «SpareBank 1 kaffesølsamler» | 180,5 mm | 117,3 mm ✗ |
+| «Trekk ut for tømming» | 134,0 mm | 87,1 mm ✗ |
+
+Endrer du en streng, mål den på samme måte i stedet for å gjette:
+
+```sh
+openscad -o /tmp/t.png -D 'mode="text_measure"' coffee_spill_mug.scad
+```
+
+`mode="text_measure"` legger blokka flatt som en 1 mm plate i origo, så en STL av
+den gir deg den virkelige omsluttende boksen – både den faktiske blekkhøyden, som
+er omtrent 2 mm mer enn `text_block_h` når underlengden i *g* og streken over *ø*
+er med, og bredden på den bredeste linja.
+
+Merk at kilden sier *kaffesølsamler* med e; ta den bort i `text_lines` hvis du vil
+ha *kaffsølsamler*.
 
 Ingenting trenger å speilvendes: bokstavene tegnes i (x, z)-planet og ekstruderes
 langs +y inn i delen, og frontvisningen ser langs +y, så det du leser i renderingen
 er det som kommer av printbordet.
 
+### To farger: svart kropp, hvite bokstaver
+
+Kontrastproblemet har ingen geometrisk løsning – det vil ha en farge til.
+FlashForge Creator Pro 2 har to skrivehoder, så merkingen printes som et
+**innlegg**: kroppen i svart fra det ene hodet, bokstavene i hvitt fra det andre, i
+flukt med frontflaten.
+
+Det betyr to STL-filer, og hele trikset er at de er **nøyaktig komplementære**: det
+volumet kroppen lar stå tomt er det volumet innlegget fyller, uten klaring og uten
+overlapp. Kontrollert med volum, som må summere seg opp helt presist:
+
+| | Rund base | Firkantbase |
+|---|---|---|
+| Kropp, med fordypningen (`mode="print"`) | 52,39 cm³ | 51,55 cm³ |
+| Hvitt innlegg (`mode="print_text"`) | 0,32 cm³ | 0,32 cm³ |
+| Kopp uten tekst i det hele tatt | 52,71 cm³ | 51,88 cm³ |
+
+Innlegget er samme del på begge riggene – de to `_text.stl`-filene er identiske
+byte for byte – men begge skrives ut, slik at hver rigg har et opplagt par.
+
+To detaljer i koden må være slik for at dette skal fungere:
+
+- Innlegget starter på **y = 0 helt nøyaktig**, ikke på de −0,1 mm som kuttekroppen
+  bruker for å unngå en sammenfallende flate. Stakk innlegget fram foran flata,
+  ville sliceren enten droppe førstelaget eller løfte hele printen 0,1 mm, og da
+  slutter de to filene å stemme med hverandre.
+- Innlegget `intersection()`-es med kroppen, så det kan aldri stikke ut gjennom en
+  fasing eller et avrundet hjørne, selv om `text_z` eller `text_size` skyves helt
+  ut til det `assert`-ene tillater.
+
+**Hvordan du faktisk kjører den** – én jobb, to hoder, og det ene steget det ikke
+finnes noen vei tilbake fra – har fått sitt eget avsnitt:
+[Slik kjører du tofargeprinten, steg for steg](#slik-kjører-du-tofargeprinten-steg-for-steg).
+
+**Bokstavene står ikke i fare for å løsne,** som var bekymringen bak tanken om å
+printe de første lagene med hull og fylle dem i en andre runde. De er ikke
+frittstående øyer: hver bokstav er omgitt av svart på alle sider *i samme lag*, PLA
+sveiset til PLA, og hele frontflata på 90 × 40,8 mm ligger på bordet. En slicer med
+to hoder gjør allerede nøyaktig sekvensen hull–fyll–fortsett, lag for lag, og det
+er bedre enn å gjøre det i to runder for hånd – en andre runde måtte hjemsøke og
+varme opp på nytt med en halvferdig print på bordet.
+
+For å se på den før printing:
+
+```sh
+# IKKE --render: CGAL kaster farge, så denne må rendres som forhåndsvisning
+openscad -o img/coffee_spill_mug_text_two_tone.png -D 'mode="two_tone"' \
+  --colorscheme=Tomorrow --projection=o --imgsize=1000,500 \
+  --camera=45,0,0,90,0,0,115 coffee_spill_mug.scad
+```
+
+`mode="two_tone"` er en modus for bilde og ingenting annet: den tegner innlegget
+uklippet og skjøvet 0,02 mm fram, fordi klippe-`intersection()`-en forvirrer
+forhåndsvisningen og fordi sammenfallende flater flimrer mot hverandre. Ingen av de
+to tingene påvirker de eksporterte STL-ene.
+
+Forhåndsvisningen er skjør på denne modellen på én måte til: den må også regne ut
+`difference()`-en som skjærer trauet og fordypningen ut av kroppen, og ved visse
+kameraavstander tegner den et falskt lyst bånd tvers over frontflata der beinet
+møter koppen – geometri som en CGAL-rendering viser at ikke finnes. Skjer det, endre
+avstanden, eller bygg bildet fra de to **eksporterte STL-ene** i stedet, rotert
+tilbake ut av printstillingen. Det er kanskje det beste bildet uansett: importerer du
+de ferdige meshene, ser du nøyaktig det paret av filer printeren får, og det er
+samtidig kontrollen på at de stemmer med hverandre.
+
+```sh
+cat > /tmp/two_tone.scad <<'EOF'
+module unprint() { rotate([-90, 0, 0]) translate([0, -20.5, 0]) children(); }
+unprint() color("#1a1a1a") import("stl/coffee_spill_mug.stl");
+unprint() color("white")   import("stl/coffee_spill_mug_text.stl");
+EOF
+openscad -o img/coffee_spill_mug_text_two_tone.png --colorscheme=Tomorrow \
+  --projection=o --imgsize=1000,500 --camera=45,0,0,90,0,0,115 /tmp/two_tone.scad
+```
+
+(`translate([0, -20.5, 0])` er `-tray_height`; sammen med `-90°`-rotasjonen opphever
+det `on_front_face()`, så merkingen leses riktig vei.)
+
+**Print `mode="gauge_text"` først.** Det er de fremste 2,4 mm av koppen som en flat
+plate, med hele merkingen i full størrelse i den samme veggen den sitter i på den
+virkelige delen, og den slices med `print_text` uendret som hvit halvpart. 10 g og en
+halvtime mot 65 g og flere timer, for å finne ut om det hvite lander i fordypningen og
+om resultatet er leselig tvers over rommet. Se [Testbiter](#testbiter).
+
+**Vil du helst ikke printe på nytt:** koppen som alt finnes har en 0,6 mm fordypning
+i seg. Gni hvit akryl- eller emaljemaling inn i den med en fingertupp og tørk flata
+rein med en klut før den tørker. Det er den tradisjonelle måten å fylle en
+gravering, det koster ingenting, og det retter kontrasthalvdelen av problemet –
+men ikke de utflytende bokstavene, de er støpt inn i den printen.
+
 ## Testbiter
 
-Tre billige print, i den rekkefølgen det er verdt å lage dem:
+Fire billige print, i den rekkefølgen det er verdt å lage dem:
 
 | `mode` | Kostnad | Hva den forteller |
 |---|---|---|
+| `"gauge_text"` | 10 g for paret | De fremste 2,4 mm av koppen som en flat plate: hele merkingen i full størrelse, i samme veggtykkelse som den har på den virkelige delen. Printes med `"print_text"`, uendret, som den hvite halvparten – innlegget er bare 0,6 mm dypt, så det passer i testplaten like godt som i koppen. Dette er den man lager **før** man binder opp 65 g i en tofarget kopp: lander det hvite i fordypningen, klarer sliceren å tegne en 1,3 mm strek i det hele tatt, og er resultatet leselig tvers over rommet? |
 | `"gauge"` | 3 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
-| `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 2,05 mm arm ved siden? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
+| `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 3,2 mm arm ved siden? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
 | `"clip"` | 26 g firkant, 31 g rund | Baksiden av koppen, `clip_back` = 12 mm foran bakveggen, stående på kuttflaten – på firkantbasen de bakre 12 mm pluss begge armene komplett, på den runde hele de 24,5 mm som buen dekker (å måle 12 mm bakover fra *hjørnene* ville kuttet bort senterlinjen og etterlatt to vinger). Den eneste testen som viser hvordan koppen virkelig går på og av, men den koster en tredjedel av en kopp, så den er bare verdt det hvis `"gauge_rear"` gjør deg usikker. |
 
 ## Printing
@@ -351,11 +533,69 @@ Tre billige print, i den rekkefølgen det er verdt å lage dem:
 | | |
 |---|---|
 | Printmål | 90 × 40,8 mm fotavtrykk, liggende på frontflaten; 66 mm høy på firkantbasen, 60,1 mm på den runde (FlashForge Creator Pro 2: 200 × 148 × 150 mm) |
-| Materialforbruk | 51,0 cm³ ≈ 65 g på firkantbasen, 52,6 cm³ ≈ 67 g på den runde |
+| Materialforbruk | svart: 51,6 cm³ ≈ 64 g på firkantbasen, 52,4 cm³ ≈ 65 g på den runde. Hvitt: 0,32 cm³ ≈ 0,4 g – et par dagers tørketårn koster mer enn bokstavene gjør |
+| Skrivehoder | to: hvitt i venstre, svart i høyre. Begge STL-ene lastet inn sammen, ingenting flyttet |
 | Støtte | ingen |
+| Bord | **60 °C**, ikke slicerens standard 40 °C |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
-| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,05 mm armene blir massive |
+| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 3,2 mm armene blir massive |
 | Kjøling | vifta for full musikk over den 35° bakrampen – det er den ene flata som bryr seg |
+
+### Slik kjører du tofargeprinten, steg for steg
+
+**Det er én printjobb, ikke to.** De to STL-filene er ikke to utskrifter som skal
+kjøres etter hverandre – de er de to halvdelene av én jobb. Maskinen skifter hode
+selv i hvert lag som har bokstaver i seg: svart kontur og fyll, hodeskifte, hvite
+bokstaver ned i hullene, hodeskifte, videre til neste lag. Hele grunnen til at
+filene er nøyaktig komplementære og deler ett koordinatsystem, er at sliceren skal
+kunne gjøre nøyaktig dette, og der de to fargene møtes blir det en PLA-mot-PLA-sveis
+inne i laget i stedet for en limt skjøt.
+
+Filene, for firkantriggen (bytt inn `_round`-navnene for en buet base):
+
+| Fil | `mode` | Hode | Mengde |
+|---|---|---|---|
+| `stl/coffee_spill_mug.stl` | `"print"` / `"print_body"` | **høyre**, svart | 51,6 cm³ ≈ 64 g |
+| `stl/coffee_spill_mug_text.stl` | `"print_text"` | **venstre**, hvit | 0,32 cm³ ≈ 0,4 g |
+
+1. **Print testplaten først.** `mode="gauge_text"` sammen med `mode="print_text"` er
+   den samme jobben i miniatyr – 10 g og en halvtime, mot 64 g og flere timer. Den
+   svarer på hvert spørsmål dette avsnittet reiser, på printbordet i stedet for i
+   teorien. Se [Testbiter](#testbiter).
+2. **Last inn begge filene i samme jobb.** Kroppen først, så teksten; ikke start en
+   ny jobb for den andre fila.
+3. **Ikke flytt, roter, skaler eller auto-arranger noen av dem.** Dette er det ene
+   steget det ikke finnes noen vei tilbake fra. Begge filene kommer ut av OpenSCAD i
+   samme koordinater, allerede liggende på frontflaten og allerede plassert riktig i
+   forhold til hverandre. En auto-arrangering som flytter den ene en millimeter,
+   legger de hvite bokstavene inn i massiv svart vegg og lar fordypningen stå tom –
+   og printen ser ikke gal ut før den er ferdig. Tilbyr sliceren «behold relativ
+   posisjon» eller «behandle som ett objekt med flere deler», er det den
+   innstillingen du vil ha.
+4. **Tildel et hode til hvert objekt,** hvit til bokstavene og svart til kroppen.
+5. **Sjekk hvilket hode som faktisk har hvitt** før du starter – mat ut noen
+   centimeter fra hvert og se. Får du dette omvendt, ender du med svart-på-svart
+   merking og en hvit kopp, altså en hel kopp kastet bort. Merk at FlashPrints
+   «venstre» og «høyre» er maskinens, sett forfra, og er lett å lese motsatt vei.
+6. **Bord 60 °C, ikke slicerens standard 40 °C.** Samme overstyring som alltid på
+   denne printeren.
+7. **Slå på prime-/tørketårn og oozeskjerm.** Risikoen i en tofargeprint er ikke
+   feste, men at et hode som har stått stille et lag sikler svart ned i de hvite
+   bokstavene ved neste hodeskifte. Tårnet koster mer filament enn bokstavene selv
+   gjør, og det er verdt det.
+8. **Ingen støtte, ingen brem, minst 3 perimetre.** Første lag er hele frontflata på
+   90 × 40,8 mm; det er ingenting for en brem å hjelpe med.
+9. **0,2 mm lag** gjør den 0,6 mm dype fordypningen nøyaktig tre lag dyp, så det
+   hvite blir dekkende uten at svart skinner gjennom. Enhver laghøyde som går opp i
+   0,6 fungerer like godt; en som ikke gjør det, gir et siste hvitt lag i delvis
+   dybde.
+10. **Se på slicerens forhåndsvisning i første lag og igjen ved 0,6 mm.** I lag 1
+    skal du se hvite bokstavformer omgitt av svart i samme lag. Over 0,6 mm skal alt
+    hvitt være borte. Legges det fortsatt hvitt ved 1 mm, har noe blitt flyttet.
+
+**Er to farger ikke et alternativ** – ett hode, eller det hvite er tomt – print
+kroppen alene og fyll fordypningen med maling, som under. Kropps-STL-en er den samme
+uansett: en fordypning er en fordypning enten det kommer noe i den eller ikke.
 
 **PETG er det riktige materialet, og er fortsatt anbefalingen.** Kaffe rett fra
 kannen er 80–90 °C, og PLA begynner å bli mykt like over 55 °C. PETG (eller
@@ -375,7 +615,7 @@ som noe annet:
   glidepassform betyr ikke det så mye lenger, men det betyr at armene blir
   stående der de er satt.
 - PLA holder også målene bedre enn PETG: mindre krymp og mindre utsvelling i
-  hjørnene, og det er det som holder 0,05 mm klaring per side til en klaring.
+  hjørnene, og det er det som holder 0,2 mm klaring per side til en klaring.
 
 To ting å holde et øye med ved PLA, og begge handler om *vedvarende* last, ikke om
 dryppene:
@@ -393,16 +633,22 @@ Filene for firkantbasen er de opprinnelige og beholder de enkle navnene; de for 
 runde basen har `_round` i navnet:
 
 ```sh
-# firkantbasen - koppen, liggende på frontflaten, klar for sliceren
-openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' -D 'base="box"' coffee_spill_mug.scad
+# firkantbasen - koppen, liggende på frontflaten, klar for sliceren, og det
+# hvite innlegget til merkingen i samme koordinater
+openscad -o stl/coffee_spill_mug.stl      -D 'mode="print"'      -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_text.stl -D 'mode="print_text"' -D 'base="box"' coffee_spill_mug.scad
 
 # ... og testbitene for den
 openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
 
+# testplata for merkingen - samme fil for begge riggene, den er bare frontflaten
+openscad -o stl/coffee_spill_mug_gauge_text.stl  -D 'mode="gauge_text"' -D 'base="box"' coffee_spill_mug.scad
+
 # den runde basen
-openscad -o stl/coffee_spill_mug_round.stl -D 'mode="print"' -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round.stl      -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_text.stl -D 'mode="print_text"' -D 'base="round"' coffee_spill_mug.scad
 
 openscad -o stl/coffee_spill_mug_round_gauge.stl      -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_round_gauge_rear.stl -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
@@ -419,8 +665,11 @@ tegnes:
 |---|---|
 | `"use"` | som den står på platen. z = 0 er platetoppen, y = 0 er frontflaten, x = 0 er venstre side av koppen |
 | `"check"` | som `"use"`, med teakplaten, bordet og basen bak koppen tegnet som spøkelser for visuell passkontroll – den grå boksen eller det buete fundamentet pluss vektskålen som henger ut over det, alt etter hva `base` sier |
-| `"print"` | liggende på frontflaten, klar for sliceren |
-| `"gauge"`, `"gauge_rear"`, `"clip"` | testbitene over, alle klare for sliceren |
+| `"print"` | liggende på frontflaten, klar for sliceren. Den svarte delen, med bokstavene senket ned. `"print_body"` er et synonym, for når det er greiere å si hvilken av de to det er |
+| `"print_text"` | bare det hvite innlegget, i samme posisjon, klart for den andre ekstruderen |
+| `"two_tone"` | begge, i filamentfargene sine, for å se på merkingen. Kun forhåndsvisning – CGAL kaster farge, så ikke `--render` |
+| `"text_measure"` | tekstblokka lagt flatt som en 1 mm plate i origo, for å måle virkelig bredde og blekkhøyde |
+| `"gauge"`, `"gauge_rear"`, `"gauge_text"`, `"clip"` | testbitene over, alle klare for sliceren |
 | `"cavity"` | traurommet som et massivt volum, for å måle kapasiteten |
 
 Alle parametrene ligger øverst i fila, med `base` først. `echo` skriver ut hvilken

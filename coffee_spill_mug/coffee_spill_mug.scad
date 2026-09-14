@@ -89,16 +89,31 @@
 //  clamp_squeeze were raised above 0, and then the grip would fade over months.
 //  See README.md.
 //
+//  TWO COLOURS. The first tray was printed in one colour with the text recessed,
+//  and the label came out all but unreadable - see the text section further down.
+//  So the label is now a two extruder job: the body in black from one head and the
+//  letters in white from the other. The two are separate STL files in the SAME
+//  coordinates, and they are exactly complementary - the recess the body leaves is
+//  the volume the inlay fills, no gap, no overlap. Load both into the slicer,
+//  assign a head to each, and do not move or auto-arrange either one.
+//
 //  The STL files are written like this - see README.md for the reasoning. The
 //  round base files carry _round in the name, the box base ones are the originals
-//  and keep the plain names:
+//  and keep the plain names, and the _text ones are the white inlay:
 //
-//    openscad -o stl/coffee_spill_mug.stl -D 'mode="print"' -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug.stl             -D 'mode="print"'      -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_text.stl        -D 'mode="print_text"' -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
 //
-//    openscad -o stl/coffee_spill_mug_round.stl            -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
+//  The label test plate is the front face and nothing else, so one file covers both
+//  rigs. Slice it with print_text, unchanged, as its white half:
+//
+//    openscad -o stl/coffee_spill_mug_gauge_text.stl  -D 'mode="gauge_text"' -D 'base="box"' coffee_spill_mug.scad
+//
+//    openscad -o stl/coffee_spill_mug_round.stl             -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_round_text.stl        -D 'mode="print_text"' -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_gauge.stl       -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_gauge_rear.stl  -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_clip.stl        -D 'mode="clip"'       -D 'base="round"' coffee_spill_mug.scad
@@ -278,27 +293,57 @@ hook_relief = 1.0;  // 45 degree relief in the inner corner, so a rounded or
 // deflection per side on the 18 mm arm in PETG, half again as much in PLA+.
 // Stiffness goes as 1 / length^3, so the short 14 mm arm is about twice that.
 //
+// WHY ONE OF THEM SNAPPED. The tray is printed on its front face, so the arms grow
+// along the print axis: each layer adds a slice of arm, and the layer lines run
+// across the arm from the outer face to the gripping face. Bending an arm sideways
+// - which is exactly what seating the tray on a socle that is too wide for it does
+// - pulls those layer lines apart, and a layer boundary in PLA+ is the weakest
+// plane there is, maybe half the strength of solid material. So the arm does not
+// bend and spring back the way the numbers above suggest; it splits at a layer.
+//
+// Three things follow, and all three are done here:
+//  1. Take the interference away. This is the real fix, and it is what the extra
+//     0.3 mm below does: an arm that never touches anything is never stressed.
+//  2. Make the arm thicker. For a load - a knock, a hand, catching the rig on the
+//     way in - the stress goes as 1 / thickness^2, so 2.05 -> 3.2 mm cuts it by
+//     more than half. Note that this only works BECAUSE of (1): if the arm were
+//     forced apart by a fixed distance instead, a thicker arm would see MORE
+//     stress, not less, because then stress goes as thickness * deflection.
+//  3. Flare the root. The break is at the rear face, where the moment is largest
+//     and where a sharp inside corner concentrates it further. clamp_root adds a
+//     45 degree gusset there on the outer side - the gripping face has to stay
+//     flat, so it can only go on the outside - which both thickens the arm where
+//     it matters and removes the notch. It costs nothing to print: the gusset
+//     tapers the right way round in the print orientation, no overhang.
+//
 // The gripping face is relieved clamp_lead mm at the free end and closes in on
 // the socle over clamp_lead_y mm, so the front corners of the socle wedge the
 // arms apart instead of hitting them head on.
 clamp_enable  = true;
-clamp_squeeze = -0.1;   // total interference, i.e. clamp_squeeze / 2 per side.
-                        // NEGATIVE ON PURPOSE: this is now a slip fit, 0.05 mm of
-                        // air per side, so the arms are lateral guides rather than
-                        // a friction clamp. It went 0.4 -> 0.2 -> 0.1 -> -0.1: the
-                        // 0.4 mm gauge splayed out and would not seat, and a tray
-                        // that grips also lets go all at once, which slops the
-                        // coffee about when it is pulled out to be emptied. What
-                        // holds the tray now is the locating tongue against the
-                        // plate edge plus its own weight, and the arms keep it
-                        // square to within 0.05 mm. Raise this above 0 to get the
-                        // friction grip back.
-clamp_t       = 2.05;   // thickness of the arm. Up to tray_width = 80 this was
-                        // also (tray_width - socle_width + clamp_squeeze) / 2, so
-                        // the outer face came out flush with the side of the tray.
-                        // At tray_width = 90 that would mean a 7 mm slab, so the
-                        // arms are thin fins standing on the rear face instead,
-                        // set in arm_x0 mm from the sides.
+clamp_squeeze = -0.4;   // total interference, i.e. clamp_squeeze / 2 per side.
+                        // NEGATIVE ON PURPOSE: this is a slip fit, 0.2 mm of air
+                        // per side, so the arms are lateral guides rather than a
+                        // friction clamp. It went 0.4 -> 0.2 -> 0.1 -> -0.1 -> -0.4:
+                        // the 0.4 mm gauge splayed out and would not seat, and a
+                        // tray that grips also lets go all at once, which slops the
+                        // coffee about when it is pulled out to be emptied. Then at
+                        // -0.1 the printed tray was still tight enough that seating
+                        // it snapped an arm, hence the extra 0.3 mm. What holds the
+                        // tray is the locating tongue against the plate edge plus
+                        // its own weight; the arms only keep it square, and 0.2 mm
+                        // per side is still well inside the wobble that matters.
+                        // Raise this above 0 to get the friction grip back - but
+                        // read the note above about why that broke the arm.
+clamp_t       = 3.2;    // thickness of the arm, 2.05 before it snapped - see (2)
+                        // above. Up to tray_width = 80 this was also
+                        // (tray_width - socle_width + clamp_squeeze) / 2, so the
+                        // outer face came out flush with the side of the tray. At
+                        // tray_width = 90 that would mean a 7 mm slab, so the arms
+                        // are fins standing on the rear face instead, set in
+                        // arm_x0 mm from the sides. The ceiling is what keeps
+                        // arm_x0 - clamp_root positive, i.e. keeps the flared root
+                        // inside the width of the tray: about 4.3 mm as it stands.
+clamp_root    = 2.5;    // 45 degree gusset at the root, on the outer face only
 // The two arms are NOT the same length. The right one may be as long as it likes,
 // but the left one butts into a connector on the rig a little way back, so it is
 // cut short. Left and right are seen from the front, standing where the overhang
@@ -345,30 +390,57 @@ arm_r    = 0.8;     // top and bottom edges of the spring arms, outer side only:
 fillet_steps = 8;   // facets per fillet arc
 
 /* [Text on the front face] */
-// Two lines engraved in the front face - the face that lies on the print bed, so
-// it comes out as the smoothest surface on the whole part. It has to be engraved
-// and not raised: raised letters on that face would need to be printed below the
-// first layer. A recess instead leaves the letters as small bridges text_depth mm
-// up, which any printer handles, and the shadow in them reads well in black.
+// Text engraved in the front face - the face that lies on the print bed, so it
+// comes out as the smoothest surface on the whole part. It has to be engraved and
+// not raised: raised letters on that face would need to be printed below the first
+// layer, which is not a thing. The recess is text_depth mm deep and the letters
+// come out as small bridges that far up, which any printer handles.
 //
 // The face is tray_width x (tray_height + plate_height - foot_clear) mm, i.e.
 // 90 x 40.8 mm, and all of it is visible: it stands overhang mm out in front of
 // the plate edge, down to the table.
 //
-// OpenSCAD cannot measure a rendered string, so the sizes below are set by hand
-// from the width of the longer line, which has to stay inside
-// tray_width - 2 * text_margin = 80 mm. Measured at size 6 in this font,
-// text_line1 comes out 108.3 mm wide, so it scales to 75.8 mm at size 4.2. If you
-// edit either string, render it on its own and scale the size the same way.
+// TWO THINGS THE FIRST PRINTED TRAY GOT WRONG, both fixed here:
+//
+// 1. A recess alone is not legible. Black on black has no contrast whatever, and
+//    the shadow in a 0.6 mm groove only reads with a lamp at the right angle - the
+//    printed tray was unreadable in room light. So the letters are now printed in
+//    a second colour: mode = "print_text" writes the inlay that exactly fills the
+//    recess, as a separate STL for the other extruder. See text_inlay().
+// 2. The letters were too small to print. In this font the "I" is a bare stem, so
+//    measuring it measures the stroke width: it comes out 2.000 mm at size 10,
+//    i.e. the stroke is exactly 0.20 * text_size. At the old size 4.2 that is
+//    0.84 mm, barely two 0.4 mm extrusions - the slicer has to squeeze two
+//    perimeters into it, they merge, and the counters of a, e, o and the gap in
+//    "kaffesøl" close up. That is the mush in the photo. At size 6.5 the stroke is
+//    1.30 mm, over three extrusions wide, which prints as a stroke and not a
+//    smudge. Keep 0.2 * text_size >= 3 * nozzle diameter.
+//
+// The price of size 6.5 is that "SpareBank 1 kaffesølsamler" no longer fits on one
+// line - measured at size 10 it is 180.5 mm wide, so it would have to stay below
+// size 4.4 to fit the tray_width - 2 * text_margin = 80 mm available. Width is the
+// binding constraint and height is not: the face is 40.8 mm tall and takes four
+// lines easily. So the label is four short lines instead of two long ones.
+//
+// OpenSCAD cannot measure a rendered string, so use mode = "text_measure" - it
+// renders the text block on its own, and the bounding box of that STL is the real
+// width and height. Measured at size 10 in this font:
+//
+//    "SpareBank 1"                 81.6 mm -> fits 80 mm up to size 9.8
+//    "kaffesølsamler"              93.9 mm -> ... up to size 8.5   <- the widest
+//    "Trekk ut"                    51.8 mm -> ... up to size 15.4
+//    "for tømming"                 78.1 mm -> ... up to size 10.2
+//    "Trekk ut for tømming"       134.0 mm -> ... up to size 6.0
+//    "SpareBank 1 kaffesølsamler" 180.5 mm -> ... up to size 4.4
 text_enable = true;
-text_line1  = "SpareBank 1 kaffesølsamler";
-text_line2  = "Trekk ut for tømming";
-text_size1  = 4.2;
-text_size2  = 4.2;
+text_lines  = ["SpareBank 1", "kaffesølsamler", "Trekk ut", "for tømming"];
+text_size   = 6.5;  // stroke width is 0.20 * this - keep it over 3 nozzle widths
 text_font   = "Liberation Sans:style=Bold";
-text_depth  = 0.6;  // deep enough to read, shallow enough to leave 1.8 mm of wall
-text_gap    = 2.0;  // between the two lines
-text_z      = 1.0;  // centre of the two-line block above the plate surface
+text_depth  = 0.6;  // deep enough to read, shallow enough to leave 1.8 mm of wall,
+                    // and 3 layers of 0.2 mm for the inlay to be solid colour
+text_gap    = 2.3;  // between the lines, about 0.35 * text_size
+text_z      = 0;    // centre of the whole block above the plate surface. The face
+                    // reaches from -20.6 to 20.5, so 0 centres it on the face.
 text_margin = 5;    // least distance from the letters to the sides
 
 /* [View] */
@@ -378,13 +450,32 @@ text_margin = 5;    // least distance from the letters to the sides
 // "gauge"  = a thin slice of the cross section, lying flat, ready for the slicer
 // "gauge_clamp" = the top clamp_gauge_t mm of the tray, i.e. the rim and the two
 //            arms: the cheap check that the arms straddle the socle
+// "gauge_text" = the front gauge_text_t mm of the tray, i.e. the front face as a
+//            flat plate with the recessed text in it: the cheap two-colour test
 // "clip"   = the rear clip_back mm of the tray plus both complete arms, in print
 //            orientation: the real friction test - see README.md
 // "cavity" = the trough volume up to the rim, as a solid (for measuring it)
+//
+// The two-colour pair, both in print orientation and both to be sliced together:
+// "print_body" = the tray, i.e. what "print" gives (black, right extruder)
+// "print_text" = only the letters filling the recess (white, left extruder)
+// "two_tone"   = the two of them assembled and coloured, for looking at. PREVIEW
+//            ONLY: --render throws colour away.
+// "text_measure" = the label alone, flat, so its bounding box can be measured
 mode = "use";
 
 gauge_t   = 2;   // thickness of the mode = "gauge" slice
 clip_back = 12;  // how much of the tray the mode = "clip" test piece takes along
+
+// mode = "gauge_text" is a flat plate off the front face carrying the whole label
+// at full size. It costs a few grams and half an hour, and it answers the only
+// questions that matter about the two-colour text: does the white land in the
+// recess, does the slicer draw a text_stroke mm wide line at all, and is the
+// result readable from across the room. Slice it exactly like the real pair -
+// gauge_text with the body extruder and print_text, unchanged, with the white one:
+// the inlay is only text_depth mm deep, so it fits the gauge as well as the tray.
+gauge_text_t = 2.4;  // thickness of the plate: text_depth plus 1.8 mm of backing,
+                     // i.e. the same wall the letters sit in on the real tray
 
 // mode = "gauge_clamp" keeps a clamp_gauge_t mm slice of the tray at the top of
 // the arms. That is a ring of wall all the way round plus the top slice of both
@@ -456,7 +547,8 @@ arm_x0   = grip_x - clamp_t;                // outer face of the left arm
 arm_end_l = tray_depth + clamp_len_l;       // free end of the left arm
 arm_end_r = tray_depth + clamp_len_r;       // ... and of the right one
 arm_end   = max(arm_end_l, arm_end_r);      // the deepest point of the part
-part_w   = tray_width - 2 * min(arm_x0, 0); // widest point of the whole part
+arm_root_x = arm_x0 - clamp_root;           // outer face of the flared root
+part_w   = tray_width - 2 * min(arm_root_x, 0);  // widest point of the whole part
 part_d   = clamps_on ? arm_end : tray_depth;
 // Cut plane of the mode = "clip" test piece, clip_back mm in front of the rear
 // wall. On the round base tray_depth is the depth at the corners, and the rear
@@ -466,6 +558,12 @@ part_d   = clamps_on ? arm_end : tray_depth;
 // clip piece deeper: it carries the whole arc, which is the thing to test.
 clip_ref = round_base ? base_y - arc_out : tray_depth;
 clip_y0  = clip_ref - clip_back;
+
+text_line_pitch = text_size + text_gap;
+text_block_h    = len(text_lines) * text_size
+                + (len(text_lines) - 1) * text_gap;
+text_stroke     = 0.20 * text_size;         // measured, see the text section
+face_h          = tray_height - table_z;    // height of the front face
 
 // The fillet at the foot of the rear ramp eats rear_fillet * (1 - cos(rear_angle))
 // of the rise before the straight run even starts, so there has to be more rise
@@ -496,10 +594,48 @@ assert(!hook_enable || !leg_enable || hook_depth < plate_height - foot_clear,
        "the locating tongue reaches below the foot of the leg - reduce hook_depth");
 assert(round_base || socle_width < tray_width,
        "the socle is wider than the tray - the arms cannot reach around it");
-assert(!clamps_on || arm_x0 >= -0.01,
-       "the arms stand outside the sides of the tray - reduce clamp_t");
+// The gusset at the root is the widest part of the arm, so it is the one that has
+// to stay inside the sides of the tray. Anything sticking out would be cut off by
+// rounded_bounds() rather than break the render, but a silently truncated gusset is
+// not what anyone meant to draw.
+assert(!clamps_on || arm_root_x >= -0.01,
+       "the flared arm roots stand outside the sides of the tray - reduce clamp_t
+        or clamp_root");
+assert(!clamps_on || clamp_root < clamp_len_l,
+       "the gusset is longer than the short arm - reduce clamp_root");
 assert(!text_enable || text_depth < wall_t - 1.2,
        "the text recess leaves less than 1.2 mm of front wall - reduce text_depth");
+// Height can be checked exactly, unlike width - the block has to stay inside the
+// front face, clear of the chamfer that runs round its whole perimeter.
+// text_block_h counts text_size per line, but real ink overruns that box: the
+// ascender of "k" and the descender of "p" and "g" put the measured height of this
+// label at 34.9 mm against a nominal 32.9, a factor of 1.06. Allow 1.1.
+assert(!text_enable || 1.1 * text_block_h + 2 * front_c < face_h,
+       "the text block is taller than the front face - fewer lines, or a smaller
+        text_size or text_gap");
+// Width cannot: OpenSCAD will not tell us how wide a rendered string is. What can
+// be checked is the thing that made the first tray unreadable - a stroke too thin
+// for the nozzle to draw. Use mode = "text_measure" for the width.
+assert(!text_enable || text_stroke > 1.1,
+       "text_size below 5.5 gives a stroke thinner than three 0.4 mm extrusions -
+        the letters print as a smudge, as they did on the first tray");
+// text_block_h counts text_size per line, which is the nominal em and about 2 mm
+// short of the real ink height once the descender of "g" and the stroke of "ø" are
+// in - 32.9 nominal against 34.9 measured for the four lines below. Check the real
+// figure with mode = "text_measure" if this one gets close.
+assert(!text_enable || text_block_h + 2 * front_c < face_h,
+       "the text block is taller than the front face - use fewer lines or a smaller
+        text_size");
+assert(!text_enable
+       || (text_z + text_block_h / 2 < tray_height - front_c
+           && text_z - text_block_h / 2 > table_z + front_c),
+       "the text block runs off the top or bottom of the front face - change text_z");
+// The hard floor: under two extrusions the letters cannot be printed at all. The
+// advisory for anything under three is an echo further down, not an assert, since
+// it is a judgement and not a broken model.
+assert(!text_enable || text_stroke > 0.8,
+       "text_size is far too small: the letter strokes come out under 0.8 mm, i.e.
+        two 0.4 mm extrusions wide");
 assert(!clamps_on || clamp_t > 1.6,
        "clamp_t below 1.6 mm is thinner than two perimeters - the spring is too weak");
 assert(!clamps_on || clamp_h <= socle_height + 1,
@@ -548,9 +684,19 @@ else
          " mm long, gripping at x = ", grip_x, " and ", tray_width - grip_x,
          ": ", clamp_squeeze, " mm total interference on the ", socle_width,
          " mm socle, mouth ", socle_width - clamp_squeeze + 2 * clamp_lead,
-         " mm at the tip"));
+         " mm at the tip, ", clamp_t + clamp_root, " mm thick at the flared root"));
 echo(str("Print footprint ", part_w, " x ", tray_height - table_z,
          " mm, ", part_d, " mm tall"));
+if (text_enable) {
+    echo(str("Text: ", len(text_lines), " lines at size ", text_size,
+             ", block ", text_block_h, " mm tall of the ", face_h,
+             " mm face, stroke ", text_stroke, " mm = ", text_stroke / 0.4,
+             " extrusions of 0.4 mm, recess ", text_depth, " mm deep"));
+    if (text_stroke < 1.2)
+        echo(str("WARNING: a stroke of ", text_stroke, " mm is under three 0.4 mm ",
+                 "extrusions. This is what made the first printed tray illegible - ",
+                 "raise text_size to ", 1.2 / 0.20, " or more"));
+}
 
 // ---------------------------------------------------------------------------
 //  Helpers
@@ -674,21 +820,39 @@ module front_chamfer_mask() {
     }
 }
 
-// The two lines of text, drawn in (x, z) so they read the right way round seen
-// from the front, and extruded backwards into the front wall. Subtracted, so what
-// is left is a recess text_depth mm deep.
+// The lines of text, drawn in (x, z) so they read the right way round seen from
+// the front, and extruded backwards into the front wall. No mirroring is needed
+// anywhere: the front view looks along +y, the same way the letters are extruded.
 module front_text_2d() {
-    h = text_size1 + text_gap + text_size2;     // height of the whole block
-    translate([tray_width / 2, text_z + h / 2 - text_size1])
-        text(text_line1, size = text_size1, font = text_font,
-             halign = "center", valign = "baseline");
-    translate([tray_width / 2, text_z - h / 2])
-        text(text_line2, size = text_size2, font = text_font,
-             halign = "center", valign = "baseline");
+    for (i = [0 : len(text_lines) - 1])
+        translate([tray_width / 2,
+                   text_z + text_block_h / 2 - text_size - i * text_line_pitch])
+            text(text_lines[i], size = text_size, font = text_font,
+                 halign = "center", valign = "baseline");
 }
 
+// The cutter. It starts 0.1 mm in front of the face so the recess opens cleanly
+// through it, which is free here because everything in front of the face is
+// discarded anyway.
 module front_text() {
     extrude_y(-0.1, text_depth + 0.1) front_text_2d();
+}
+
+// The white inlay: exactly the volume front_text() takes out of the wall, so the
+// two STL files are complementary and touch along every letter edge with no gap to
+// bond across. Two details that matter:
+//
+//   * it starts at y = 0 exactly, NOT at -0.1 like the cutter. Laid on the front
+//     face, y = 0 is the print bed, so a cutter-shaped inlay would hang 0.1 mm
+//     below the bed and the slicer would either drop its first layer or lift the
+//     whole print by 0.1 mm - and then the two files no longer line up.
+//   * it is clipped to tray_solid(), so an oversized text_size cannot leave white
+//     sticking out past the front chamfer or the cut corners.
+module text_inlay() {
+    intersection() {
+        extrude_y(0, text_depth) front_text_2d();
+        tray_solid();
+    }
 }
 
 // Rounds the top and bottom edges of the spring arms, on the outer side only -
@@ -822,12 +986,19 @@ module trough() {
 //  length - the left one is cut short to clear a connector on the rig - so the
 //  free end y is a parameter.
 // ---------------------------------------------------------------------------
+//  The outer face steps out by clamp_root over the last clamp_root mm before the
+//  rear face, and stays stepped out through the wall. That gusset is the anti-snap
+//  measure: it puts the extra material exactly where the arm broke, and because it
+//  is drawn in plan it is a wedge lying along the print axis, so it neither needs
+//  support nor changes any gripping dimension.
 function arm_plan(y_end) = [
-    [arm_x0, cav_y1],                       // buried in the rear wall
+    [arm_x0 - clamp_root, cav_y1],          // buried in the rear wall
     [grip_x, cav_y1],
     [grip_x, y_end - clamp_lead_y],         // the gripping face
     [grip_x - clamp_lead, y_end],           // relieved towards the free end
-    [arm_x0, y_end]                         // outer face, flush with the tray
+    [arm_x0, y_end],                        // outer face, flush with the tray
+    [arm_x0, tray_depth + clamp_root],      // ... until the gusset at the root
+    [arm_x0 - clamp_root, tray_depth]
 ];
 
 module clamp(y_end) {
@@ -845,18 +1016,24 @@ module clamps() {
 // ---------------------------------------------------------------------------
 //  The tray
 // ---------------------------------------------------------------------------
+// The outer solid, before anything is hollowed out of it. Split out from the tray
+// so the white text inlay can be clipped to it - see text_inlay().
+module tray_solid() {
+    intersection() {
+        union() {
+            extrude_x(0, tray_width) polygon(body_section());
+            if (clamps_on) intersection() { clamps(); arm_mask(); }
+        }
+        rounded_bounds();
+        plan_mask();
+        front_chamfer_mask();
+        plan_round_mask();
+    }
+}
+
 module coffee_spill_tray() {
     difference() {
-        intersection() {
-            union() {
-                extrude_x(0, tray_width) polygon(body_section());
-                if (clamps_on) intersection() { clamps(); arm_mask(); }
-            }
-            rounded_bounds();
-            plan_mask();
-            front_chamfer_mask();
-            plan_round_mask();
-        }
+        tray_solid();
         trough();
         if (text_enable) front_text();
         if (round_base) base_mask();
@@ -906,8 +1083,42 @@ module on_front_face() {
     translate([0, tray_height, 0]) rotate([90, 0, 0]) children();
 }
 
-if (mode == "print")
+if (mode == "print" || mode == "print_body")
+    // The body, with the text as a recess in the front face. On a single extruder
+    // this is the whole part; on two it is the black one.
     on_front_face() coffee_spill_tray();
+else if (mode == "print_text")
+    // Just the letters, filling that recess exactly, in the same coordinates as
+    // mode = "print" - load both STL files without moving either and they line up.
+    // This is the one for the white extruder.
+    on_front_face() text_inlay();
+else if (mode == "two_tone") {
+    // The two extruders' worth of plastic in their filament colours, for looking at
+    // the label before printing it. Picture only, and it has two quirks: colour
+    // survives preview but not CGAL, so render this one WITHOUT --render; and the
+    // inlay is drawn unclipped and nudged 0.02 mm forward, because the clipping
+    // intersection in text_inlay() confuses the preview renderer and because
+    // coplanar faces flicker against each other. Neither affects the exported STLs.
+    color("#1a1a1a") coffee_spill_tray();
+    color("white") extrude_y(-0.02, text_depth) front_text_2d();
+}
+else if (mode == "text_measure")
+    // The text block on its own, lying in the xy plane. OpenSCAD cannot measure a
+    // string, but the bounding box of this STL is the real width and height of the
+    // label - which is how the numbers in the text section were arrived at.
+    translate([0, -text_z + text_block_h / 2, 0])
+        linear_extrude(height = 1) front_text_2d();
+else if (mode == "gauge_text")
+    // The front gauge_text_t mm of the tray: the whole front face as a flat plate,
+    // recess and all, standing the same way up as mode = "print". Print it together
+    // with mode = "print_text", which is already only text_depth mm deep and so is
+    // its own inlay - a 10 g pair that tests the two colour setup, the alignment and
+    // the letter shapes before committing to a 67 g tray.
+    on_front_face() intersection() {
+        coffee_spill_tray();
+        translate([-1, -1, table_z - 1])
+            cube([tray_width + 2, gauge_text_t + 1, face_h + 2]);
+    }
 else if (mode == "gauge")
     // The cross section laid flat in the xy plane: x is the depth of the tray,
     // y is the height over the table
