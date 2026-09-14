@@ -463,6 +463,57 @@ Two details in the code matter for this to work:
 - The inlay is `intersection()`ed with the tray solid, so it can never stick out
   through a chamfer or a rounded corner even if `text_z` or `text_size` is pushed
   to the edge of what the `assert`s allow.
+- The two files have the **same bounding box centre**, which is what makes a slicer
+  load them in register. See below – this one cost a printed tray to learn.
+
+#### Ink centring: the two files share a bounding box centre
+
+Being complementary in the model is not enough. **FlashPrint, and most other
+slicers, centre each object on the platform as it is loaded.** Two files that are in
+perfect register in the model therefore arrive on the bed offset by exactly the
+difference between their two bounding box centres – and the slicer will have done it
+silently, before you have touched anything.
+
+For this label the difference was not nothing:
+
+| | X centre | Y centre |
+|---|---|---|
+| Body | 45.000 | 20.400 |
+| Inlay, as first written | 45.288 | **21.436** |
+
+1.04 mm is most of a 1.3 mm stroke, so the white would have landed half off the
+recess. The files were right and the alignment was still wrong.
+
+The reason is that the layout centres the **nominal** text block – `text_size` per
+line plus the gaps – while the real ink does not fill that box symmetrically.
+Ascenders (`B`, `k`, `T`, `1`) reach above it, descenders (`p`, `g`, the `ø` in
+*tømming*) below, and the side bearings of `S` and `1` are not equal either.
+
+So `text_ink_dx` = **−0.288 mm** and `text_ink_dz` = **+1.036 mm** shift the block
+until the ink box is centred on the face:
+
+| | X centre | Y centre |
+|---|---|---|
+| Body | 45.000 | 20.400 |
+| Inlay, corrected | 45.000 | 20.400 |
+| Label test plate (`gauge_text`) | 45.000 | 20.400 |
+
+Now centring each object independently is a **no-op**, and the slicer's default
+behaviour lines the files up instead of breaking them. It also bought a millimetre
+of clearance up to the rim: the top of the ink was 1.94 mm below the top of the
+face, of which the 1.0 mm `front_c` chamfer eats most; it is 2.97 mm now.
+
+**These two numbers are measured, not derived.** OpenSCAD cannot be asked how wide
+or how tall a rendered string is, so if you change `text_lines`, `text_size`,
+`text_gap` or the font, they have to be measured again:
+
+1. Set both to 0.
+2. `openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad`
+3. Read the bounding box of `/tmp/t.stl`. The target is
+   (`tray_width`/2, `face_h`/2) = (45, 20.4), which the `echo` also prints.
+4. `text_ink_dx` = 45 − (measured X centre);
+   `text_ink_dz` = (measured Y centre) − 20.4. **Note the opposite sign:** print y
+   runs down the face while model z runs up it.
 
 **How to actually run it** – one job, two heads, and the one step that has no
 recovery – is a section of its own:
@@ -585,6 +636,26 @@ the arc ever grows far enough forward to clip a letter.
    solid black wall and leaves the recess empty, and the print will not look wrong
    until it is finished. If the slicer offers "keep relative position" or "treat as a
    single object with multiple parts", that is the setting you want.
+
+   *Centring* is safe, and deliberately so: the two files are built to share a
+   bounding box centre, so a slicer that centres each object on the platform as it
+   loads it puts them in exactly the right place. See
+   [Ink centring](#ink-centring-the-two-files-share-a-bounding-box-centre) – it did
+   not use to be true, and it is worth knowing which of the two behaviours is the
+   dangerous one. **Auto-arrange is the dangerous one**, because it deliberately
+   places objects side by side so they do not touch, which is the opposite of what
+   this pair needs.
+
+   If they do arrive misaligned, the numbers to check are these – both bounding boxes
+   in print coordinates, from OpenSCAD:
+
+   | | X | Y | Z |
+   |---|---|---|---|
+   | body | 0 → 90 | 0 → 40.8 | 0 → 66 (box) / 60.1 (round) |
+   | inlay | 14.469 → 75.531 | 2.973 → 37.827 | 0 → 0.6 |
+
+   Both centre on (45, 20.4). If your slicer shows two different centres, whatever
+   made them different is what to undo.
 4. **Assign a head to each object,** white to the letters and black to the body.
 5. **Check which head actually holds the white** before starting – extrude a few
    centimetres of each and look. Getting this backwards gives you a black-on-black

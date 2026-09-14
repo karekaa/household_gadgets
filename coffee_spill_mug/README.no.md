@@ -456,6 +456,58 @@ To detaljer i koden må være slik for at dette skal fungere:
 - Innlegget `intersection()`-es med kroppen, så det kan aldri stikke ut gjennom en
   fasing eller et avrundet hjørne, selv om `text_z` eller `text_size` skyves helt
   ut til det `assert`-ene tillater.
+- De to filene har **samme senter i sin omsluttende boks**, og det er det som gjør at
+  sliceren laster dem inn i register. Se under – denne kostet en printet kopp å lære.
+
+#### Blekksentrering: de to filene deler senter i den omsluttende boksen
+
+Å være komplementære i modellen er ikke nok. **FlashPrint, og de fleste andre
+slicere, sentrerer hvert objekt på platformen når det lastes inn.** To filer som
+ligger i perfekt register i modellen, havner derfor på bordet forskjøvet med
+nøyaktig differansen mellom senterpunktene i de to omsluttende boksene – og
+sliceren har gjort det stille, før du har tatt på noe som helst.
+
+For denne merkingen var differansen ikke ingenting:
+
+| | X-senter | Y-senter |
+|---|---|---|
+| Kropp | 45,000 | 20,400 |
+| Innlegg, som først skrevet | 45,288 | **21,436** |
+
+1,04 mm er nesten hele en 1,3 mm strek, så det hvite ville landet halvveis utenfor
+fordypningen. Filene var riktige, og innrettingen var likevel gal.
+
+Grunnen er at oppsettet sentrerer det **nominelle** tekstfeltet – `text_size` per
+linje pluss mellomrommene – mens det virkelige blekket ikke fyller den boksen
+symmetrisk. Oppstavelser (`B`, `k`, `T`, `1`) rekker over det, nedstavelser (`p`,
+`g`, `ø`-en i *tømming*) under, og sidemargene til `S` og `1` er heller ikke like.
+
+Så `text_ink_dx` = **−0,288 mm** og `text_ink_dz` = **+1,036 mm** flytter feltet til
+blekkboksen er sentrert på flaten:
+
+| | X-senter | Y-senter |
+|---|---|---|
+| Kropp | 45,000 | 20,400 |
+| Innlegg, korrigert | 45,000 | 20,400 |
+| Testplate for merkingen (`gauge_text`) | 45,000 | 20,400 |
+
+Nå er det å sentrere hvert objekt for seg en **nulloperasjon**, og slicerens
+standardoppførsel innretter filene i stedet for å ødelegge dem. Det ga samtidig en
+millimeter mer klaring opp til rimet: toppen av blekket lå 1,94 mm under toppen av
+flaten, og av det spiser den 1,0 mm store `front_c`-fasingen mesteparten; nå er det
+2,97 mm.
+
+**Disse to tallene er målt, ikke utregnet.** OpenSCAD kan ikke spørres om hvor bred
+eller hvor høy en rendret tekststreng er, så endrer du `text_lines`, `text_size`,
+`text_gap` eller fonten, må de måles på nytt:
+
+1. Sett begge til 0.
+2. `openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad`
+3. Les den omsluttende boksen til `/tmp/t.stl`. Målet er
+   (`tray_width`/2, `face_h`/2) = (45, 20,4), som `echo` også skriver ut.
+4. `text_ink_dx` = 45 − (målt X-senter);
+   `text_ink_dz` = (målt Y-senter) − 20,4. **Merk motsatt fortegn:** print-y går
+   nedover flaten mens modell-z går oppover den.
 
 **Hvordan du faktisk kjører den** – én jobb, to hoder, og det ene steget det ikke
 finnes noen vei tilbake fra – har fått sitt eget avsnitt:
@@ -578,6 +630,26 @@ hvis buen en gang skulle komme så langt fram at den klipper en bokstav.
    og printen ser ikke gal ut før den er ferdig. Tilbyr sliceren «behold relativ
    posisjon» eller «behandle som ett objekt med flere deler», er det den
    innstillingen du vil ha.
+
+   *Sentrering* er trygt, og det er med vilje: de to filene er bygget slik at de
+   deler senter i den omsluttende boksen, så en slicer som sentrerer hvert objekt på
+   platformen når det lastes inn, plasserer dem nøyaktig riktig. Se
+   [Blekksentrering](#blekksentrering-de-to-filene-deler-senter-i-den-omsluttende-boksen)
+   – det var ikke sant før, og det er verdt å vite hvilken av de to oppførslene som
+   er den farlige. **Auto-arrangering er den farlige**, for den plasserer med hensikt
+   objekter ved siden av hverandre så de ikke berører hverandre, som er det motsatte
+   av hva dette paret trenger.
+
+   Kommer de likevel inn feiljustert, er dette tallene å sjekke mot – begge
+   omsluttende bokser i printkoordinater, fra OpenSCAD:
+
+   | | X | Y | Z |
+   |---|---|---|---|
+   | kropp | 0 → 90 | 0 → 40,8 | 0 → 66 (firkant) / 60,1 (rund) |
+   | innlegg | 14,469 → 75,531 | 2,973 → 37,827 | 0 → 0,6 |
+
+   Begge sentrerer på (45; 20,4). Viser sliceren to forskjellige sentre, er det som
+   gjorde dem forskjellige, det som skal angres.
 4. **Tildel et hode til hvert objekt,** hvit til bokstavene og svart til kroppen.
 5. **Sjekk hvilket hode som faktisk har hvitt** før du starter – mat ut noen
    centimeter fra hvert og se. Får du dette omvendt, ender du med svart-på-svart

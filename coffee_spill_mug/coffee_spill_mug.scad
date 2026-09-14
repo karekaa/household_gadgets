@@ -443,6 +443,45 @@ text_z      = 0;    // centre of the whole block above the plate surface. The fa
                     // reaches from -20.6 to 20.5, so 0 centres it on the face.
 text_margin = 5;    // least distance from the letters to the sides
 
+// INK CENTRING, AND WHY IT MATTERS TO THE SLICER.
+//
+// The layout above centres the NOMINAL text block - text_size per line plus the
+// gaps. The real ink does not fill that box symmetrically: ascenders (B, k, T, 1)
+// reach above it and descenders (p, g, ø in "tømming") below, and the side bearings
+// of "S" and "1" are not equal either. Measured on this label, the ink box came out
+// centred 0.288 mm right of the middle of the face and 1.036 mm above it.
+//
+// That would be cosmetically invisible, and it was left alone at first. It is not
+// harmless, because of what a slicer does with two STL files: FlashPrint - and most
+// others - CENTRES EACH OBJECT ON THE PLATFORM AS IT IS LOADED. Two files that are
+// in perfect register in the model then arrive on the bed offset by exactly the
+// difference between their two bounding box centres. 1.04 mm is most of a 1.3 mm
+// stroke, so the white lands half off the recess. The files were right and the
+// alignment was still wrong.
+//
+// The fix is to make the two bounding boxes share a centre, so that centring each
+// one independently is a no-op. Then the slicer's default behaviour lines them up
+// instead of breaking them. It also buys a millimetre of clearance up to the rim:
+// the top of the ink was only 1.94 mm below the top of the face, of which front_c
+// eats 1.0.
+//
+// These two numbers are MEASURED, not derived - OpenSCAD cannot ask how wide or
+// how tall a rendered string is. Change text_lines, text_size, text_gap or the font
+// and they must be measured again:
+//
+//   1. set both to 0
+//   2. openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad
+//   3. read the bounding box of /tmp/t.stl. In print coordinates the body spans
+//      x = 0..tray_width and y = 0..face_h, so the target centre is
+//      (tray_width / 2, face_h / 2) = (45, 20.4)
+//   4. text_ink_dx = 45 - (measured x centre)
+//      text_ink_dz = (measured y centre) - 20.4     <- note the sign: print y runs
+//                                                     the other way from model z
+//
+// The echo at the bottom of the file prints the target centre to compare against.
+text_ink_dx = -0.288;   // measured, see above. Along the width of the tray.
+text_ink_dz =  1.036;   // ... and up the front face, in model z
+
 /* [View] */
 // "use"    = as it sits on the plate (z = 0 is the plate surface)
 // "print"  = lying on the front face, ready for the slicer
@@ -696,6 +735,13 @@ if (text_enable) {
         echo(str("WARNING: a stroke of ", text_stroke, " mm is under three 0.4 mm ",
                  "extrusions. This is what made the first printed tray illegible - ",
                  "raise text_size to ", 1.2 / 0.20, " or more"));
+    // The bounding box of mode = "print_text" must be centred on this, or a slicer
+    // that centres each object as it loads it will pull the two files out of
+    // register by the difference. Currently corrected by text_ink_dx/text_ink_dz.
+    echo(str("Text: the print_text bounding box centre must be (", tray_width / 2,
+             ", ", face_h / 2, ") in print coordinates - measure it if you change ",
+             "the label, and re-fit text_ink_dx = ", text_ink_dx,
+             " / text_ink_dz = ", text_ink_dz));
 }
 
 // ---------------------------------------------------------------------------
@@ -823,10 +869,14 @@ module front_chamfer_mask() {
 // The lines of text, drawn in (x, z) so they read the right way round seen from
 // the front, and extruded backwards into the front wall. No mirroring is needed
 // anywhere: the front view looks along +y, the same way the letters are extruded.
+// The label in the plane of the front face, in (x, model z). The two ink offsets are
+// what put the centre of the real ink on the centre of the face - see the text
+// parameters for why the slicer cares about that and how to re-measure them.
 module front_text_2d() {
     for (i = [0 : len(text_lines) - 1])
-        translate([tray_width / 2,
-                   text_z + text_block_h / 2 - text_size - i * text_line_pitch])
+        translate([tray_width / 2 + text_ink_dx,
+                   text_z + text_ink_dz
+                          + text_block_h / 2 - text_size - i * text_line_pitch])
             text(text_lines[i], size = text_size, font = text_font,
                  halign = "center", valign = "baseline");
 }
