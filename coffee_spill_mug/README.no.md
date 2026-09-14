@@ -558,6 +558,12 @@ Filene, for firkantriggen (bytt inn `_round`-navnene for en buet base):
 | `stl/coffee_spill_mug.stl` | `"print"` / `"print_body"` | **høyre**, svart | 51,6 cm³ ≈ 64 g |
 | `stl/coffee_spill_mug_text.stl` | `"print_text"` | **venstre**, hvit | 0,32 cm³ ≈ 0,4 g |
 
+Innlegget ligger i sin helhet i de fremste 0,6 mm av koppen, der de to basene har
+samme form, så `coffee_spill_mug_round_text.stl` blir **byte for byte identisk** med
+`coffee_spill_mug_text.stl`. Begge navnene beholdes likevel, slik at hver rigg har et
+par som hører sammen og som ikke kan forveksles, og slik at parringen fortsatt holder
+hvis buen en gang skulle komme så langt fram at den klipper en bokstav.
+
 1. **Print testplaten først.** `mode="gauge_text"` sammen med `mode="print_text"` er
    den samme jobben i miniatyr – 10 g og en halvtime, mot 64 g og flere timer. Den
    svarer på hvert spørsmål dette avsnittet reiser, på printbordet i stedet for i

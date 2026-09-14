@@ -566,6 +566,12 @@ The files, for the box base rig (swap in the `_round` names for a curved base):
 | `stl/coffee_spill_mug.stl` | `"print"` / `"print_body"` | **right**, black | 51.6 cm³ ≈ 64 g |
 | `stl/coffee_spill_mug_text.stl` | `"print_text"` | **left**, white | 0.32 cm³ ≈ 0.4 g |
 
+The inlay lives entirely in the front 0.6 mm of the tray, where the two bases are the
+same shape, so `coffee_spill_mug_round_text.stl` comes out **byte for byte identical**
+to `coffee_spill_mug_text.stl`. Both names are kept anyway, so that each rig has a
+matching pair you cannot pick up by mistake, and so that the pairing still holds if
+the arc ever grows far enough forward to clip a letter.
+
 1. **Print the test plate first.** `mode="gauge_text"` plus `mode="print_text"` is
    the same job in miniature – 10 g and about half an hour, against 64 g and several
    hours. It answers every question this section raises, on the bed rather than in
