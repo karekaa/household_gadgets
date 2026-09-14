@@ -782,3 +782,45 @@ not narrower than the socle. On the round base it checks instead that the arc is
 reach the sides at all, that the tray is not wider than the curved part of the base,
 that the revolved ramp leaves a flat floor, and that the rim clears the underside of
 the overhanging weighing bowl.
+
+### Checking every mode at once
+
+`./check_modes.sh` runs all 14 modes against both bases – 28 combinations – and
+reports any that produce an error or a tripped `assert`. It has two levels, and they
+differ in cost by a factor of about three thousand:
+
+| | What it checks | Cost |
+|---|---|---|
+| `./check_modes.sh` | parameters, `echo`, every `assert` | 0.3 s |
+| `./check_modes.sh --full` | all of that plus the full CGAL geometry | 2 min 46 s |
+
+The fast level exports to `.echo` instead of `.stl`. OpenSCAD still evaluates the
+whole parameter set and the whole CSG tree, so every `assert` fires, but it never
+hands the tree to CGAL – which is where essentially all the time goes. That catches
+the mistakes worth catching on every edit: an `assert` that now trips, a variable used
+before it is declared, a mode name that has fallen out of the dispatch. It does *not*
+catch geometry faults, so run `--full` before committing new STLs.
+
+One trap, if you write something like this yourself: with `-o something.echo`
+OpenSCAD writes its errors **into the .echo file** and still exits 0. The exit code
+tells you nothing; the file has to be grepped.
+
+The full level is parallel across all cores, which is what makes it bearable. The
+sweep costs 20 min 47 s of CPU but only 2 min 46 s of wall clock – about what its
+slowest single combination costs on its own. `base="round"` is roughly 60 s dearer
+than `base="box"` in every mode, because the rear arc is two `rotate_extrude()` calls
+at `base_fn = 240`, and `"two_tone"` builds both halves of the label so it pays the
+text CSG twice:
+
+| | `box` | `round` |
+|---|---|---|
+| `"use"` | 7.9 s | 69.9 s |
+| `"print"` | 9.7 s | 74.2 s |
+| `"print_white"` | 15.4 s | 16.6 s |
+| `"two_tone"` | 51.2 s | 119.9 s |
+
+While iterating on the round base, `-D base_fn=48` cuts a render from 74 s to 22 s.
+Never export an STL that way – 48 facets leaves visible flat spots on an R 87 mm arc.
+These figures are from OpenSCAD 2021.01, which has only the old CGAL engine; 2022 and
+later ship the Manifold engine, which is typically an order of magnitude faster on
+exactly this kind of CSG.

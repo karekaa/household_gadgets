@@ -774,3 +774,45 @@ sokkelen. På den runde basen sjekker den i stedet at buen har stor nok radius t
 rekke ut til sidene i det hele tatt, at koppen ikke er bredere enn den buete delen av
 fundamentet, at den roterte rampen etterlater en flat bunn, og at rimet går klar av
 undersiden av den utstikkende vektskålen.
+
+### Slik sjekker du alle modusene på én gang
+
+`./check_modes.sh` kjører alle 14 modusene mot begge basene – 28 kombinasjoner – og
+melder om noen av dem gir feil eller trigger en `assert`. Den har to nivåer, og de
+skiller seg i kostnad med en faktor på rundt tre tusen:
+
+| | Hva den sjekker | Kostnad |
+|---|---|---|
+| `./check_modes.sh` | parametre, `echo`, hver `assert` | 0,3 s |
+| `./check_modes.sh --full` | alt det, pluss full CGAL-geometri | 2 min 46 s |
+
+Det raske nivået eksporterer til `.echo` i stedet for `.stl`. OpenSCAD evaluerer
+fortsatt hele parametersettet og hele CSG-treet, så hver `assert` fyrer, men treet blir
+aldri levert til CGAL – og det er der praktisk talt all tiden går. Det fanger de
+feilene som er verdt å fange på hver endring: en `assert` som nå slår inn, en variabel
+brukt før den er deklarert, et modusnavn som har falt ut av dispatchen. Det fanger
+*ikke* geometrifeil, så kjør `--full` før du committer nye STL-er.
+
+Én felle, hvis du skriver noe slikt selv: med `-o noe.echo` skriver OpenSCAD feilene
+**inn i .echo-fila** og avslutter likevel med kode 0. Exit-koden sier ingenting; fila
+må grep-es.
+
+Det fulle nivået kjører parallelt over alle kjerner, og det er det som gjør det
+utholdelig. Sveipen koster 20 min 47 s CPU-tid, men bare 2 min 46 s veggklokke – omtrent
+det den tregeste enkeltkombinasjonen koster alene. `base="round"` er rundt 60 s dyrere
+enn `base="box"` i hver modus, fordi bakbuen er to `rotate_extrude()`-kall med
+`base_fn = 240`, og `"two_tone"` bygger begge halvdelene av merkingen og betaler derfor
+tekst-CSG-en to ganger:
+
+| | `box` | `round` |
+|---|---|---|
+| `"use"` | 7,9 s | 69,9 s |
+| `"print"` | 9,7 s | 74,2 s |
+| `"print_white"` | 15,4 s | 16,6 s |
+| `"two_tone"` | 51,2 s | 119,9 s |
+
+Mens du eksperimenterer med den runde basen kutter `-D base_fn=48` en render fra 74 s
+til 22 s. Aldri eksporter en STL på den måten – 48 fasetter etterlater synlige flate
+partier på en R 87 mm bue. Tallene er fra OpenSCAD 2021.01, som bare har den gamle
+CGAL-motoren; 2022 og senere har Manifold-motoren, som typisk er en størrelsesorden
+raskere på nettopp denne typen CSG.

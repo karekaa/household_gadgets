@@ -50,3 +50,5 @@ En ting til: Avstand mellom «armene» kan økes med ytterliger 0,3 mm (den ene 
 Jeg har lastet inn i FlashForge slicer hhv text STL og kopp STL - Det ser ut som de IKKE aligner i forhold til hverandre?
 
 Slik ser det ut etter først å ha lastet inn @stl/coffee_spill_mug_gauge_text.stl - så valgt Left extruder, og så lastet inn @stl/coffee_spill_mug_round.stl : [Image #16]
+
+Kan du utdype dette: «Én ting jeg ikke har fått bekreftet: den fulle modus-sveipen (28 kombinasjoner) kjører fortsatt på two_tone/round, som er den tregeste.» - jeg skjønner ikke, og er det noe vi kan gjøre for å øke farten?
