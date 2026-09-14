@@ -48,3 +48,5 @@ Teksten blir [nesten] helt uleselig, i beste fall noe leselig med lys fra en kor
 En ting til: Avstand mellom «armene» kan økes med ytterliger 0,3 mm (den ene armen brakk, da det var for trangt) - kanskje også litt tykkere arm, så den ikke brekker så lett
 
 Jeg har lastet inn i FlashForge slicer hhv text STL og kopp STL - Det ser ut som de IKKE aligner i forhold til hverandre?
+
+Slik ser det ut etter først å ha lastet inn @stl/coffee_spill_mug_gauge_text.stl - så valgt Left extruder, og så lastet inn @stl/coffee_spill_mug_round.stl : [Image #16]

@@ -441,10 +441,10 @@ overlapp. Kontrollert med volum, som må summere seg opp helt presist:
 | | Rund base | Firkantbase |
 |---|---|---|
 | Kropp, med fordypningen (`mode="print"`) | 52,39 cm³ | 51,55 cm³ |
-| Hvitt innlegg (`mode="print_text"`) | 0,32 cm³ | 0,32 cm³ |
+| Hvitt innlegg (`mode="print_white"`) | 0,32 cm³ | 0,32 cm³ |
 | Kopp uten tekst i det hele tatt | 52,71 cm³ | 51,88 cm³ |
 
-Innlegget er samme del på begge riggene – de to `_text.stl`-filene er identiske
+Innlegget er samme del på begge riggene – de to `_white.stl`-filene er identiske
 byte for byte – men begge skrives ut, slik at hver rigg har et opplagt par.
 
 To detaljer i koden må være slik for at dette skal fungere:
@@ -489,7 +489,7 @@ blekkboksen er sentrert på flaten:
 |---|---|---|
 | Kropp | 45,000 | 20,400 |
 | Innlegg, korrigert | 45,000 | 20,400 |
-| Testplate for merkingen (`gauge_text`) | 45,000 | 20,400 |
+| Testplate for merkingen (`gauge_label`) | 45,000 | 20,400 |
 
 Nå er det å sentrere hvert objekt for seg en **nulloperasjon**, og slicerens
 standardoppførsel innretter filene i stedet for å ødelegge dem. Det ga samtidig en
@@ -502,7 +502,7 @@ eller hvor høy en rendret tekststreng er, så endrer du `text_lines`, `text_siz
 `text_gap` eller fonten, må de måles på nytt:
 
 1. Sett begge til 0.
-2. `openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad`
+2. `openscad -o /tmp/t.stl -D 'mode="print_white"' coffee_spill_mug.scad`
 3. Les den omsluttende boksen til `/tmp/t.stl`. Målet er
    (`tray_width`/2, `face_h`/2) = (45, 20,4), som `echo` også skriver ut.
 4. `text_ink_dx` = 45 − (målt X-senter);
@@ -548,7 +548,7 @@ samtidig kontrollen på at de stemmer med hverandre.
 cat > /tmp/two_tone.scad <<'EOF'
 module unprint() { rotate([-90, 0, 0]) translate([0, -20.5, 0]) children(); }
 unprint() color("#1a1a1a") import("stl/coffee_spill_mug.stl");
-unprint() color("white")   import("stl/coffee_spill_mug_text.stl");
+unprint() color("white")   import("stl/coffee_spill_mug_white.stl");
 EOF
 openscad -o img/coffee_spill_mug_text_two_tone.png --colorscheme=Tomorrow \
   --projection=o --imgsize=1000,500 --camera=45,0,0,90,0,0,115 /tmp/two_tone.scad
@@ -557,9 +557,9 @@ openscad -o img/coffee_spill_mug_text_two_tone.png --colorscheme=Tomorrow \
 (`translate([0, -20.5, 0])` er `-tray_height`; sammen med `-90°`-rotasjonen opphever
 det `on_front_face()`, så merkingen leses riktig vei.)
 
-**Print `mode="gauge_text"` først.** Det er de fremste 2,4 mm av koppen som en flat
+**Print `mode="gauge_label"` først.** Det er de fremste 2,4 mm av koppen som en flat
 plate, med hele merkingen i full størrelse i den samme veggen den sitter i på den
-virkelige delen, og den slices med `print_text` uendret som hvit halvpart. 10 g og en
+virkelige delen, og den slices med `print_white` uendret som hvit halvpart. 10 g og en
 halvtime mot 65 g og flere timer, for å finne ut om det hvite lander i fordypningen og
 om resultatet er leselig tvers over rommet. Se [Testbiter](#testbiter).
 
@@ -575,7 +575,7 @@ Fire billige print, i den rekkefølgen det er verdt å lage dem:
 
 | `mode` | Kostnad | Hva den forteller |
 |---|---|---|
-| `"gauge_text"` | 10 g for paret | De fremste 2,4 mm av koppen som en flat plate: hele merkingen i full størrelse, i samme veggtykkelse som den har på den virkelige delen. Printes med `"print_text"`, uendret, som den hvite halvparten – innlegget er bare 0,6 mm dypt, så det passer i testplaten like godt som i koppen. Dette er den man lager **før** man binder opp 65 g i en tofarget kopp: lander det hvite i fordypningen, klarer sliceren å tegne en 1,3 mm strek i det hele tatt, og er resultatet leselig tvers over rommet? |
+| `"gauge_label"` | 10 g for paret | De fremste 2,4 mm av koppen som en flat plate: hele merkingen i full størrelse, i samme veggtykkelse som den har på den virkelige delen. Printes med `"print_white"`, uendret, som den hvite halvparten – innlegget er bare 0,6 mm dypt, så det passer i testplaten like godt som i koppen. Dette er den man lager **før** man binder opp 65 g i en tofarget kopp: lander det hvite i fordypningen, klarer sliceren å tegne en 1,3 mm strek i det hele tatt, og er resultatet leselig tvers over rommet? |
 | `"gauge"` | 3 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
 | `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 3,2 mm arm ved siden? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
 | `"clip"` | 26 g firkant, 31 g rund | Baksiden av koppen, `clip_back` = 12 mm foran bakveggen, stående på kuttflaten – på firkantbasen de bakre 12 mm pluss begge armene komplett, på den runde hele de 24,5 mm som buen dekker (å måle 12 mm bakover fra *hjørnene* ville kuttet bort senterlinjen og etterlatt to vinger). Den eneste testen som viser hvordan koppen virkelig går på og av, men den koster en tredjedel av en kopp, så den er bare verdt det hvis `"gauge_rear"` gjør deg usikker. |
@@ -608,15 +608,24 @@ Filene, for firkantriggen (bytt inn `_round`-navnene for en buet base):
 | Fil | `mode` | Hode | Mengde |
 |---|---|---|---|
 | `stl/coffee_spill_mug.stl` | `"print"` / `"print_body"` | **høyre**, svart | 51,6 cm³ ≈ 64 g |
-| `stl/coffee_spill_mug_text.stl` | `"print_text"` | **venstre**, hvit | 0,32 cm³ ≈ 0,4 g |
+| `stl/coffee_spill_mug_white.stl` | `"print_white"` | **venstre**, hvit | 0,32 cm³ ≈ 0,4 g |
 
 Innlegget ligger i sin helhet i de fremste 0,6 mm av koppen, der de to basene har
-samme form, så `coffee_spill_mug_round_text.stl` blir **byte for byte identisk** med
-`coffee_spill_mug_text.stl`. Begge navnene beholdes likevel, slik at hver rigg har et
+samme form, så `coffee_spill_mug_round_white.stl` blir **byte for byte identisk** med
+`coffee_spill_mug_white.stl`. Begge navnene beholdes likevel, slik at hver rigg har et
 par som hører sammen og som ikke kan forveksles, og slik at parringen fortsatt holder
 hvis buen en gang skulle komme så langt fram at den klipper en bokstav.
 
-1. **Print testplaten først.** `mode="gauge_text"` sammen med `mode="print_text"` er
+**Fargen står i filnavnet med hensikt.** Disse filene het `_text.stl` og
+`_gauge_text.stl` en stund, og de to navnene ligner nok på hverandre til at
+testplaten for merkingen ble lastet inn i sliceren sammen med kroppen – to svarte
+filer, altså en jobb helt uten merking, og med platen usynlig i forhåndsvisningen
+fordi den ligger fullstendig inne i kroppen. Regelen nå: alt som kommer ut av det
+svarte hodet har ikke noe fargeord i navnet, den ene hvite fila sier `white`, og
+testplaten for merkingen sier `label`. De gamle modusnavnene `print_text` og
+`gauge_text` godtas fortsatt, slik at gamle kommandoer virker som før.
+
+1. **Print testplaten først.** `mode="gauge_label"` sammen med `mode="print_white"` er
    den samme jobben i miniatyr – 10 g og en halvtime, mot 64 g og flere timer. Den
    svarer på hvert spørsmål dette avsnittet reiser, på printbordet i stedet for i
    teorien. Se [Testbiter](#testbiter).
@@ -714,7 +723,7 @@ runde basen har `_round` i navnet:
 # firkantbasen - koppen, liggende på frontflaten, klar for sliceren, og det
 # hvite innlegget til merkingen i samme koordinater
 openscad -o stl/coffee_spill_mug.stl      -D 'mode="print"'      -D 'base="box"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_text.stl -D 'mode="print_text"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_white.stl -D 'mode="print_white"' -D 'base="box"' coffee_spill_mug.scad
 
 # ... og testbitene for den
 openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
@@ -722,11 +731,11 @@ openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base
 openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
 
 # testplata for merkingen - samme fil for begge riggene, den er bare frontflaten
-openscad -o stl/coffee_spill_mug_gauge_text.stl  -D 'mode="gauge_text"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_gauge_label.stl  -D 'mode="gauge_label"' -D 'base="box"' coffee_spill_mug.scad
 
 # den runde basen
 openscad -o stl/coffee_spill_mug_round.stl      -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_round_text.stl -D 'mode="print_text"' -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_white.stl -D 'mode="print_white"' -D 'base="round"' coffee_spill_mug.scad
 
 openscad -o stl/coffee_spill_mug_round_gauge.stl      -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_round_gauge_rear.stl -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
@@ -744,10 +753,10 @@ tegnes:
 | `"use"` | som den står på platen. z = 0 er platetoppen, y = 0 er frontflaten, x = 0 er venstre side av koppen |
 | `"check"` | som `"use"`, med teakplaten, bordet og basen bak koppen tegnet som spøkelser for visuell passkontroll – den grå boksen eller det buete fundamentet pluss vektskålen som henger ut over det, alt etter hva `base` sier |
 | `"print"` | liggende på frontflaten, klar for sliceren. Den svarte delen, med bokstavene senket ned. `"print_body"` er et synonym, for når det er greiere å si hvilken av de to det er |
-| `"print_text"` | bare det hvite innlegget, i samme posisjon, klart for den andre ekstruderen |
+| `"print_white"` | bare det hvite innlegget, i samme posisjon, klart for den andre ekstruderen |
 | `"two_tone"` | begge, i filamentfargene sine, for å se på merkingen. Kun forhåndsvisning – CGAL kaster farge, så ikke `--render` |
 | `"text_measure"` | tekstblokka lagt flatt som en 1 mm plate i origo, for å måle virkelig bredde og blekkhøyde |
-| `"gauge"`, `"gauge_rear"`, `"gauge_text"`, `"clip"` | testbitene over, alle klare for sliceren |
+| `"gauge"`, `"gauge_rear"`, `"gauge_label"`, `"clip"` | testbitene over, alle klare for sliceren |
 | `"cavity"` | traurommet som et massivt volum, for å måle kapasiteten |
 
 Alle parametrene ligger øverst i fila, med `base` først. `echo` skriver ut hvilken

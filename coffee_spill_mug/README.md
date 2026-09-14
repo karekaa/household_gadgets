@@ -448,10 +448,10 @@ with no gap and no overlap. Verified by volume, which has to add up exactly:
 | | Round base | Box base |
 |---|---|---|
 | Body, with the recess (`mode="print"`) | 52.39 cm³ | 51.55 cm³ |
-| White inlay (`mode="print_text"`) | 0.32 cm³ | 0.32 cm³ |
+| White inlay (`mode="print_white"`) | 0.32 cm³ | 0.32 cm³ |
 | Plain tray, no text at all (`-D text_enable=false`) | 52.71 cm³ | 51.88 cm³ |
 
-The inlay is the same part on both rigs – the two `_text.stl` files are
+The inlay is the same part on both rigs – the two `_white.stl` files are
 byte-identical – but both are written out so that each rig has an obvious pair.
 
 Two details in the code matter for this to work:
@@ -496,7 +496,7 @@ until the ink box is centred on the face:
 |---|---|---|
 | Body | 45.000 | 20.400 |
 | Inlay, corrected | 45.000 | 20.400 |
-| Label test plate (`gauge_text`) | 45.000 | 20.400 |
+| Label test plate (`gauge_label`) | 45.000 | 20.400 |
 
 Now centring each object independently is a **no-op**, and the slicer's default
 behaviour lines the files up instead of breaking them. It also bought a millimetre
@@ -508,7 +508,7 @@ or how tall a rendered string is, so if you change `text_lines`, `text_size`,
 `text_gap` or the font, they have to be measured again:
 
 1. Set both to 0.
-2. `openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad`
+2. `openscad -o /tmp/t.stl -D 'mode="print_white"' coffee_spill_mug.scad`
 3. Read the bounding box of `/tmp/t.stl`. The target is
    (`tray_width`/2, `face_h`/2) = (45, 20.4), which the `echo` also prints.
 4. `text_ink_dx` = 45 − (measured X centre);
@@ -555,7 +555,7 @@ pair of files the printer will get, which is also the check that they line up.
 cat > /tmp/two_tone.scad <<'EOF'
 module unprint() { rotate([-90, 0, 0]) translate([0, -20.5, 0]) children(); }
 unprint() color("#1a1a1a") import("stl/coffee_spill_mug.stl");
-unprint() color("white")   import("stl/coffee_spill_mug_text.stl");
+unprint() color("white")   import("stl/coffee_spill_mug_white.stl");
 EOF
 openscad -o img/coffee_spill_mug_text_two_tone.png --colorscheme=Tomorrow \
   --projection=o --imgsize=1000,500 --camera=45,0,0,90,0,0,115 /tmp/two_tone.scad
@@ -564,9 +564,9 @@ openscad -o img/coffee_spill_mug_text_two_tone.png --colorscheme=Tomorrow \
 (`translate([0, -20.5, 0])` is `-tray_height`; together with the `-90°` rotation it
 undoes `on_front_face()`, so the label reads the right way up.)
 
-**Print `mode="gauge_text"` first.** It is the front 2.4 mm of the tray as a flat
+**Print `mode="gauge_label"` first.** It is the front 2.4 mm of the tray as a flat
 plate, carrying the whole label at full size in the same wall it sits in on the real
-thing, and it slices with `print_text` unchanged as its white half. 10 g and half an
+thing, and it slices with `print_white` unchanged as its white half. 10 g and half an
 hour against 65 g and several, to find out whether the white lands in the recess and
 whether the result reads from across the room. See [Test pieces](#test-pieces).
 
@@ -584,7 +584,7 @@ Four cheap prints, in the order they are worth making:
 |---|---|---|
 | `"gauge"` | 3 g | The whole cross section as a 2 mm slice, lying flat. Hook it on the front edge of the plate: does the leg reach the table, does the tongue clear whatever is under the plate, is there air left up to the grey cup? |
 | `"gauge_rear"` | 3 g | A 2.5 mm slice at the top of the tray – whatever closes the rear off, already lying flat. On the box base a ring of wall plus both arms, held apart at the right spacing: do they straddle the socle, does the mouth find it, is there room beside it for a 3.2 mm arm? It was 1.5 mm at first, too floppy to say anything at all – it simply splayed out. On the round base the back of the ring is the full concave arc: lay it against the curved base and see whether the radius is right and it touches all the way along instead of rocking on the middle. `"gauge_clamp"` still works as a name for it. |
-| `"gauge_text"` | 10 g the pair | The front 2.4 mm of the tray as a flat plate: the whole label at full size, in the same wall thickness it has on the real thing. Print it with `"print_text"`, unchanged, as its white half – the inlay is only 0.6 mm deep, so it fits the gauge as well as the tray. This is the one to make **before** committing 67 g to a two colour tray: does the white land in the recess, does the slicer draw a 1.3 mm line at all, and is the result readable from across the room? |
+| `"gauge_label"` | 10 g the pair | The front 2.4 mm of the tray as a flat plate: the whole label at full size, in the same wall thickness it has on the real thing. Print it with `"print_white"`, unchanged, as its white half – the inlay is only 0.6 mm deep, so it fits the gauge as well as the tray. This is the one to make **before** committing 67 g to a two colour tray: does the white land in the recess, does the slicer draw a 1.3 mm line at all, and is the result readable from across the room? |
 | `"clip"` | 26 g box, 31 g round | The rear of the tray, `clip_back` = 12 mm in front of the rear wall, standing on the cut face – on the box base that is the rear 12 mm plus both complete arms, on the round base the whole 24.5 mm that the arc spans (measuring 12 mm back from the *corners* would cut the centreline away and leave two wings). The only test that shows how the tray really goes on and comes off, but it costs a third of a tray, so it is only worth it if `"gauge_rear"` leaves you unsure. |
 
 ## Printing
@@ -615,15 +615,24 @@ The files, for the box base rig (swap in the `_round` names for a curved base):
 | File | `mode` | Head | Amount |
 |---|---|---|---|
 | `stl/coffee_spill_mug.stl` | `"print"` / `"print_body"` | **right**, black | 51.6 cm³ ≈ 64 g |
-| `stl/coffee_spill_mug_text.stl` | `"print_text"` | **left**, white | 0.32 cm³ ≈ 0.4 g |
+| `stl/coffee_spill_mug_white.stl` | `"print_white"` | **left**, white | 0.32 cm³ ≈ 0.4 g |
 
 The inlay lives entirely in the front 0.6 mm of the tray, where the two bases are the
-same shape, so `coffee_spill_mug_round_text.stl` comes out **byte for byte identical**
-to `coffee_spill_mug_text.stl`. Both names are kept anyway, so that each rig has a
+same shape, so `coffee_spill_mug_round_white.stl` comes out **byte for byte identical**
+to `coffee_spill_mug_white.stl`. Both names are kept anyway, so that each rig has a
 matching pair you cannot pick up by mistake, and so that the pairing still holds if
 the arc ever grows far enough forward to clip a letter.
 
-1. **Print the test plate first.** `mode="gauge_text"` plus `mode="print_text"` is
+**The colour is in the filename on purpose.** These files were called `_text.stl` and
+`_gauge_text.stl` for a while, and the two names are close enough that the label test
+plate got loaded into the slicer alongside the body – two black files, so a job with
+no label in it at all, and the plate invisible in the preview because it sits wholly
+inside the body. The rule now: anything that comes out of the black head has no
+colour word in its name, the single white file says `white`, and the label test plate
+says `label`. The old mode names `print_text` and `gauge_text` are still accepted so
+that older commands keep working.
+
+1. **Print the test plate first.** `mode="gauge_label"` plus `mode="print_white"` is
    the same job in miniature – 10 g and about half an hour, against 64 g and several
    hours. It answers every question this section raises, on the bed rather than in
    theory. See [Test pieces](#test-pieces).
@@ -721,20 +730,20 @@ carry `_round`:
 # the box base rig - the tray, lying on the front face, ready for the slicer,
 # and the white inlay for the label in the same coordinates
 openscad -o stl/coffee_spill_mug.stl      -D 'mode="print"'      -D 'base="box"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_text.stl -D 'mode="print_text"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_white.stl -D 'mode="print_white"' -D 'base="box"' coffee_spill_mug.scad
 
 # ... and its test pieces
 openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
 
-# the label test plate. Its white half is coffee_spill_mug_text.stl above, unchanged,
+# the label test plate. Its white half is coffee_spill_mug_white.stl above, unchanged,
 # and the plate is the same either side, so there is no _round version of it
-openscad -o stl/coffee_spill_mug_gauge_text.stl  -D 'mode="gauge_text"' -D 'base="box"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_gauge_label.stl  -D 'mode="gauge_label"' -D 'base="box"' coffee_spill_mug.scad
 
 # the round base rig
 openscad -o stl/coffee_spill_mug_round.stl      -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
-openscad -o stl/coffee_spill_mug_round_text.stl -D 'mode="print_text"' -D 'base="round"' coffee_spill_mug.scad
+openscad -o stl/coffee_spill_mug_round_white.stl -D 'mode="print_white"' -D 'base="round"' coffee_spill_mug.scad
 
 openscad -o stl/coffee_spill_mug_round_gauge.stl      -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
 openscad -o stl/coffee_spill_mug_round_gauge_rear.stl -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
@@ -751,10 +760,10 @@ Open `coffee_spill_mug.scad` to look at it instead. `mode` decides what is drawn
 | `"use"` | as it sits on the plate. z = 0 is the top of the plate, y = 0 is the front face, x = 0 is the left side of the body |
 | `"check"` | as `"use"`, with the teak plate, the table and the base behind the tray drawn as ghosts for a visual fit check – the grey box or the curved base plus the weighing bowl that overhangs it, whichever `base` says |
 | `"print"` | lying on the front face, ready for the slicer. The black part, with the letters recessed. `"print_body"` is a synonym, for when it is clearer to say which of the two it is |
-| `"print_text"` | the white inlay alone, in the same position, ready for the second extruder |
+| `"print_white"` | the white inlay alone, in the same position, ready for the second extruder |
 | `"two_tone"` | both, in their filament colours, for looking at the label. Preview only – CGAL discards colour, so no `--render` |
 | `"text_measure"` | the text block laid flat as a 1 mm plate at the origin, for measuring the real width and ink height |
-| `"gauge"`, `"gauge_rear"`, `"gauge_text"`, `"clip"` | the test pieces above, all ready for the slicer |
+| `"gauge"`, `"gauge_rear"`, `"gauge_label"`, `"clip"` | the test pieces above, all ready for the slicer |
 | `"cavity"` | the trough volume as a solid, for measuring the capacity |
 
 All the parameters sit at the top of the file, `base` first. `echo` prints which

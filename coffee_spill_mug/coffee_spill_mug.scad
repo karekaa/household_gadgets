@@ -99,21 +99,25 @@
 //
 //  The STL files are written like this - see README.md for the reasoning. The
 //  round base files carry _round in the name, the box base ones are the originals
-//  and keep the plain names, and the _text ones are the white inlay:
+//  and keep the plain names, and the _white ones are the white inlay. The colour is
+//  in the name on purpose: an earlier _text / _gauge_text pair got loaded into the
+//  slicer as two black files, which of course produced a job with no label in it at
+//  all. Everything that comes out of the black head has no colour word in its name,
+//  the one white file says white, and the label test plate says label:
 //
 //    openscad -o stl/coffee_spill_mug.stl             -D 'mode="print"'      -D 'base="box"' coffee_spill_mug.scad
-//    openscad -o stl/coffee_spill_mug_text.stl        -D 'mode="print_text"' -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_white.stl       -D 'mode="print_white"' -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_gauge.stl       -D 'mode="gauge"'      -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_gauge_clamp.stl -D 'mode="gauge_rear"' -D 'base="box"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_clip.stl        -D 'mode="clip"'       -D 'base="box"' coffee_spill_mug.scad
 //
 //  The label test plate is the front face and nothing else, so one file covers both
-//  rigs. Slice it with print_text, unchanged, as its white half:
+//  rigs. Slice it with print_white, unchanged, as its white half:
 //
-//    openscad -o stl/coffee_spill_mug_gauge_text.stl  -D 'mode="gauge_text"' -D 'base="box"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_gauge_label.stl  -D 'mode="gauge_label"' -D 'base="box"' coffee_spill_mug.scad
 //
 //    openscad -o stl/coffee_spill_mug_round.stl             -D 'mode="print"'      -D 'base="round"' coffee_spill_mug.scad
-//    openscad -o stl/coffee_spill_mug_round_text.stl        -D 'mode="print_text"' -D 'base="round"' coffee_spill_mug.scad
+//    openscad -o stl/coffee_spill_mug_round_white.stl       -D 'mode="print_white"' -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_gauge.stl       -D 'mode="gauge"'      -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_gauge_rear.stl  -D 'mode="gauge_rear"' -D 'base="round"' coffee_spill_mug.scad
 //    openscad -o stl/coffee_spill_mug_round_clip.stl        -D 'mode="clip"'       -D 'base="round"' coffee_spill_mug.scad
@@ -405,7 +409,7 @@ fillet_steps = 8;   // facets per fillet arc
 // 1. A recess alone is not legible. Black on black has no contrast whatever, and
 //    the shadow in a 0.6 mm groove only reads with a lamp at the right angle - the
 //    printed tray was unreadable in room light. So the letters are now printed in
-//    a second colour: mode = "print_text" writes the inlay that exactly fills the
+//    a second colour: mode = "print_white" writes the inlay that exactly fills the
 //    recess, as a separate STL for the other extruder. See text_inlay().
 // 2. The letters were too small to print. In this font the "I" is a bare stem, so
 //    measuring it measures the stroke width: it comes out 2.000 mm at size 10,
@@ -470,7 +474,7 @@ text_margin = 5;    // least distance from the letters to the sides
 // and they must be measured again:
 //
 //   1. set both to 0
-//   2. openscad -o /tmp/t.stl -D 'mode="print_text"' coffee_spill_mug.scad
+//   2. openscad -o /tmp/t.stl -D 'mode="print_white"' coffee_spill_mug.scad
 //   3. read the bounding box of /tmp/t.stl. In print coordinates the body spans
 //      x = 0..tray_width and y = 0..face_h, so the target centre is
 //      (tray_width / 2, face_h / 2) = (45, 20.4)
@@ -489,7 +493,7 @@ text_ink_dz =  1.036;   // ... and up the front face, in model z
 // "gauge"  = a thin slice of the cross section, lying flat, ready for the slicer
 // "gauge_clamp" = the top clamp_gauge_t mm of the tray, i.e. the rim and the two
 //            arms: the cheap check that the arms straddle the socle
-// "gauge_text" = the front gauge_text_t mm of the tray, i.e. the front face as a
+// "gauge_label" = the front gauge_text_t mm of the tray, i.e. the front face as a
 //            flat plate with the recessed text in it: the cheap two-colour test
 // "clip"   = the rear clip_back mm of the tray plus both complete arms, in print
 //            orientation: the real friction test - see README.md
@@ -497,7 +501,7 @@ text_ink_dz =  1.036;   // ... and up the front face, in model z
 //
 // The two-colour pair, both in print orientation and both to be sliced together:
 // "print_body" = the tray, i.e. what "print" gives (black, right extruder)
-// "print_text" = only the letters filling the recess (white, left extruder)
+// "print_white" = only the letters filling the recess (white, left extruder)
 // "two_tone"   = the two of them assembled and coloured, for looking at. PREVIEW
 //            ONLY: --render throws colour away.
 // "text_measure" = the label alone, flat, so its bounding box can be measured
@@ -506,12 +510,12 @@ mode = "use";
 gauge_t   = 2;   // thickness of the mode = "gauge" slice
 clip_back = 12;  // how much of the tray the mode = "clip" test piece takes along
 
-// mode = "gauge_text" is a flat plate off the front face carrying the whole label
+// mode = "gauge_label" is a flat plate off the front face carrying the whole label
 // at full size. It costs a few grams and half an hour, and it answers the only
 // questions that matter about the two-colour text: does the white land in the
 // recess, does the slicer draw a text_stroke mm wide line at all, and is the
 // result readable from across the room. Slice it exactly like the real pair -
-// gauge_text with the body extruder and print_text, unchanged, with the white one:
+// gauge_label with the body extruder and print_white, unchanged, with the white one:
 // the inlay is only text_depth mm deep, so it fits the gauge as well as the tray.
 gauge_text_t = 2.4;  // thickness of the plate: text_depth plus 1.8 mm of backing,
                      // i.e. the same wall the letters sit in on the real tray
@@ -735,10 +739,10 @@ if (text_enable) {
         echo(str("WARNING: a stroke of ", text_stroke, " mm is under three 0.4 mm ",
                  "extrusions. This is what made the first printed tray illegible - ",
                  "raise text_size to ", 1.2 / 0.20, " or more"));
-    // The bounding box of mode = "print_text" must be centred on this, or a slicer
+    // The bounding box of mode = "print_white" must be centred on this, or a slicer
     // that centres each object as it loads it will pull the two files out of
     // register by the difference. Currently corrected by text_ink_dx/text_ink_dz.
-    echo(str("Text: the print_text bounding box centre must be (", tray_width / 2,
+    echo(str("Text: the print_white bounding box centre must be (", tray_width / 2,
              ", ", face_h / 2, ") in print coordinates - measure it if you change ",
              "the label, and re-fit text_ink_dx = ", text_ink_dx,
              " / text_ink_dz = ", text_ink_dz));
@@ -1137,7 +1141,7 @@ if (mode == "print" || mode == "print_body")
     // The body, with the text as a recess in the front face. On a single extruder
     // this is the whole part; on two it is the black one.
     on_front_face() coffee_spill_tray();
-else if (mode == "print_text")
+else if (mode == "print_white" || mode == "print_text")
     // Just the letters, filling that recess exactly, in the same coordinates as
     // mode = "print" - load both STL files without moving either and they line up.
     // This is the one for the white extruder.
@@ -1158,10 +1162,10 @@ else if (mode == "text_measure")
     // label - which is how the numbers in the text section were arrived at.
     translate([0, -text_z + text_block_h / 2, 0])
         linear_extrude(height = 1) front_text_2d();
-else if (mode == "gauge_text")
+else if (mode == "gauge_label" || mode == "gauge_text")
     // The front gauge_text_t mm of the tray: the whole front face as a flat plate,
     // recess and all, standing the same way up as mode = "print". Print it together
-    // with mode = "print_text", which is already only text_depth mm deep and so is
+    // with mode = "print_white", which is already only text_depth mm deep and so is
     // its own inlay - a 10 g pair that tests the two colour setup, the alignment and
     // the letter shapes before committing to a 67 g tray.
     on_front_face() intersection() {
