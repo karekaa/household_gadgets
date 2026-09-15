@@ -113,6 +113,7 @@ Selve riggen, målt med skyvelær – det er disse tallene passformen er utledet
 | Grå 3D-printet sokkel, bredde | 76 mm |
 | Grå 3D-printet sokkel, høyde over teakplaten | 22 mm |
 | Grå 3D-printet sokkel, dybde innover | ikke målt, «mye», rundt 76 mm |
+| Kanal mellom sokkelen og display-foten, til venstre | **3,38 mm** (`foot_gap_l`). Det trangeste målet på hele riggen – se [Display-foten](#display-foten-som-er-trangere-enn-noe-i-fila). |
 | Teakplaten, tykkelse | 19 mm |
 | Teakplaten, overflate over bordet | 20,6 mm (`plate_height`, tilpasset med malen) |
 | Teakplaten, sett ovenfra | 200 × 200 mm med 45°-avkapp på alle fire hjørner, så den lille sidekanten blir ca. 37 mm – altså en åttekant. Koppen står midt på forkanten, som er rett over ca. 148 mm, så hjørneavkappene er ikke i nærheten. Det er bare spøkelset i `mode = "check"` som bryr seg. |
@@ -162,7 +163,7 @@ finnes ingen armer, og buen gjør denne jobben bedre – se over.*
 
 Det som er verdt å gripe rundt, er den **grå 3D-printede sokkelen** som bærer
 sensoren: en kloss 76 mm bred som står 22 mm opp fra teakplaten, rett bak koppen.
-To finner 3,2 mm tykke rekker bakover fra bakflaten, én langs hver side av den.
+To finner 2,8 mm tykke rekker bakover fra bakflaten, én langs hver side av den.
 
 De begynte som fjærarmer som klemte om sokkelen, og det er de **ikke lenger**.
 `clamp_squeeze` er **−0,4 mm**, altså er åpningen 0,4 mm *videre* enn sokkelen i
@@ -197,19 +198,20 @@ Tre endringer følger av det, og fila gjør alle tre:
 1. **Ta bort overlappen.** `clamp_squeeze` −0,1 → **−0,4**, de 0,3 mm ekstra som
    ble bedt om. En arm som aldri tar i noe, blir aldri påkjent, og 0,2 mm luft per
    side ligger fremdeles langt innenfor det sideveis sluret som ville betydd noe.
-2. **Gjør armen tykkere.** `clamp_t` 2,05 → **3,2 mm**. Mot en *last* – et støt, en
+2. **Gjør armen tykkere.** `clamp_t` 2,05 → **2,8 mm**. Mot en *last* – et støt, en
    hånd, å komme skjevt ned over riggen – går spenningen som 1/tykkelse², så dette
    halverer den med god margin. Merk at det bare hjelper *fordi* (1) er gjort: hvis
    armen fortsatt ble tvunget ut en fast avstand, ville en tykkere arm fått **mer**
    spenning, ikke mindre, for ved påtvunget utbøying går spenningen som tykkelse ×
    utbøying. Tykkelse og klaring er ikke uavhengige knapper.
-3. **Utvid roten.** `clamp_root` = **2,5 mm** legger på en 45° kile der armen går ut
-   fra bakflaten – punktet med det største bøyemomentet, og tidligere et skarpt
+3. **Utvid roten.** `clamp_root_r` = **2,5 mm** legger på en 45° kile der armen går
+   ut fra bakflaten – punktet med det største bøyemomentet, og tidligere et skarpt
    innvendig hjørne som konsentrerte det ytterligere. Den kan bare legges på
-   *utsiden*, siden styreflaten må være plan i hele sin lengde, så armen er 5,7 mm
-   tykk ved roten og tynnes til 3,2 mm over de første 2,5 mm. Den er gratis å
+   *utsiden*, siden styreflaten må være plan i hele sin lengde, så armen er 5,3 mm
+   tykk ved roten og tynnes til 2,8 mm over de første 2,5 mm. Den er gratis å
    printe: tegnet i planet er kilen en skråflate som ligger langs printaksen, ingen
-   overheng og ingen støtte.
+   overheng og ingen støtte. **Bare den høyre armen får en** – se neste avsnitt for
+   grunnen.
 
 Printer du i PETG i stedet, er alt dette mindre presserende – PETG har mye bedre
 lagbinding enn PLA+ – men geometrien koster ingenting uansett.
@@ -228,19 +230,56 @@ Armene ligger **ikke lenger i flukt med sidene**. Det gjorde de da koppen var
 80 mm og sokkelen 76: 2,05 mm tykkelse traff nøyaktig det 2 mm store trinnet på
 hver side. Ved 90 mm ville den samme regelen krevd en 7 mm plate, så de to er
 koblet fra hverandre – `clamp_t` er den tykkelsen finna trenger, og armene ligger
-3,6 mm innenfor sidene, der sokkelen setter dem. Det innrykket er samtidig taket på
+3,2 mm innenfor sidene, der sokkelen setter dem. Det innrykket er ett av takene på
 armen: kilen må holde seg innenfor bredden på koppen, noe som begrenser
-`clamp_t + clamp_root` til 7 mm, så `clamp_t` kan ikke gå forbi omtrent 4,3 mm ved
-`clamp_root` = 2,5. En assert sier det.
+`clamp_t + clamp_root_r` til 7 mm. Men det er ikke lenger det som binder – se
+display-foten, neste avsnitt.
+
+### Display-foten, som er trangere enn noe i fila
+
+Endringen mot brekkasje over gikk på riggen og **lot seg ikke sette på**. Grunnen
+hadde ingenting med koppen å gjøre: til venstre for sokkelen, sett forfra, står foten
+til displayet på teakplaten, og den venstre armen må tres mellom den og siden av
+sokkelen. Den kanalen er **3,38 mm** bred, målt på riggen, og den er det trangeste
+målet i hele designet.
+
+| | |
+|---|---|
+| Kanal, sidflaten på sokkelen til display-foten | 3,38 mm (`foot_gap_l`, målt) |
+| Den gamle 2,05 mm armen | 0,2 mm glideluft + 2,05 mm arm = 2,25 mm. Passet, med 1,13 mm til gode. |
+| Den 3,2 mm tykke armen | 0,2 + 3,2 = **3,40 mm i et 3,38 mm gap.** 0,02 mm for mye – som er nøyaktig derfor den *nesten* gikk på. |
+| … med den 2,5 mm kilen | 0,2 + 3,2 + 2,5 = **5,90 mm.** Ikke i nærheten. |
+| Nå | 0,2 + 2,8 = 3,00 mm, som etterlater `foot_clear_l` = 0,3 mm luft |
+
+To ting er endret, og `foot_gap_l` er nå en parameter med en `assert` bak, så nettopp
+denne overraskelsen kan ikke skje to ganger:
+
+- `clamp_t` 3,2 → **2,8 mm**. Fortsatt 37 % mer arm enn de 2,05 som brakk, og
+  tykkelsen betyr mye mindre nå som endring (1) har fjernet overlappen helt – armen
+  blir ikke holdt bøyd i det hele tatt.
+- Kilen er **per side**: `clamp_root_l` = 0, `clamp_root_r` = 2,5. Den vokser på
+  utsiden, og på venstre side er det den flaten som peker mot display-foten, så en
+  kile der er 2,5 mm ren overlapp. Å miste den til venstre er et mindre tap enn det
+  ser ut som – kilen var tiltak (3) av tre, og (1) er det som faktisk gjør at armen
+  ikke blir påkjent.
+
+**Selve koppen er ikke berørt, og var det aldri.** Den er 7 mm bredere enn sokkelen på
+hver side, men den står i sin helhet *foran* sokkelen, og display-foten sperrer bare
+stripa langs siden av den. Så `tray_width` blir stående på 90, og merkingen beholder
+plassen sin.
+
+Det finnes ingen tilsvarende hindring på høyre side, og det er derfor den høyre armen
+beholder kilen sin. Flytter displayet seg, øk `clamp_root_l`, og asserten sier fra om
+det går.
 
 | | |
 |---|---|
 | Styreflater | x = 6,8 og 83,2, altså en åpning på 76,4 mm på den 76 mm brede sokkelen: 0,2 mm klaring per side |
-| Arm | 3,2 mm tykk, 5,7 mm ved den utvidede roten, 17,5 mm høy, 18 mm fri lengde til høyre, 14 mm til venstre |
+| Arm | 2,8 mm tykk, 5,3 mm ved den utvidede roten til høyre og uten kile til venstre, 17,5 mm høy, 18 mm fri lengde til høyre, 14 mm til venstre |
 | Munn ved frie enden | 78,4 mm, avlastet `clamp_lead` = 1,0 mm per side slik at forkantene på sokkelen leder koppen inn i stedet for å hake seg fast i armtippene, og lukker seg inn over de siste 6 mm |
 | Undersiden av armen | 1,5 mm over platen (`clamp_z0`), for å gå klar av en eventuell fillet eller elefantfot ved foten av sokkelen |
 | Toppen av armen | 19 mm = `tray_height - edge_r`; høyere enn det ville avrundingen av rimet tynnet armen ned til en knivsegg |
-| Hvis du legger overlapp tilbake | som isotrop bladfjær gir `k = 3EI/L³` med `I = b·t³/12` ca. 50 N/mm på den 18 mm lange armen i PETG ved 3,2 mm tykkelse, halvparten mer i PLA+, og stivheten går som 1/lengde³, så den korte 14 mm-armen er 2,1 ganger stivere igjen. **Men armen er ikke isotrop** – se avsnittet over om hvorfor den ene flerret opp langs en laggrense. Se på disse tallene som en øvre grense for hva armen tåler, ikke som et designmål. |
+| Hvis du legger overlapp tilbake | som isotrop bladfjær gir `k = 3EI/L³` med `I = b·t³/12` ca. 33 N/mm på den 18 mm lange armen i PETG ved 2,8 mm tykkelse, halvparten mer i PLA+, og stivheten går som 1/lengde³, så den korte 14 mm-armen er 2,1 ganger stivere igjen. **Men armen er ikke isotrop** – se avsnittet over om hvorfor den ene flerret opp langs en laggrense. Se på disse tallene som en øvre grense for hva armen tåler, ikke som et designmål. |
 
 ## Avrundede kanter, og hvorfor ikke `minkowski()`
 
@@ -307,7 +346,7 @@ frontflaten blir førstelaget, 90 × 40,8 mm massiv kontakt med bordet, og bunne
 veggene i trauet printes som én sammenhengende kontur i hvert enkelt lag, så
 hjørnet der de møtes ikke er en lagfuge kaffen kan sive gjennom. De to armene blir
 de siste 14 og 18 mm av printet: to finner som står på bakflaten, hver med et fotavtrykk
-på 3,2 × 17,5 mm (5,7 mm ved den utvidede roten). De printer greit, men senk farten på de siste lagene hvis
+på 2,8 × 17,5 mm (5,3 mm ved den utvidede roten til høyre). De printer greit, men senk farten på de siste lagene hvis
 sliceren ikke gjør det selv.
 
 Bare to flater vender mot printbordet i denne orienteringen:
@@ -577,7 +616,7 @@ Fire billige print, i den rekkefølgen det er verdt å lage dem:
 |---|---|---|
 | `"gauge_label"` | 10 g for paret | De fremste 2,4 mm av koppen som en flat plate: hele merkingen i full størrelse, i samme veggtykkelse som den har på den virkelige delen. Printes med `"print_white"`, uendret, som den hvite halvparten – innlegget er bare 0,6 mm dypt, så det passer i testplaten like godt som i koppen. Dette er den man lager **før** man binder opp 65 g i en tofarget kopp: lander det hvite i fordypningen, klarer sliceren å tegne en 1,3 mm strek i det hele tatt, og er resultatet leselig tvers over rommet? |
 | `"gauge"` | 3 g | Hele tverrsnittet som en 2 mm skive, liggende flatt. Hekt den på forkanten av platen: rekker beinet ned til bordet, går tunga klar av det som er under platen, er det luft igjen opp til den grå koppen? |
-| `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 3,2 mm arm ved siden? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
+| `"gauge_rear"` | 3 g | En 2,5 mm skive i toppen av koppen – det som lukker baksiden, og allerede liggende flatt. På firkantbasen en ring av vegg pluss begge armene, holdt fra hverandre med riktig avstand: går de ned langs sokkelen, finner munnen den, er det plass til en 2,8 mm arm ved siden, og går den venstre klar av display-foten? Den var 1,5 mm først, for slapt til å si noe i det hele tatt – den bare spriket ut. På den runde basen er baksiden av ringen hele den konkave buen: legg den mot det buete fundamentet og se om radien stemmer, og om den ligger inntil hele veien i stedet for å vippe på midten. `"gauge_clamp"` virker fortsatt som navn på den. |
 | `"clip"` | 26 g firkant, 31 g rund | Baksiden av koppen, `clip_back` = 12 mm foran bakveggen, stående på kuttflaten – på firkantbasen de bakre 12 mm pluss begge armene komplett, på den runde hele de 24,5 mm som buen dekker (å måle 12 mm bakover fra *hjørnene* ville kuttet bort senterlinjen og etterlatt to vinger). Den eneste testen som viser hvordan koppen virkelig går på og av, men den koster en tredjedel av en kopp, så den er bare verdt det hvis `"gauge_rear"` gjør deg usikker. |
 
 ## Printing
@@ -590,7 +629,7 @@ Fire billige print, i den rekkefølgen det er verdt å lage dem:
 | Støtte | ingen |
 | Bord | **60 °C**, ikke slicerens standard 40 °C |
 | Brim | trengs ikke – førstelaget er hele frontflaten |
-| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 3,2 mm armene blir massive |
+| Vegger | minst 3 perimetre, så de 2,4 mm veggene og de 2,8 mm armene blir massive |
 | Kjøling | vifta for full musikk over den 35° bakrampen – det er den ene flata som bryr seg |
 
 ### Slik kjører du tofargeprinten, steg for steg
@@ -768,8 +807,10 @@ senterlinjen og i hjørnene.
 kolliderer med beinet eller rekker under foten, hvis tekstfordypningen etterlater
 mindre enn 1,2 mm frontvegg, eller hvis en fillet eller fas er for stor for kanten
 den skal bryte. På firkantbasen sjekker den i tillegg at ingen arm havner utenfor
-siden av koppen, blir høyere enn sokkelen, kommer inn i avrundingen av rimet eller
-rekker forbi baksiden av sokkelen, og at munnen på armene ikke blir smalere enn
+siden av koppen – heller ikke den utvidede roten, som er det bredeste punktet på den
+– blir høyere enn sokkelen, kommer inn i avrundingen av rimet eller rekker forbi
+baksiden av sokkelen, at ingen av kilene er lengre enn sin egen arm, at den venstre
+armen går klar av display-foten, og at munnen på armene ikke blir smalere enn
 sokkelen. På den runde basen sjekker den i stedet at buen har stor nok radius til å
 rekke ut til sidene i det hele tatt, at koppen ikke er bredere enn den buete delen av
 fundamentet, at den roterte rampen etterlater en flat bunn, og at rimet går klar av

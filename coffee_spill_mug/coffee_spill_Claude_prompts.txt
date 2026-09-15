@@ -52,3 +52,7 @@ Jeg har lastet inn i FlashForge slicer hhv text STL og kopp STL - Det ser ut som
 Slik ser det ut etter først å ha lastet inn @stl/coffee_spill_mug_gauge_text.stl - så valgt Left extruder, og så lastet inn @stl/coffee_spill_mug_round.stl : [Image #16]
 
 Kan du utdype dette: «Én ting jeg ikke har fått bekreftet: den fulle modus-sveipen (28 kombinasjoner) kjører fortsatt på two_tone/round, som er den tregeste.» - jeg skjønner ikke, og er det noe vi kan gjøre for å øke farten?
+
+Nei, nei, sorry - MIN feil! Jeg har pekt ut FEIL filer når jeg rapporterte til deg. Hvis dine siste endringer er basert på DEN misforståelsen, blir det «dobbelfeil»
+
+Den siste endringen gikk litt galt, da bredden/avstanden mellom innsiden av venstre arm og utsiden av venstresiden av koppen, ikke passer inn mellom «display-foten» og den grå sokkelen vi skal gripe rundt. Se bilde: [Image #17] - Tilgjengelig avstand i forhold til den GAMLE koppen er 3.38 mm

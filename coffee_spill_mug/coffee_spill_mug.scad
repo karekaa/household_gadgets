@@ -187,6 +187,21 @@ overhang    = 18;   // how far the tray sticks out past the front edge of the
 socle_width  = 76;  // across, at the front face of the socle
 socle_height = 22;  // up from the top of the teak plate
 socle_depth  = 76;  // backwards - not measured exactly, "a lot", about this
+// THE DISPLAY FOOT. On the left of the socle, seen from the front, the foot of the
+// display stands on the teak plate. The left arm has to thread between it and the
+// side of the socle, and that channel is the tightest dimension on the whole rig -
+// tighter than anything inside the tray. It is measured on the rig, from the left
+// face of the socle to the nearest face of the display foot. There is no
+// corresponding obstruction on the right, so the right arm is free.
+//
+// This is what caught out the anti-snap change: clamp_t went 2.05 -> 3.2 and a
+// clamp_root_r mm gusset was added, which took the left arm from 2.05 mm of material
+// to 5.7 mm at the root - into a 3.38 mm channel. The tray would not go on. Note
+// that the BODY of the tray is not affected and never was: it is 7 mm wider than
+// the socle on each side, but it sits entirely in front of the socle, and the
+// display foot only obstructs the strip alongside it. So tray_width stays at 90.
+foot_gap_l   = 3.38;  // measured clear channel, socle side face to display foot
+foot_clear_l = 0.3;   // air to leave on the display foot side of the arm
 
 /* [The round rig] */
 // The curved base under the weighing bowl. Only used when base = "round".
@@ -314,7 +329,7 @@ hook_relief = 1.0;  // 45 degree relief in the inner corner, so a rounded or
 //     forced apart by a fixed distance instead, a thicker arm would see MORE
 //     stress, not less, because then stress goes as thickness * deflection.
 //  3. Flare the root. The break is at the rear face, where the moment is largest
-//     and where a sharp inside corner concentrates it further. clamp_root adds a
+//     and where a sharp inside corner concentrates it further. clamp_root_r adds a
 //     45 degree gusset there on the outer side - the gripping face has to stay
 //     flat, so it can only go on the outside - which both thickens the arm where
 //     it matters and removes the notch. It costs nothing to print: the gusset
@@ -338,16 +353,31 @@ clamp_squeeze = -0.4;   // total interference, i.e. clamp_squeeze / 2 per side.
                         // per side is still well inside the wobble that matters.
                         // Raise this above 0 to get the friction grip back - but
                         // read the note above about why that broke the arm.
-clamp_t       = 3.2;    // thickness of the arm, 2.05 before it snapped - see (2)
-                        // above. Up to tray_width = 80 this was also
+clamp_t       = 2.8;    // thickness of the arm, 2.05 before it snapped - see (2)
+                        // above. It went to 3.2 first, and that was 0.02 mm too
+                        // thick to thread the foot_gap_l mm channel past the display
+                        // foot: 0.2 mm of slip air on the socle side plus 3.2 mm of
+                        // arm is 3.4 mm in a 3.38 mm gap. 2.8 leaves foot_clear_l mm
+                        // of air and is still 37 % more arm than the 2.05 that broke,
+                        // which is enough now that (1) has taken the interference
+                        // away and the arm is not being held bent at all.
+                        // Up to tray_width = 80 this was also
                         // (tray_width - socle_width + clamp_squeeze) / 2, so the
                         // outer face came out flush with the side of the tray. At
                         // tray_width = 90 that would mean a 7 mm slab, so the arms
                         // are fins standing on the rear face instead, set in
                         // arm_x0 mm from the sides. The ceiling is what keeps
-                        // arm_x0 - clamp_root positive, i.e. keeps the flared root
+                        // arm_x0 - clamp_root_r positive, i.e. keeps the flared root
                         // inside the width of the tray: about 4.3 mm as it stands.
-clamp_root    = 2.5;    // 45 degree gusset at the root, on the outer face only
+// The gusset is per side, and only the right arm gets one. It grows on the OUTER
+// face - the gripping face has to stay flat - and on the left that outer face is
+// the one pointing at the display foot, so a gusset there is 2.5 mm of pure
+// interference in a 3.38 mm channel. The right side is open, so the right arm keeps
+// it. Losing it on the left is a smaller loss than it looks: the gusset was measure
+// (3) of three, and (1), removing the interference, is the one that actually stops
+// the arm being stressed. Set clamp_root_l above 0 only if the display foot moves.
+clamp_root_l  = 0;      // 45 degree gusset at the root of the left arm: none
+clamp_root_r  = 2.5;    // ... and on the right, where there is room for it
 // The two arms are NOT the same length. The right one may be as long as it likes,
 // but the left one butts into a connector on the rig a little way back, so it is
 // cut short. Left and right are seen from the front, standing where the overhang
@@ -590,7 +620,12 @@ arm_x0   = grip_x - clamp_t;                // outer face of the left arm
 arm_end_l = tray_depth + clamp_len_l;       // free end of the left arm
 arm_end_r = tray_depth + clamp_len_r;       // ... and of the right one
 arm_end   = max(arm_end_l, arm_end_r);      // the deepest point of the part
-arm_root_x = arm_x0 - clamp_root;           // outer face of the flared root
+arm_root_x_l = arm_x0 - clamp_root_l;       // outer face of the flared root, left
+arm_root_x_r = arm_x0 - clamp_root_r;       // ... and right
+arm_root_x = min(arm_root_x_l, arm_root_x_r);    // whichever stands out furthest
+// How much of the display foot channel the left arm actually uses: out from the
+// side face of the socle, across the slip air and the arm and its root.
+foot_use_l = socle_x0 - arm_root_x_l;
 part_w   = tray_width - 2 * min(arm_root_x, 0);  // widest point of the whole part
 part_d   = clamps_on ? arm_end : tray_depth;
 // Cut plane of the mode = "clip" test piece, clip_back mm in front of the rear
@@ -643,9 +678,19 @@ assert(round_base || socle_width < tray_width,
 // not what anyone meant to draw.
 assert(!clamps_on || arm_root_x >= -0.01,
        "the flared arm roots stand outside the sides of the tray - reduce clamp_t
-        or clamp_root");
-assert(!clamps_on || clamp_root < clamp_len_l,
-       "the gusset is longer than the short arm - reduce clamp_root");
+        or clamp_root_l/clamp_root_r");
+assert(!clamps_on || clamp_root_l < clamp_len_l,
+       "the left gusset is longer than the left arm - reduce clamp_root_l");
+assert(!clamps_on || clamp_root_r < clamp_len_r,
+       "the right gusset is longer than the right arm - reduce clamp_root_r");
+// The tightest dimension on the whole rig: the left arm has to thread between the
+// side of the socle and the foot of the display. This is the check that the 3.2 mm
+// arm with a 2.5 mm gusset failed, on the rig rather than in the file - so it is
+// worth having as an assert rather than as a note in a comment.
+assert(!clamps_on || foot_use_l <= foot_gap_l - foot_clear_l,
+       str("the left arm does not clear the display foot: it uses ", foot_use_l,
+           " mm of the ", foot_gap_l, " mm channel and needs to leave ",
+           foot_clear_l, " mm - reduce clamp_t or clamp_root_l"));
 assert(!text_enable || text_depth < wall_t - 1.2,
        "the text recess leaves less than 1.2 mm of front wall - reduce text_depth");
 // Height can be checked exactly, unlike width - the block has to stay inside the
@@ -727,7 +772,12 @@ else
          " mm long, gripping at x = ", grip_x, " and ", tray_width - grip_x,
          ": ", clamp_squeeze, " mm total interference on the ", socle_width,
          " mm socle, mouth ", socle_width - clamp_squeeze + 2 * clamp_lead,
-         " mm at the tip, ", clamp_t + clamp_root, " mm thick at the flared root"));
+         " mm at the tip, ", clamp_t + clamp_root_l, " mm thick at the left root and ",
+         clamp_t + clamp_root_r, " mm at the right"));
+if (!round_base)
+    echo(str("Display foot: the left arm uses ", foot_use_l, " mm of the ",
+             foot_gap_l, " mm channel beside the socle, leaving ",
+             foot_gap_l - foot_use_l, " mm"));
 echo(str("Print footprint ", part_w, " x ", tray_height - table_z,
          " mm, ", part_d, " mm tall"));
 if (text_enable) {
@@ -1040,31 +1090,35 @@ module trough() {
 //  length - the left one is cut short to clear a connector on the rig - so the
 //  free end y is a parameter.
 // ---------------------------------------------------------------------------
-//  The outer face steps out by clamp_root over the last clamp_root mm before the
-//  rear face, and stays stepped out through the wall. That gusset is the anti-snap
-//  measure: it puts the extra material exactly where the arm broke, and because it
-//  is drawn in plan it is a wedge lying along the print axis, so it neither needs
-//  support nor changes any gripping dimension.
-function arm_plan(y_end) = [
-    [arm_x0 - clamp_root, cav_y1],          // buried in the rear wall
-    [grip_x, cav_y1],
-    [grip_x, y_end - clamp_lead_y],         // the gripping face
-    [grip_x - clamp_lead, y_end],           // relieved towards the free end
-    [arm_x0, y_end],                        // outer face, flush with the tray
-    [arm_x0, tray_depth + clamp_root],      // ... until the gusset at the root
-    [arm_x0 - clamp_root, tray_depth]
-];
+//  The outer face steps out by root mm over the last root mm before the rear face,
+//  and stays stepped out through the wall. That gusset is the anti-snap measure: it
+//  puts the extra material exactly where the arm broke, and because it is drawn in
+//  plan it is a wedge lying along the print axis, so it neither needs support nor
+//  changes any gripping dimension. It is a parameter and not a constant because the
+//  left arm cannot have one - see clamp_root_l. At root = 0 the two gusset points are
+//  left out entirely rather than allowed to collapse onto the outer face: coincident
+//  points would give round2d() a zero length edge to offset, and offset() on a
+//  degenerate polygon is not something to rely on.
+function arm_plan(y_end, root) = concat(
+    [[arm_x0 - root, cav_y1],               // buried in the rear wall
+     [grip_x, cav_y1],
+     [grip_x, y_end - clamp_lead_y],        // the gripping face
+     [grip_x - clamp_lead, y_end],          // relieved towards the free end
+     [arm_x0, y_end]],                      // outer face, flush with the tray
+    root > 0 ? [[arm_x0, tray_depth + root],  // ... until the gusset at the root
+                [arm_x0 - root, tray_depth]]
+             : []);
 
-module clamp(y_end) {
+module clamp(y_end, root) {
     translate([0, 0, clamp_z0])
         linear_extrude(height = clamp_h - clamp_z0)
-            round2d(clamp_r) polygon(arm_plan(y_end));
+            round2d(clamp_r) polygon(arm_plan(y_end, root));
 }
 
 module clamps() {
-    clamp(arm_end_l);                                   // left, at x = 0
+    clamp(arm_end_l, clamp_root_l);                     // left, at x = 0
     translate([tray_width, 0, 0]) scale([-1, 1, 1])     // right, mirrored
-        clamp(arm_end_r);
+        clamp(arm_end_r, clamp_root_r);
 }
 
 // ---------------------------------------------------------------------------

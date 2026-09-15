@@ -114,6 +114,7 @@ derived from:
 | Grey printed socle, width | 76 mm |
 | Grey printed socle, height above the teak plate | 22 mm |
 | Grey printed socle, depth backwards | not measured, "a lot", around 76 mm |
+| Channel between the socle and the display foot, on the left | **3.38 mm** (`foot_gap_l`). The tightest dimension on the rig – see [The display foot](#the-display-foot-which-is-tighter-than-anything-in-the-file). |
 | Teak plate, thickness | 19 mm |
 | Teak plate, top surface over the table | 20.6 mm (`plate_height`, fitted with the gauge) |
 | Teak plate, plan | 200 × 200 mm with all four corners cut at 45°, leaving a short edge of about 37 mm – an octagon. The tray sits centred on the middle of the front edge, which stays flat for about 148 mm, so the corner cuts are nowhere near it. Only the ghost in `mode = "check"` cares. |
@@ -165,7 +166,7 @@ the arc does this job better – see above.*
 
 The thing worth reaching around is the **grey printed socle** that carries the
 sensor: a block 76 mm wide standing 22 mm up from the teak plate, right behind the
-tray. Two fins 3.2 mm thick reach backwards from the rear face, one along each
+tray. Two fins 2.8 mm thick reach backwards from the rear face, one along each
 side of it.
 
 They started life as spring arms that clamped the socle, and they are **not that
@@ -201,19 +202,20 @@ Three changes follow, and the file makes all three:
 1. **Take the interference away.** `clamp_squeeze` −0.1 → **−0.4**, the extra
    0.3 mm asked for. An arm that never touches anything is never stressed, and
    0.2 mm of air per side is still far inside the sideways slop that would matter.
-2. **Thicken the arm.** `clamp_t` 2.05 → **3.2 mm**. Against a *load* – a knock, a
+2. **Thicken the arm.** `clamp_t` 2.05 → **2.8 mm**. Against a *load* – a knock, a
    hand, catching the rig on the way in – stress goes as 1/thickness², so this
    cuts it by more than half. Note that it only helps *because* of (1): if the arm
    were still being forced apart by a fixed distance, a thicker arm would see
    **more** stress, not less, because for an imposed deflection stress goes as
    thickness × deflection. Thickness and clearance are not independent knobs.
-3. **Flare the root.** `clamp_root` = **2.5 mm** adds a 45° gusset where the arm
+3. **Flare the root.** `clamp_root_r` = **2.5 mm** adds a 45° gusset where the arm
    leaves the rear face – the point of largest bending moment, and previously a
    sharp inside corner that concentrated it further. It can only go on the *outer*
    face, since the guiding face has to stay flat over its whole length, so the arm
-   is 5.7 mm thick at the root tapering to 3.2 mm over the first 2.5 mm. It is
+   is 5.3 mm thick at the root tapering to 2.8 mm over the first 2.5 mm. It is
    free to print: drawn in plan, the gusset is a wedge lying along the print axis,
-   no overhang and no support.
+   no overhang and no support. **Only the right arm gets one** – see the next
+   section for the reason.
 
 If you print in PETG instead this is all less pressing – PETG layer adhesion is
 much better than PLA+'s – but the geometry costs nothing either way.
@@ -232,19 +234,56 @@ The arms are **no longer flush with the sides**. They were, back when the body w
 80 mm and the socle 76: 2.05 mm of thickness landed exactly in the 2 mm step on
 each side. At 90 mm the same rule would demand a 7 mm slab, so the two are
 decoupled – `clamp_t` is the thickness the fin needs, and the arms sit 3.6 mm in
-from the sides of the body wherever the socle puts them. That set-in is also the
-ceiling on the arm: the gusset has to stay inside the width of the tray, which
-caps `clamp_t + clamp_root` at 7 mm, so `clamp_t` cannot go past about 4.3 mm at
-`clamp_root` = 2.5. An assert says so.
+from the sides of the body wherever the socle puts them (3.2 mm as it stands). That
+set-in is one ceiling on the arm: the gusset has to stay inside the width of the tray,
+which caps `clamp_t + clamp_root_r` at 7 mm. But it is no longer the binding one – see
+the display foot, next.
+
+### The display foot, which is tighter than anything in the file
+
+The anti-snap change above went onto the rig and **would not go on**. The reason had
+nothing to do with the tray: on the left of the socle, seen from the front, the foot of
+the display stands on the teak plate, and the left arm has to thread between it and the
+side of the socle. That channel is **3.38 mm** wide, measured on the rig, and it is the
+tightest dimension in the whole design.
+
+| | |
+|---|---|
+| Channel, socle side face to display foot | 3.38 mm (`foot_gap_l`, measured) |
+| The old 2.05 mm arm | 0.2 mm slip air + 2.05 mm arm = 2.25 mm. Fitted, with 1.13 mm to spare. |
+| The 3.2 mm arm | 0.2 + 3.2 = **3.40 mm in a 3.38 mm gap.** Over by 0.02 mm – which is exactly why it *nearly* went on. |
+| … with the 2.5 mm gusset | 0.2 + 3.2 + 2.5 = **5.90 mm.** Not close. |
+| Now | 0.2 + 2.8 = 3.00 mm, leaving `foot_clear_l` = 0.3 mm of air |
+
+Two things changed, and `foot_gap_l` is now a parameter with an `assert` behind it, so
+this particular surprise cannot happen twice:
+
+- `clamp_t` 3.2 → **2.8 mm**. Still 37 % more arm than the 2.05 that broke, and
+  thickness matters much less now that change (1) has removed the interference
+  altogether – the arm is not being held bent at all.
+- The gusset is **per side**: `clamp_root_l` = 0, `clamp_root_r` = 2.5. It grows on the
+  outer face, and on the left that face is the one pointing at the display foot, so a
+  gusset there is 2.5 mm of pure interference. Losing it on the left is a smaller loss
+  than it looks – the gusset was measure (3) of three, and (1) is the one that actually
+  stops the arm being stressed.
+
+**The body of the tray is not affected and never was.** It is 7 mm wider than the socle
+on each side, but it sits entirely in *front* of the socle, and the display foot only
+obstructs the strip alongside it. So `tray_width` stays at 90 and the label keeps its
+room.
+
+There is no corresponding obstruction on the right, which is why the right arm keeps
+its gusset. If the display moves, raise `clamp_root_l` and the assert will tell you
+whether it fits.
 
 | | |
 |---|---|
 | Guiding faces | x = 6.8 and 83.2, i.e. an opening of 76.4 mm on the 76 mm socle: 0.2 mm of clearance per side |
-| Arm | 3.2 mm thick, 5.7 mm at the flared root, 17.5 mm tall, 18 mm free length on the right, 14 mm on the left |
+| Arm | 2.8 mm thick, 5.3 mm at the flared root on the right and unflared on the left, 17.5 mm tall, 18 mm free length on the right, 14 mm on the left |
 | Mouth at the free end | 78.4 mm, relieved `clamp_lead` = 1.0 mm per side so the front corners of the socle guide the tray in instead of catching on the arm tips, closing in over the last 6 mm |
 | Bottom of the arm | 1.5 mm above the plate (`clamp_z0`), to clear any fillet or elephant foot at the base of the socle |
 | Top of the arm | 19 mm = `tray_height - edge_r`; any higher and the rounding of the rim would thin the arm to a knife edge |
-| If you do put interference back | as an isotropic leaf spring, `k = 3EI/L³` with `I = b·t³/12` gives about 50 N/mm on the 18 mm arm in PETG at 3.2 mm thick, half again as much in PLA+, and stiffness goes as 1/length³ so the short 14 mm arm is 2.1 times stiffer again. **But the arm is not isotropic** – see the section above on why one of them split at a layer boundary. Treat these numbers as an upper bound on what the arm can take, not a design target. |
+| If you do put interference back | as an isotropic leaf spring, `k = 3EI/L³` with `I = b·t³/12` gives about 33 N/mm on the 18 mm arm in PETG at 2.8 mm thick, half again as much in PLA+, and stiffness goes as 1/length³ so the short 14 mm arm is 2.1 times stiffer again. **But the arm is not isotropic** – see the section above on why one of them split at a layer boundary. Treat these numbers as an upper bound on what the arm can take, not a design target. |
 
 ## Rounded edges, and why not `minkowski()`
 
@@ -314,7 +353,7 @@ solid contact with the bed, and the floor and the walls of the trough are printe
 as one continuous outline in every single layer, so the corner where they meet is
 not a layer boundary the coffee can seep through. The two arms end up as the last
 14 and 18 mm of the print: two fins standing on the rear face, each with a
-3.2 × 17.5 mm footprint (5.7 mm at the flared root). They print fine, but slow the last layers down if your slicer does not
+2.8 × 17.5 mm footprint (5.3 mm at the flared root on the right). They print fine, but slow the last layers down if your slicer does not
 do it by itself.
 
 Only two surfaces face the bed in this orientation:
@@ -583,7 +622,7 @@ Four cheap prints, in the order they are worth making:
 | `mode` | Cost | What it tells you |
 |---|---|---|
 | `"gauge"` | 3 g | The whole cross section as a 2 mm slice, lying flat. Hook it on the front edge of the plate: does the leg reach the table, does the tongue clear whatever is under the plate, is there air left up to the grey cup? |
-| `"gauge_rear"` | 3 g | A 2.5 mm slice at the top of the tray – whatever closes the rear off, already lying flat. On the box base a ring of wall plus both arms, held apart at the right spacing: do they straddle the socle, does the mouth find it, is there room beside it for a 3.2 mm arm? It was 1.5 mm at first, too floppy to say anything at all – it simply splayed out. On the round base the back of the ring is the full concave arc: lay it against the curved base and see whether the radius is right and it touches all the way along instead of rocking on the middle. `"gauge_clamp"` still works as a name for it. |
+| `"gauge_rear"` | 3 g | A 2.5 mm slice at the top of the tray – whatever closes the rear off, already lying flat. On the box base a ring of wall plus both arms, held apart at the right spacing: do they straddle the socle, does the mouth find it, is there room beside it for a 2.8 mm arm, and does the left one clear the display foot? It was 1.5 mm at first, too floppy to say anything at all – it simply splayed out. On the round base the back of the ring is the full concave arc: lay it against the curved base and see whether the radius is right and it touches all the way along instead of rocking on the middle. `"gauge_clamp"` still works as a name for it. |
 | `"gauge_label"` | 10 g the pair | The front 2.4 mm of the tray as a flat plate: the whole label at full size, in the same wall thickness it has on the real thing. Print it with `"print_white"`, unchanged, as its white half – the inlay is only 0.6 mm deep, so it fits the gauge as well as the tray. This is the one to make **before** committing 67 g to a two colour tray: does the white land in the recess, does the slicer draw a 1.3 mm line at all, and is the result readable from across the room? |
 | `"clip"` | 26 g box, 31 g round | The rear of the tray, `clip_back` = 12 mm in front of the rear wall, standing on the cut face – on the box base that is the rear 12 mm plus both complete arms, on the round base the whole 24.5 mm that the arc spans (measuring 12 mm back from the *corners* would cut the centreline away and leave two wings). The only test that shows how the tray really goes on and comes off, but it costs a third of a tray, so it is only worth it if `"gauge_rear"` leaves you unsure. |
 
@@ -597,7 +636,7 @@ Four cheap prints, in the order they are worth making:
 | Support | none |
 | Bed | **60 °C**, not the slicer default of 40 °C |
 | Brim | not needed – the first layer is the whole front face |
-| Walls | at least 3 perimeters, so the 2.4 mm walls and the 3.2 mm arms come out solid |
+| Walls | at least 3 perimeters, so the 2.4 mm walls and the 2.8 mm arms come out solid |
 | Cooling | fan flat out over the 35° rear ramp – that is the one surface that cares |
 
 ### Running the two colour print, step by step
@@ -777,7 +816,8 @@ less than 1.2 mm of front wall, or if a fillet or chamfer is too large for the
 feature it is supposed to break. On the box base it also checks that no arm – including its
 flared root, which is the widest part of it – ends up outside the side of the tray,
 taller than the socle, into the rounding of the rim or past the back of the socle,
-that the gusset is not longer than the short arm, and that the mouth of the arms is
+that neither gusset is longer than its own arm, that the left arm clears the display
+foot, and that the mouth of the arms is
 not narrower than the socle. On the round base it checks instead that the arc is a large enough radius to
 reach the sides at all, that the tray is not wider than the curved part of the base,
 that the revolved ramp leaves a flat floor, and that the rim clears the underside of
