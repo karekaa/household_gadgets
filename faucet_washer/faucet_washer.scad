@@ -7,9 +7,9 @@
 // Author:      Kjell Arne Rekaa, 2026-11-03
 ///////////////////////////////////////////////////////////////////////////////
 
-washer_height        = 4;
-outer_diameter       = 56;
-hole_diameter        = 30;
+washer_height        = 5;
+outer_diameter       = 69;
+hole_diameter        = 31;
 cut_through_overlap  = 1;
 
 $fn = 180;
